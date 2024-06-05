@@ -5,6 +5,8 @@ import { RidersModule } from './riders/riders.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongoDBConfigService } from './config/database/mongodb.config';
+import { SponsorsController } from './sponsors/sponsors.controller';
+import { SponsorsModule } from './sponsors/sponsors.module';
 
 @Module({
   imports: [
@@ -25,8 +27,9 @@ import { MongoDBConfigService } from './config/database/mongodb.config';
       inject: [ConfigService],
     }),
     RidersModule,
+    SponsorsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, SponsorsController],
   providers: [AppService],
 })
 export class AppModule {}
