@@ -3,7 +3,11 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { RiderDocument } from "./schemas/rider.schema";
 
-import { AccountStatus, Rider } from "@kascad-app/shared-types";
+import {
+  AccountStatus,
+  registerRiderDto,
+  Rider,
+} from "@kascad-app/shared-types";
 
 type RiderSearchParams = {
   [key: string]: string | number | boolean;
@@ -29,15 +33,10 @@ export class RidersService {
     return await this._riderModel.findById(id);
   }
 
-  // async create({ email }: { email: string }): Promise<Rider> {
-  //   const rider: RiderDocument = await this._riderModel.create({
-  //     username,
-  //     email,
-  //     password,
-  //     role: 1,
-  //   });
-  //   return rider.save();
-  // }
+  async create(registerDto: registerRiderDto): Promise<Rider> {
+    const rider: RiderDocument = await this._riderModel.create(registerDto);
+    return rider.save();
+  }
 
   async updateOne(id: string, rider: Partial<Rider>) {
     return await this._riderModel.findByIdAndUpdate(id, rider, { new: true });
