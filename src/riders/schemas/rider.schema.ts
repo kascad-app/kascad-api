@@ -10,15 +10,15 @@ import {
   ProfileType,
   ProfileRole,
   AccountStatus,
-} from '@kascad-app/shared-types';
-import * as bcrypt from 'bcrypt';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import type { HydratedDocument } from 'mongoose';
-import { ProfileStatus } from 'src/config/database/base.schema';
+} from "@kascad-app/shared-types";
+import * as bcrypt from "bcrypt";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import type { HydratedDocument } from "mongoose";
+import { ProfileStatus } from "src/config/database/base.schema";
 
 const SALT_ROUNDS = 12;
 
-export type UserDocument = HydratedDocument<
+export type RiderDocument = HydratedDocument<
   Rider & {
     // generateAccountValidationToken: (_size: number) => Promise<string>;
     getEncryptedPassword: (_password: string) => Promise<string>;
@@ -177,15 +177,15 @@ RiderSchema.methods.compareEncryptedPassword = function (password: string) {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-RiderSchema.pre('save', async function (next: any) {
+RiderSchema.pre("save", async function (next: any) {
   this.createdAt = new Date();
   this.status = {
     status: AccountStatus.ACTIVE,
     onboardingCompleted: false,
   };
 
-  if (this.isModified('password')) {
-    this.password = await (this as UserDocument).getEncryptedPassword(
+  if (this.isModified("password")) {
+    this.password = await (this as RiderDocument).getEncryptedPassword(
       this.password,
     );
   }
@@ -194,7 +194,7 @@ RiderSchema.pre('save', async function (next: any) {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-RiderSchema.pre('updateOne', function (next: any) {
+RiderSchema.pre("updateOne", function (next: any) {
   this.updateOne({}, { $set: { updatedAt: new Date() } });
   next();
 });
