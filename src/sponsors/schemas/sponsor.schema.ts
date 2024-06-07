@@ -81,7 +81,7 @@ class SponsorPreferences implements SponsorPreferencesType {
   },
   id: true,
 })
-class Sponsor implements ISponsor {
+export class Sponsor implements ISponsor {
   _id: string;
 
   identifier: SponsorIdentifier;
@@ -150,6 +150,7 @@ function transformValue(_: unknown, ret: { [key: string]: any }) {
   delete ret.password;
 }
 
+export type SponsorDocument = Sponsor & Document;
 export const SponsorSchema = SchemaFactory.createForClass<Sponsor>(Sponsor);
 
 SponsorSchema.methods.getEncryptedPassword = (

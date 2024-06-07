@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SponsorsController } from './sponsors.controller';
-import { SponsorsService } from './sponsors.service';
 import { SponsorSchema } from './schemas/sponsor.schema';
 import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongoDBConfigService } from 'src/config/database/mongodb.config';
+import { SponsorsService } from './sponsors.service';
 import MongoDBConnection from 'src/common/constants/mongoDbConnections';
 
 @Module({
@@ -15,7 +15,7 @@ import MongoDBConnection from 'src/common/constants/mongoDbConnections';
     }),
     MongooseModule.forFeature([
       {
-        name: 'Sponsors',
+        name: 'Sponsor',
         schema: SponsorSchema,
         collection: MongoDBConnection.SPONSORS,
       },
@@ -23,5 +23,6 @@ import MongoDBConnection from 'src/common/constants/mongoDbConnections';
   ],
   controllers: [SponsorsController],
   providers: [SponsorsService],
+  exports: [SponsorsService],
 })
 export class SponsorsModule {}
