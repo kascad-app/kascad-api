@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongoDBConfigService } from './config/database/mongodb.config';
 import { SponsorsController } from './sponsors/sponsors.controller';
 import { SponsorsModule } from './sponsors/sponsors.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SponsorsModule } from './sponsors/sponsors.module';
     }),
     RidersModule,
     SponsorsModule,
+    AuthModule,
   ],
   controllers: [AppController, SponsorsController],
   providers: [AppService],
