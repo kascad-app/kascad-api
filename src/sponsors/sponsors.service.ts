@@ -1,30 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Sponsor, SponsorDocument } from './schemas/sponsor.schema';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { SponsorDocument, Sponsor } from "./schemas/sponsor.schema";
+import { registerSponsorDto } from "@kascad-app/shared-types";
 
 @Injectable()
 export class SponsorsService {
   constructor(
-    @InjectModel('Sponsor') private sponsorModel: Model<SponsorDocument>,
+    @InjectModel("Sponsor") private sponsorModel: Model<SponsorDocument>,
   ) {}
 
   // Vos méthodes de service ici
   async findAll(): Promise<Sponsor[]> {
-    return this.sponsorModel.find().exec();
+    return await this.sponsorModel.find().exec();
   }
 
   async findOne(id: string): Promise<Sponsor> {
-    return this.sponsorModel.findById(id).exec();
+    return await this.sponsorModel.findById(id).exec();
   }
 
-  async create(createSponsorDto): Promise<Sponsor> {
+  async create(createSponsorDto: registerSponsorDto): Promise<Sponsor> {
     const newSponsor = new this.sponsorModel(createSponsorDto);
-    return newSponsor.save();
+    return await newSponsor.save();
   }
 
-  async update(id: string, updateSponsorDto): Promise<Sponsor> {
-    return this.sponsorModel
+  async compareEncryptedPassword(
+    sponsorId: string,
+    password: string,
+  ): Promise<boolean> {
+    const sponsor = await this.sponsorModel.findById(sponsorId).exec();
+
+    return sponsor.compareEncryptedPassword(password);
+  }
+
+  async update(id: string, updateSponsorDto: Sponsor): Promise<Sponsor> {
+    return await this.sponsorModel
       .findByIdAndUpdate(id, updateSponsorDto, { new: true })
       .exec();
   }

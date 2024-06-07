@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@kascad-app/shared-types':
-        specifier: ^1.2.3
-        version: 1.2.3
+        specifier: ^1.2.6
+        version: 1.2.6
       '@nestjs/common':
         specifier: ^10.3.9
         version: 10.3.9(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -466,8 +466,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@kascad-app/shared-types@1.2.3':
-    resolution: {integrity: sha512-4LqJgYHkHWDvvfjsmXLA0H5B7WBcs/o3RJUaMSGDVupOdmTQLjfNaozXjnyncQo1GhSMsu7A/nBrPotcEPZoug==, tarball: https://npm.pkg.github.com/download/@kascad-app/shared-types/1.2.3/b3e791218d3953917452311de05b1d77af34663e}
+  '@kascad-app/shared-types@1.2.6':
+    resolution: {integrity: sha512-eHIDwlMs8nlF5hhvIEZ3Q23/Kak57RVuAxKl6hawbiJ8CvA40fIQXnTP4GT+TQUrZPMet9eHEZ+70+m+kYfE8g==, tarball: https://npm.pkg.github.com/download/@kascad-app/shared-types/1.2.6/99fffe1ebf1f09ead60bf8730d40dafe067829bf}
 
   '@ljharb/through@2.3.13':
     resolution: {integrity: sha512-/gKJun8NNiWGZJkGzI/Ragc53cOdcLNdzjLaIa+GEjguQs0ulsurx8WN0jijdK9yPqDvziX995sMRLyLt1uZMQ==}
@@ -1377,8 +1377,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.4.794:
-    resolution: {integrity: sha512-6FApLtsYhDCY0Vglq3AptsdxQ+PJLc6AxlAM0HjEihUAiOPPbkASEsq9gtxUeZY9o0sJIEa3WnF0vVH4VT4iug==}
+  electron-to-chromium@1.4.795:
+    resolution: {integrity: sha512-hHo4lK/8wb4NUa+NJYSFyJ0xedNHiR6ylilDtb8NUW9d4dmBFmGiecYEKCEbti1wTNzbKXLfl4hPWEkAFbHYlw==}
 
   emittery@0.13.1:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
@@ -3798,7 +3798,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@kascad-app/shared-types@1.2.3': {}
+  '@kascad-app/shared-types@1.2.6': {}
 
   '@ljharb/through@2.3.13':
     dependencies:
@@ -4539,7 +4539,7 @@ snapshots:
   browserslist@4.23.0:
     dependencies:
       caniuse-lite: 1.0.30001629
-      electron-to-chromium: 1.4.794
+      electron-to-chromium: 1.4.795
       node-releases: 2.0.14
       update-browserslist-db: 1.0.16(browserslist@4.23.0)
 
@@ -4817,7 +4817,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-to-chromium@1.4.794: {}
+  electron-to-chromium@1.4.795: {}
 
   emittery@0.13.1: {}
 

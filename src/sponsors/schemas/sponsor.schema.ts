@@ -10,15 +10,15 @@ import {
   ProfileType,
   ProfileRole,
   AccountStatus,
-} from '@kascad-app/shared-types';
-import * as bcrypt from 'bcrypt';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import type { HydratedDocument } from 'mongoose';
-import { ProfileStatus } from 'src/config/database/base.schema';
+} from "@kascad-app/shared-types";
+import * as bcrypt from "bcrypt";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import type { HydratedDocument } from "mongoose";
+import { ProfileStatus } from "src/config/database/base.schema";
 
 const SALT_ROUNDS = 12;
 
-export type UserDocument = HydratedDocument<
+export type SponsorDocument = HydratedDocument<
   Sponsor & {
     // generateAccountValidationToken: (_size: number) => Promise<string>;
     getEncryptedPassword: (_password: string) => Promise<string>;
@@ -150,7 +150,6 @@ function transformValue(_: unknown, ret: { [key: string]: any }) {
   delete ret.password;
 }
 
-export type SponsorDocument = Sponsor & Document;
 export const SponsorSchema = SchemaFactory.createForClass<Sponsor>(Sponsor);
 
 SponsorSchema.methods.getEncryptedPassword = (
@@ -164,15 +163,15 @@ SponsorSchema.methods.compareEncryptedPassword = function (password: string) {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-SponsorSchema.pre('save', async function (next: any) {
+SponsorSchema.pre("save", async function (next: any) {
   this.createdAt = new Date();
   this.status = {
     status: AccountStatus.ACTIVE,
     onboardingCompleted: false,
   };
 
-  if (this.isModified('password')) {
-    this.password = await (this as UserDocument).getEncryptedPassword(
+  if (this.isModified("password")) {
+    this.password = await (this as SponsorDocument).getEncryptedPassword(
       this.password,
     );
   }
@@ -181,7 +180,7 @@ SponsorSchema.pre('save', async function (next: any) {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-SponsorSchema.pre('updateOne', function (next: any) {
+SponsorSchema.pre("updateOne", function (next: any) {
   this.updateOne({}, { $set: { updatedAt: new Date() } });
   next();
 });
