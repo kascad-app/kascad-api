@@ -42,6 +42,15 @@ export class RidersService {
     return await this._riderModel.findByIdAndUpdate(id, rider, { new: true });
   }
 
+  async compareEncryptedPassword(
+    riderId: string,
+    password: string,
+  ): Promise<boolean> {
+    const user = await this._riderModel.findById(riderId).exec();
+
+    return user.compareEncryptedPassword(password);
+  }
+
   async suspend(id: string, reason: string) {
     const since = new Date();
 
