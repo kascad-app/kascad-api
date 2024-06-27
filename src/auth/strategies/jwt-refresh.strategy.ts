@@ -5,14 +5,14 @@ import { Request as RequestType } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
+export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   "jwt-refresh",
 ) {
   constructor(_configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        RefreshTokenStrategy.extractJWT,
+        JwtRefreshStrategy.extractJWT,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,

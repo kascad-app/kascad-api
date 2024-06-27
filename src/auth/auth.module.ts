@@ -5,18 +5,25 @@ import { RidersModule } from "src/riders/riders.module";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { RefreshTokenStrategy } from "./strategies/jwt-refresh.strategy";
+import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { PermissionGuard } from "./guards/permission.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthenticationGuard } from "./guards/authentication.guard";
+import { SponsorsModule } from "src/sponsors/sponsors.module";
 
 @Module({
-  imports: [RidersModule, PassportModule.register({ defaultStrategy: "jwt" })],
+  imports: [
+    RidersModule,
+    SponsorsModule,
+    PassportModule.register({ defaultStrategy: "jwt" }),
+  ],
 
   controllers: [AuthController],
   providers: [
     AuthService,
+    JwtStrategy,
+    JwtRefreshStrategy,
     {
       provide: "JwtAccessTokenService",
       inject: [ConfigService],
@@ -34,7 +41,7 @@ import { AuthenticationGuard } from "./guards/authentication.guard";
       inject: [ConfigService],
       useFactory: (configService: ConfigService): JwtService => {
         return new JwtService({
-          secret: configService.get<string>("JWT_REFRESHTOKEN_SECRET"),
+          secret: configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
           signOptions: {
             expiresIn: configService.get<number>("JWT_REFRESH_EXPIRATION_TIME"),
           },
@@ -50,7 +57,7 @@ import { AuthenticationGuard } from "./guards/authentication.guard";
       useClass: PermissionGuard,
     },
     JwtStrategy,
-    RefreshTokenStrategy,
+    JwtRefreshStrategy,
   ],
 })
 export class AuthModule {}
