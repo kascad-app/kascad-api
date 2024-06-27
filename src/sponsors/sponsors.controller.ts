@@ -22,7 +22,7 @@ export class SponsorsController {
 
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<Sponsor> {
-    return await this._sponsorsService.findOne(id);
+    return await this._sponsorsService.findById(id);
   }
 
   @Post()

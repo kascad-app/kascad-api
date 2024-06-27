@@ -15,7 +15,7 @@ export class SponsorsService {
     return await this.sponsorModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Sponsor> {
+  async findById(id: string): Promise<Sponsor> {
     return await this.sponsorModel.findById(id).exec();
   }
 
