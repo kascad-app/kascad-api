@@ -115,7 +115,10 @@ export class AuthService {
    *   Sponsor
    *
    */
-  private async registerSponsor(registerDto: registerSponsorDto) {}
+  private async registerSponsor(registerDto: registerSponsorDto) {
+    const test = {} as Sponsor;
+    return test;
+  }
 
   private async loginSponsor(loginDto: loginSponsorDto) {}
 }

@@ -1,4 +1,4 @@
-import { Profile, ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
+import { Rider, Sponsor } from "@kascad-app/shared-types";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
@@ -16,12 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   constructor(
     private _ridersService: RidersService,
     private _sponsorService: SponsorsService,
-    private readonly _configService: ConfigService,
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([JwtStrategy.extractJWT]),
-      expiresIn: _configService.get<number>("JWT_ACCESSTOKEN_EXPIRESIN"),
-      secretOrKey: _configService.get<string>("JWT_ACCESSTOKEN_SECRET"),
+      secretOrKey: configService.get<string>("JWT_ACCESSTOKEN_SECRET"),
+      expiresIn: configService.get<number>("JWT_ACCESSTOKEN_EXPIRESIN"),
     });
   }
 

@@ -11,12 +11,20 @@ import { PermissionGuard } from "./guards/permission.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthenticationGuard } from "./guards/authentication.guard";
 import { SponsorsModule } from "src/sponsors/sponsors.module";
+import { MongooseModule } from "@nestjs/mongoose";
+import MongoDBConnection from "src/common/constants/mongoDbConnections";
+import { MongoDBConfigService } from "src/config/database/mongodb.config";
 
 @Module({
   imports: [
     RidersModule,
     SponsorsModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
+    MongooseModule.forRootAsync({
+      useClass: MongoDBConfigService,
+      inject: [ConfigService],
+      connectionName: MongoDBConnection.AUTH,
+    }),
   ],
 
   controllers: [AuthController],
