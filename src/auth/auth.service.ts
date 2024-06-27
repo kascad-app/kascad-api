@@ -4,20 +4,24 @@ import {
   registerRiderDto,
   registerSponsorDto,
   Rider,
+  Sponsor,
 } from "@kascad-app/shared-types";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { RidersService } from "src/riders/riders.service";
 import * as bcrypt from "bcrypt";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { JwtService } from "@nestjs/jwt";
+
+type User = Rider | Sponsor;
 
 @Injectable()
 export class AuthService {
   constructor(
     private _ridersService: RidersService,
-    // @Inject("JwtAccessTokenService")
-    // private readonly _accessTokenService: JwtService,
-    // @Inject("JwtRefreshTokenService")
-    // private readonly _refreshTokenService: JwtService,
+    @Inject("JwtAccessTokenService")
+    private readonly _accessTokenService: JwtService,
+    @Inject("JwtRefreshTokenService")
+    private readonly _refreshTokenService: JwtService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -36,11 +40,41 @@ export class AuthService {
       : this.loginSponsor(loginDto);
   }
 
+  async generateAccessToken(user: User): Promise<string> {
+    return this._accessTokenService.sign(
+      {
+        user: user._id,
+        accountType: user.type,
+      },
+      {
+        subject: user._id,
+      },
+    );
+  }
+
+  async generateRefreshToken(user: User): Promise<string> {
+    return this._refreshTokenService.sign(
+      {
+        user: user._id,
+        accountType: user.type,
+      },
+      {
+        subject: user._id,
+      },
+    );
+  }
+
   /**
    *
    *--------------------------------------------------
    * ---------------- PRIVATE METHODS ----------------
    *--------------------------------------------------
+   *
+   */
+
+  /**
+   *
+   *   RIDERS
    *
    */
 
@@ -54,8 +88,6 @@ export class AuthService {
 
     return await this._ridersService.create(registerDto);
   }
-
-  private async registerSponsor(registerDto: registerSponsorDto) {}
 
   private async loginRider(loginDto: loginRiderDto) {
     const riderExist = await this._ridersService.search({
@@ -77,6 +109,13 @@ export class AuthService {
 
     return rider;
   }
+
+  /**
+   *
+   *   Sponsor
+   *
+   */
+  private async registerSponsor(registerDto: registerSponsorDto) {}
 
   private async loginSponsor(loginDto: loginSponsorDto) {}
 }
