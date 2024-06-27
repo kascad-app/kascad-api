@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@fastify/cookie": "^9.3.1",
     "@kascad-app/shared-types": "^1.2.6",
     "@nestjs/common": "^10.3.9",
     "@nestjs/config": "^3.2.2",
@@ -31,6 +32,7 @@
     "@nestjs/platform-fastify": "^10.3.9",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
+    "fastify": "^4.28.0",
     "mongoose": "^8.4.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
