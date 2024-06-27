@@ -31,7 +31,7 @@ import { AuthModule } from "./auth/auth.module";
     SponsorsModule,
     AuthModule,
   ],
-  controllers: [AppController, SponsorsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
