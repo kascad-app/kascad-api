@@ -39,7 +39,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
         return new JwtService({
           secret: configService.get<string>("JWT_ACCESSTOKEN_SECRET"),
           signOptions: {
-            expiresIn: configService.get<number>("JWT_ACCESSTOKEN_EXPIRESIN"),
+            expiresIn: configService.get<string>("JWT_ACCESSTOKEN_EXPIRESIN"),
           },
         });
       },
@@ -51,7 +51,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
         return new JwtService({
           secret: configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
           signOptions: {
-            expiresIn: configService.get<number>("JWT_REFRESH_EXPIRATION_TIME"),
+            expiresIn: configService.get<string>("JWT_REFRESH_TOKEN_EXPIRESIN"),
           },
         });
       },

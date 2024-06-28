@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from "@nestjs/common";
+import { Body, Controller, Logger, Post, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import { registerRiderDto, registerSponsorDto } from "@kascad-app/shared-types";
@@ -21,14 +21,14 @@ export class AuthController {
       secure: true,
       sameSite: "none",
       path: "/",
-      maxAge: this._configService.get<number>("JWT_ACCESSTOKEN_EXPIRESIN"),
+      maxAge: eval(this._configService.get<string>("JWT_ACCESSTOKEN_MAXAGE")),
     },
     refreshToken: {
       httpOnly: true,
       secure: true,
       sameSite: "none",
       path: "/auth/refresh-token",
-      maxAge: this._configService.get<number>("JWT_REFRESH_EXPIRATION_TIME"),
+      maxAge: eval(this._configService.get<string>("JWT_REFRESH_TOKEN_MAXAGE")),
     },
   };
 
@@ -37,17 +37,26 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() registerDto: registerRiderDto | registerSponsorDto,
   ) {
-    const response = await this._authService.register(registerDto);
+    const result = await this._authService.register(registerDto);
 
-    if (response instanceof BadRequest) {
-      throw response;
+    if (result instanceof BadRequest) {
+      throw result;
     }
+    res.setCookie(
+      "access-token",
+      await this._authService.generateAccessToken(result),
+      this.cookieSerializeOptions.accessToken,
+    );
 
-    console.log(typeof response);
+    res.setCookie(
+      "refresh-token",
+      await this._authService.generateRefreshToken(result),
+      this.cookieSerializeOptions.refreshToken,
+    );
 
     return {
       success: true,
-      data: response,
+      data: result,
     };
   }
 }

@@ -17,7 +17,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       ]),
       ignoreExpiration: false,
       secretOrKey: _configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
-      expiresIn: _configService.get<number>("JWT_REFRESH_EXPIRATION_TIME"),
+      // expiresIn: _configService.get<number>("JWT_REFRESH_TOKEN_EXPIRESIN"),
       passReqToCallback: true,
     });
   }

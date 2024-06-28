@@ -41,27 +41,17 @@ export class AuthService {
   }
 
   async generateAccessToken(user: User): Promise<string> {
-    return this._accessTokenService.sign(
-      {
-        user: user._id,
-        accountType: user.type,
-      },
-      {
-        subject: user._id,
-      },
-    );
+    return this._accessTokenService.sign({
+      user: user._id,
+      accountType: user.type,
+    });
   }
 
   async generateRefreshToken(user: User): Promise<string> {
-    return this._refreshTokenService.sign(
-      {
-        user: user._id,
-        accountType: user.type,
-      },
-      {
-        subject: user._id,
-      },
-    );
+    return this._refreshTokenService.sign({
+      user: user._id,
+      accountType: user.type,
+    });
   }
 
   /**
