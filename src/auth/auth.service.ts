@@ -70,7 +70,7 @@ export class AuthService {
 
   private async registerRider(registerDto: registerRiderDto) {
     const isRiderExist: Rider[] = await this._ridersService.search({
-      email: registerDto.email,
+      "identifier.email": registerDto.email,
     });
 
     if (isRiderExist && isRiderExist.length > 0)
