@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
   APIResponse,
+  loginRiderDto,
   registerRiderDto,
   registerSponsorDto,
   StatusCode,
@@ -66,7 +67,33 @@ export class AuthController {
   }
 
   @Post("login")
-  async login() {}
+  async login(
+    @Res({ passthrough: true }) res: FastifyReply,
+    @Body() data: loginRiderDto | registerSponsorDto,
+  ) {
+    const result = await this._authService.login(data);
+
+    if (result instanceof BadRequest) {
+      throw result;
+    }
+
+    res.setCookie(
+      "access-token",
+      await this._authService.generateAccessToken(result),
+      this.cookieSerializeOptions.accessToken,
+    );
+
+    res.setCookie(
+      "refresh-token",
+      await this._authService.generateRefreshToken(result),
+      this.cookieSerializeOptions.refreshToken,
+    );
+
+    return {
+      success: true,
+      data: result,
+    };
+  }
 
   @Post("logout")
   @HttpCode(StatusCode.SuccessNoContent)

@@ -110,5 +110,8 @@ export class AuthService {
     return test;
   }
 
-  private async loginSponsor(loginDto: loginSponsorDto) {}
+  private async loginSponsor(loginDto: loginSponsorDto) {
+    const test = {} as Sponsor;
+    return test;
+  }
 }
