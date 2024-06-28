@@ -1,7 +1,12 @@
-import { Body, Controller, Logger, Post, Res } from "@nestjs/common";
+import { Body, Controller, HttpCode, Logger, Post, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
-import { registerRiderDto, registerSponsorDto } from "@kascad-app/shared-types";
+import {
+  APIResponse,
+  registerRiderDto,
+  registerSponsorDto,
+  StatusCode,
+} from "@kascad-app/shared-types";
 import { CookieSerializeOptions } from "@fastify/cookie";
 import { FastifyReply } from "fastify";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
@@ -57,6 +62,28 @@ export class AuthController {
     return {
       success: true,
       data: result,
+    };
+  }
+
+  @Post("login")
+  async login() {}
+
+  @Post("logout")
+  @HttpCode(StatusCode.SuccessNoContent)
+  async signOut(
+    @Res({ passthrough: true }) res: FastifyReply,
+  ): Promise<APIResponse> {
+    res.clearCookie("access-token", {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.clearCookie("refresh-token", {
+      httpOnly: true,
+      maxAge: 0,
+    });
+
+    return {
+      success: true,
     };
   }
 }
