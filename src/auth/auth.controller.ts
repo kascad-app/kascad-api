@@ -1,16 +1,33 @@
-import { Body, Controller, HttpCode, Logger, Post, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Logger,
+  Post,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
   APIResponse,
+  APIResponsePromise,
   loginRiderDto,
   registerRiderDto,
   registerSponsorDto,
+  Rider,
+  Sponsor,
   StatusCode,
+  UnknowProfile,
 } from "@kascad-app/shared-types";
 import { CookieSerializeOptions } from "@fastify/cookie";
 import { FastifyReply } from "fastify";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
+import { Logged } from "src/common/decorators/logged.decorator";
+import { User } from "src/common/decorators/user.decorator";
+import { emit } from "process";
+
 @Controller("auth")
 export class AuthController {
   constructor(
@@ -92,6 +109,30 @@ export class AuthController {
     return {
       success: true,
       data: result,
+    };
+  }
+
+  @Post("refresh-token")
+  @UseGuards(RefreshAuthGuard)
+  @Logged()
+  async refreshToken(
+    @Res({ passthrough: true }) res: FastifyReply,
+    @User() user: UnknowProfile,
+  ) {
+    res.cookie(
+      "access-token",
+      await this._authService.generateAccessToken(user),
+      this.cookieSerializeOptions.accessToken,
+    );
+    res.cookie(
+      "refresh-token",
+      await this._authService.generateRefreshToken(user),
+      this.cookieSerializeOptions.refreshToken,
+    );
+
+    return {
+      success: true,
+      data: user,
     };
   }
 
