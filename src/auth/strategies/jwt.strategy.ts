@@ -34,9 +34,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
 
   async validate(payload: JwtToken): Promise<Rider | Sponsor> {
     if (payload.accountType === "rider") {
-      return await this._ridersService.findById(payload.sub);
+      return await this._ridersService.findById(payload.user);
     } else {
-      return await this._sponsorService.findById(payload.sub);
+      return await this._sponsorService.findById(payload.user);
     }
   }
 }
