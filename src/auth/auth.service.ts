@@ -119,13 +119,9 @@ export class AuthService {
   }
 
   private async loginSponsor(loginDto: loginSponsorDto) {
-    console.log("loginDto", loginDto);
-
     const isSponsorExist: Sponsor[] = await this._sponsorsService.search({
       "identifier.email": loginDto.email,
     });
-
-    console.log("isSponsorExist", isSponsorExist);
 
     if (!isSponsorExist || isSponsorExist.length === 0)
       throw new BadRequest("Sponsor not found");

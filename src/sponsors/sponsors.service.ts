@@ -21,8 +21,6 @@ export class SponsorsService {
         $or: Object.entries(params).map(([key, value]) => ({ [key]: value })),
       };
     }
-    console.log("query", query);
-
     const sponsor: Sponsor[] = await this._sponsorModel.find(query);
     return sponsor;
   }

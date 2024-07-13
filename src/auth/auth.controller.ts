@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   HttpCode,
-  Logger,
   Post,
   Res,
   UseGuards,
@@ -11,12 +10,9 @@ import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
   APIResponse,
-  APIResponsePromise,
   loginRiderDto,
   registerRiderDto,
   registerSponsorDto,
-  Rider,
-  Sponsor,
   StatusCode,
   UnknowProfile,
 } from "@kascad-app/shared-types";
@@ -26,7 +22,6 @@ import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
-import { emit } from "process";
 
 @Controller("auth")
 export class AuthController {
@@ -88,8 +83,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() data: loginRiderDto | registerSponsorDto,
   ) {
-    console.log("data", data);
-
     const result = await this._authService.login(data);
 
     if (result instanceof BadRequest) {
