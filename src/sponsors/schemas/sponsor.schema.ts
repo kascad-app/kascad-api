@@ -1,5 +1,4 @@
 import {
-  GenderIdentity,
   type SponsorIdentity as SponsorIdentityType,
   type SponsorPreferences as SponsorPreferencesType,
   type SponsorIdentifier as SponsorIdentifierType,
@@ -30,10 +29,19 @@ export type SponsorDocument = HydratedDocument<
   _id: false,
 })
 class SponsorIdentity implements SponsorIdentityType {
+  @Prop({
+    type: String,
+  })
   companyName: string;
 
+  @Prop({
+    type: String,
+  })
   website: string;
 
+  @Prop({
+    type: String,
+  })
   logo: string;
 }
 
@@ -59,11 +67,16 @@ class SponsorIdentifier implements SponsorIdentifierType {
 class SponsorPreferences implements SponsorPreferencesType {
   sports: Sport[];
 
+  @Prop({
+    type: String,
+    default: [],
+  })
   languages: Language;
 
   @Prop({
     type: String,
     enum: Object.values(SocialNetwork),
+    default: [],
   })
   networks: SocialNetwork[];
 }
@@ -84,6 +97,9 @@ class SponsorPreferences implements SponsorPreferencesType {
 export class Sponsor implements ISponsor {
   _id: string;
 
+  @Prop({
+    type: SponsorIdentifier,
+  })
   identifier: SponsorIdentifier;
 
   @Prop({
@@ -93,10 +109,19 @@ export class Sponsor implements ISponsor {
   })
   password: string;
 
+  @Prop({
+    type: SponsorIdentity,
+  })
   identity: SponsorIdentity;
 
+  @Prop({
+    type: SponsorPreferences,
+  })
   preferences: SponsorPreferences;
 
+  @Prop({
+    default: [],
+  })
   partnerships: string[];
 
   @Prop({
@@ -105,7 +130,7 @@ export class Sponsor implements ISponsor {
   })
   type: ProfileType;
 
-  displayName: string;
+  displayName?: string;
 
   description?: string;
 
@@ -118,6 +143,9 @@ export class Sponsor implements ISponsor {
   })
   role: ProfileRole;
 
+  @Prop({
+    type: ProfileStatus,
+  })
   status: ProfileStatus;
 
   @Prop({

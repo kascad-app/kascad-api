@@ -8,6 +8,7 @@ import {
 } from "@kascad-app/shared-types";
 import { Inject, Injectable } from "@nestjs/common";
 import { RidersService } from "src/riders/riders.service";
+import { SponsorsService } from "src/sponsors/sponsors.service";
 import * as bcrypt from "bcrypt";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { JwtService } from "@nestjs/jwt";
@@ -18,6 +19,7 @@ type User = Rider | Sponsor;
 export class AuthService {
   constructor(
     private _ridersService: RidersService,
+    private _sponsorsService: SponsorsService,
     @Inject("JwtAccessTokenService")
     private readonly _accessTokenService: JwtService,
     @Inject("JwtRefreshTokenService")
@@ -81,7 +83,7 @@ export class AuthService {
 
   private async loginRider(loginDto: loginRiderDto) {
     const riderExist = await this._ridersService.search({
-      email: loginDto.email,
+      "identifier.email": loginDto.email,
     });
 
     if (!riderExist || riderExist.length === 0)
@@ -106,12 +108,38 @@ export class AuthService {
    *
    */
   private async registerSponsor(registerDto: registerSponsorDto) {
-    const test = {} as Sponsor;
-    return test;
+    const isSponsorExist: Sponsor[] = await this._sponsorsService.search({
+      "identifier.email": registerDto.email,
+    });
+
+    if (isSponsorExist && isSponsorExist.length > 0)
+      return new BadRequest("Sponsor already exists");
+
+    return await this._sponsorsService.create(registerDto);
   }
 
   private async loginSponsor(loginDto: loginSponsorDto) {
-    const test = {} as Sponsor;
-    return test;
+    console.log("loginDto", loginDto);
+
+    const isSponsorExist: Sponsor[] = await this._sponsorsService.search({
+      "identifier.email": loginDto.email,
+    });
+
+    console.log("isSponsorExist", isSponsorExist);
+
+    if (!isSponsorExist || isSponsorExist.length === 0)
+      throw new BadRequest("Sponsor not found");
+
+    const sponsor = isSponsorExist[0];
+
+    const isPasswordValid: boolean =
+      await this._sponsorsService.compareEncryptedPassword(
+        sponsor._id,
+        loginDto.password,
+      );
+
+    if (!isPasswordValid) throw new BadRequest("Incorrect password");
+
+    return sponsor;
   }
 }

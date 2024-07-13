@@ -88,6 +88,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() data: loginRiderDto | registerSponsorDto,
   ) {
+    console.log("data", data);
+
     const result = await this._authService.login(data);
 
     if (result instanceof BadRequest) {
