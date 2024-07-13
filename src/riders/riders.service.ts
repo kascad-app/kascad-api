@@ -5,8 +5,10 @@ import { RiderDocument } from "./schemas/rider.schema";
 
 import {
   AccountStatus,
+  GenderIdentity,
   registerRiderDto,
   Rider,
+  RiderIdentity,
 } from "@kascad-app/shared-types";
 
 type RiderSearchParams = {
@@ -34,12 +36,32 @@ export class RidersService {
   }
 
   async create(registerDto: registerRiderDto): Promise<Rider> {
-    const rider: RiderDocument = await this._riderModel.create(registerDto);
-    return rider.save();
+    const newRider = new this._riderModel(registerDto);
+
+    newRider.identifier = { email: registerDto.email };
+
+    newRider.identity = {
+      firstName: registerDto.firstName,
+      lastName: registerDto.lastName,
+      fullName: `${registerDto.firstName} ${registerDto.lastName}`,
+      gender: registerDto.gender,
+      birthDate: registerDto.birthDate,
+    };
+
+    return await newRider.save();
   }
 
   async updateOne(id: string, rider: Partial<Rider>) {
     return await this._riderModel.findByIdAndUpdate(id, rider, { new: true });
+  }
+
+  async compareEncryptedPassword(
+    riderId: string,
+    password: string,
+  ): Promise<boolean> {
+    const user = await this._riderModel.findById(riderId).exec();
+
+    return user.compareEncryptedPassword(password);
   }
 
   async suspend(id: string, reason: string) {

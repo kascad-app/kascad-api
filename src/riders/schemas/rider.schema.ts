@@ -30,10 +30,19 @@ export type RiderDocument = HydratedDocument<
   _id: false,
 })
 class RiderIdentity implements RiderIdentityType {
+  @Prop({
+    type: String,
+  })
   firstName: string;
 
+  @Prop({
+    type: String,
+  })
   lastName: string;
 
+  @Prop({
+    type: String,
+  })
   fullName: string;
 
   @Prop({
@@ -42,6 +51,9 @@ class RiderIdentity implements RiderIdentityType {
   })
   gender: GenderIdentity;
 
+  @Prop({
+    type: Date,
+  })
   birthDate: Date;
 }
 
@@ -71,13 +83,22 @@ class RiderIdentifier implements RiderIdentifierType {
   _id: false,
 })
 class RiderPreferences implements RiderPreferencesType {
+  @Prop({
+    type: [String],
+    default: [],
+  })
   sports: Sport[];
-
-  languages: Language;
 
   @Prop({
     type: String,
+    default: [],
+  })
+  languages: Language;
+
+  @Prop({
+    type: [String],
     enum: Object.values(SocialNetwork),
+    default: [],
   })
   networks: SocialNetwork[];
 }
@@ -98,6 +119,9 @@ class RiderPreferences implements RiderPreferencesType {
 class Rider implements IRider {
   _id: string;
 
+  @Prop({
+    type: RiderIdentifier,
+  })
   identifier: RiderIdentifier;
 
   @Prop({
@@ -107,10 +131,19 @@ class Rider implements IRider {
   })
   password: string;
 
+  @Prop({
+    type: RiderIdentity,
+  })
   identity: RiderIdentity;
 
+  @Prop({
+    type: RiderPreferences,
+  })
   preferences: RiderPreferences;
 
+  @Prop({
+    default: [],
+  })
   partnerships: string[];
 
   @Prop({
@@ -119,7 +152,7 @@ class Rider implements IRider {
   })
   type: ProfileType;
 
-  displayName: string;
+  displayName?: string;
 
   description?: string;
 
@@ -132,6 +165,9 @@ class Rider implements IRider {
   })
   role: ProfileRole;
 
+  @Prop({
+    type: ProfileStatus,
+  })
   status: ProfileStatus;
 
   @Prop({

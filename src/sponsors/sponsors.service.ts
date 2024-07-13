@@ -4,23 +4,46 @@ import { Model } from "mongoose";
 import { SponsorDocument, Sponsor } from "./schemas/sponsor.schema";
 import { registerSponsorDto } from "@kascad-app/shared-types";
 
+type SponsorSearchParams = {
+  [key: string]: string | number | boolean;
+};
+
 @Injectable()
 export class SponsorsService {
   constructor(
-    @InjectModel("Sponsor") private sponsorModel: Model<SponsorDocument>,
+    @InjectModel("Sponsor") private _sponsorModel: Model<SponsorDocument>,
   ) {}
+
+  async search(params?: SponsorSearchParams): Promise<Sponsor[]> {
+    let query = {};
+    if (params) {
+      query = {
+        $or: Object.entries(params).map(([key, value]) => ({ [key]: value })),
+      };
+    }
+    const sponsor: Sponsor[] = await this._sponsorModel.find(query);
+    return sponsor;
+  }
 
   // Vos méthodes de service ici
   async findAll(): Promise<Sponsor[]> {
-    return await this.sponsorModel.find().exec();
+    return await this._sponsorModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Sponsor> {
-    return await this.sponsorModel.findById(id).exec();
+  async findById(id: string): Promise<Sponsor> {
+    return await this._sponsorModel.findById(id).exec();
   }
 
   async create(createSponsorDto: registerSponsorDto): Promise<Sponsor> {
-    const newSponsor = new this.sponsorModel(createSponsorDto);
+    const newSponsor = new this._sponsorModel(createSponsorDto);
+    newSponsor.identifier = { email: createSponsorDto.email };
+
+    newSponsor.identity = {
+      companyName: createSponsorDto.companyName,
+      website: "",
+      logo: "",
+    };
+
     return await newSponsor.save();
   }
 
@@ -28,18 +51,18 @@ export class SponsorsService {
     sponsorId: string,
     password: string,
   ): Promise<boolean> {
-    const sponsor = await this.sponsorModel.findById(sponsorId).exec();
+    const sponsor = await this._sponsorModel.findById(sponsorId).exec();
 
     return sponsor.compareEncryptedPassword(password);
   }
 
   async update(id: string, updateSponsorDto: Sponsor): Promise<Sponsor> {
-    return await this.sponsorModel
+    return await this._sponsorModel
       .findByIdAndUpdate(id, updateSponsorDto, { new: true })
       .exec();
   }
 
   async remove(id: string): Promise<void> {
-    await this.sponsorModel.findByIdAndDelete(id).exec();
+    await this._sponsorModel.findByIdAndDelete(id).exec();
   }
 }
