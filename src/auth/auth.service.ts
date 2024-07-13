@@ -5,6 +5,7 @@ import {
   registerSponsorDto,
   Rider,
   Sponsor,
+  UnknowProfile,
 } from "@kascad-app/shared-types";
 import { Inject, Injectable } from "@nestjs/common";
 import { RidersService } from "src/riders/riders.service";
@@ -12,8 +13,6 @@ import { SponsorsService } from "src/sponsors/sponsors.service";
 import * as bcrypt from "bcrypt";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { JwtService } from "@nestjs/jwt";
-
-type User = Rider | Sponsor;
 
 @Injectable()
 export class AuthService {
@@ -42,14 +41,14 @@ export class AuthService {
       : this.loginSponsor(loginDto);
   }
 
-  async generateAccessToken(user: User): Promise<string> {
+  async generateAccessToken(user: UnknowProfile): Promise<string> {
     return this._accessTokenService.sign({
       user: user._id,
       accountType: user.type,
     });
   }
 
-  async generateRefreshToken(user: User): Promise<string> {
+  async generateRefreshToken(user: UnknowProfile): Promise<string> {
     return this._refreshTokenService.sign({
       user: user._id,
       accountType: user.type,
