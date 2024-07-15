@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Post,
-  Res,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Post, Res, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
@@ -13,7 +6,6 @@ import {
   loginRiderDto,
   registerRiderDto,
   registerSponsorDto,
-  StatusCode,
   UnknowProfile,
 } from "@kascad-app/shared-types";
 import { CookieSerializeOptions } from "@fastify/cookie";
