@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
@@ -42,6 +42,12 @@ export class AuthController {
     },
   };
 
+  @Logged()
+  @Get("me")
+  async getMe(@User() user: UnknowProfile) {
+    return user;
+  }
+
   @Post("register")
   async register(
     @Res({ passthrough: true }) res: FastifyReply,
@@ -57,6 +63,11 @@ export class AuthController {
       await this._authService.generateAccessToken(result),
       this.cookieSerializeOptions.accessToken,
     );
+
+    res.setCookie("logged-in", "true", {
+      ...this.cookieSerializeOptions.accessToken,
+      httpOnly: false,
+    });
 
     res.setCookie(
       "refresh-token",
@@ -87,11 +98,10 @@ export class AuthController {
       this.cookieSerializeOptions.accessToken,
     );
 
-    res.setCookie(
-      "logged-in",
-      true.toString(),
-      this.cookieSerializeOptions.accessToken,
-    );
+    res.setCookie("logged-in", "true", {
+      ...this.cookieSerializeOptions.accessToken,
+      httpOnly: false,
+    });
 
     res.setCookie(
       "refresh-token",
@@ -118,6 +128,11 @@ export class AuthController {
       this.cookieSerializeOptions.accessToken,
     );
 
+    res.setCookie("logged-in", "true", {
+      ...this.cookieSerializeOptions.accessToken,
+      httpOnly: false,
+    });
+
     res.setCookie(
       "refresh-token",
       await this._authService.generateRefreshToken(user),
@@ -141,6 +156,11 @@ export class AuthController {
     res.clearCookie("refresh-token", {
       httpOnly: true,
       maxAge: 0,
+    });
+
+    res.setCookie("logged-in", "false", {
+      ...this.cookieSerializeOptions.accessToken,
+      httpOnly: false,
     });
 
     return {
