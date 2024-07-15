@@ -96,6 +96,12 @@ export class AuthController {
     );
 
     res.setCookie(
+      "logged-in",
+      true.toString(),
+      this.cookieSerializeOptions.accessToken,
+    );
+
+    res.setCookie(
       "refresh-token",
       await this._authService.generateRefreshToken(result),
       this.cookieSerializeOptions.refreshToken,
@@ -114,12 +120,13 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @User() user: UnknowProfile,
   ) {
-    res.cookie(
+    res.setCookie(
       "access-token",
       await this._authService.generateAccessToken(user),
       this.cookieSerializeOptions.accessToken,
     );
-    res.cookie(
+
+    res.setCookie(
       "refresh-token",
       await this._authService.generateRefreshToken(user),
       this.cookieSerializeOptions.refreshToken,
@@ -132,7 +139,6 @@ export class AuthController {
   }
 
   @Post("logout")
-  @HttpCode(StatusCode.SuccessNoContent)
   async signOut(
     @Res({ passthrough: true }) res: FastifyReply,
   ): Promise<APIResponse> {
