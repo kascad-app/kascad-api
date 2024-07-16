@@ -31,6 +31,10 @@ export class RidersService {
     return riders;
   }
 
+  async findAll(): Promise<Rider[]> {
+    return await this._riderModel.find().exec();
+  }
+
   async findById(id: string): Promise<Rider> {
     return await this._riderModel.findById(id);
   }
@@ -51,8 +55,20 @@ export class RidersService {
     return await newRider.save();
   }
 
-  async updateOne(id: string, rider: Partial<Rider>) {
-    return await this._riderModel.findByIdAndUpdate(id, rider, { new: true });
+  async updateOne(id: string, rider: registerRiderDto) {
+    const newRider = {
+      ...rider,
+      identity: {
+        firstName: rider.firstName,
+        lastName: rider.lastName,
+        fullName: `${rider.firstName} ${rider.lastName}`,
+        gender: rider.gender,
+        birthDate: rider.birthDate,
+      },
+    };
+    return await this._riderModel.findByIdAndUpdate(id, newRider, {
+      new: true,
+    });
   }
 
   async compareEncryptedPassword(
@@ -86,5 +102,9 @@ export class RidersService {
         since,
       },
     });
+  }
+
+  async remove(id: string): Promise<void> {
+    await this._riderModel.findByIdAndDelete(id).exec();
   }
 }

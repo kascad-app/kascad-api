@@ -10,8 +10,11 @@ import {
 import { registerSponsorDto } from "@kascad-app/shared-types";
 import { Sponsor } from "./schemas/sponsor.schema";
 import { SponsorsService } from "./sponsors.service";
+import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { Logged } from "src/common/decorators/logged.decorator";
 
 @Controller("sponsors")
+@Logged()
 export class SponsorsController {
   constructor(private _sponsorsService: SponsorsService) {}
 
@@ -33,7 +36,7 @@ export class SponsorsController {
   @Put(":id")
   async update(
     @Param("id") id: string,
-    @Body() updateSponsorDto: Sponsor,
+    @Body() updateSponsorDto: registerSponsorDto,
   ): Promise<Sponsor> {
     return await this._sponsorsService.update(id, updateSponsorDto);
   }
