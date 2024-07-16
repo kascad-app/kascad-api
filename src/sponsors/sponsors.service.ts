@@ -56,7 +56,18 @@ export class SponsorsService {
     return sponsor.compareEncryptedPassword(password);
   }
 
-  async update(id: string, updateSponsorDto: Sponsor): Promise<Sponsor> {
+  async update(
+    id: string,
+    updateSponsorDto: registerSponsorDto,
+  ): Promise<Sponsor> {
+    const newSponsor = new this._sponsorModel(updateSponsorDto);
+
+    newSponsor.identity = {
+      companyName: updateSponsorDto.companyName,
+      website: "",
+      logo: "",
+    };
+
     return await this._sponsorModel
       .findByIdAndUpdate(id, updateSponsorDto, { new: true })
       .exec();
