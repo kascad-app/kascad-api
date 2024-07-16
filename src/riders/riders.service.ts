@@ -40,7 +40,10 @@ export class RidersService {
   }
 
   async create(registerDto: registerRiderDto): Promise<Rider> {
-    const newRider = new this._riderModel(registerDto);
+    const newRider = new this._riderModel({
+      password: registerDto.password,
+      type: registerDto.type,
+    });
 
     newRider.identifier = { email: registerDto.email };
 
