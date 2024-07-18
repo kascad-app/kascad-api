@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import {
@@ -14,6 +22,7 @@ import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
+import { z } from "zod";
 
 @Controller("auth")
 export class AuthController {
@@ -53,6 +62,17 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() registerDto: registerRiderDto | registerSponsorDto,
   ) {
+    const safeResult = z
+      .object({
+        success: z.boolean(),
+        error: z.string(),
+      })
+      .safeParse(registerDto);
+
+    if (!safeResult.success) {
+      throw new BadRequestException(safeResult.error);
+    }
+
     const result = await this._authService.register(registerDto);
 
     if (result instanceof BadRequest) {
