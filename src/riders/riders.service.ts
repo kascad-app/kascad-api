@@ -39,6 +39,10 @@ export class RidersService {
     return await this._riderModel.findById(id);
   }
 
+  async aggregate(pipeline: any[]): Promise<Rider[]> {
+    return await this._riderModel.aggregate(pipeline).exec();
+  }
+
   async create(registerDto: registerRiderDto): Promise<Rider> {
     const newRider = new this._riderModel({
       password: registerDto.password,
