@@ -75,6 +75,7 @@ class RiderIdentifier implements RiderIdentifierType {
   @Prop({
     type: String,
     unique: true,
+    sparse: true,
   })
   username?: string;
 }
