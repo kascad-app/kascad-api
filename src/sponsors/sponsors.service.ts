@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { SponsorDocument, Sponsor } from "./schemas/sponsor.schema";
-import { registerSponsorDto } from "@kascad-app/shared-types";
+import { SponsorDocument } from "./schemas/sponsor.schema";
+import { registerSponsorDto, Sponsor } from "@kascad-app/shared-types";
 
 type SponsorSearchParams = {
   [key: string]: string | number | boolean;
@@ -48,6 +48,10 @@ export class SponsorsService {
     };
 
     return await newSponsor.save();
+  }
+
+  async aggregate(pipeline: any[]): Promise<Sponsor[]> {
+    return await this._sponsorModel.aggregate(pipeline).exec();
   }
 
   async compareEncryptedPassword(
