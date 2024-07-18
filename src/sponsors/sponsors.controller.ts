@@ -7,10 +7,8 @@ import {
   Body,
   Param,
 } from "@nestjs/common";
-import { registerSponsorDto } from "@kascad-app/shared-types";
-import { Sponsor } from "./schemas/sponsor.schema";
+import { registerSponsorDto, Sponsor } from "@kascad-app/shared-types";
 import { SponsorsService } from "./sponsors.service";
-import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { Logged } from "src/common/decorators/logged.decorator";
 
 @Controller("sponsors")
