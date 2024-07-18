@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { RidersService } from "src/riders/riders.service";
 import { SponsorsService } from "src/sponsors/sponsors.service";
 import { getLast5Riders, getLast3Sponsors } from "./utils/aggregates";
+import { Rider, Sponsor } from "@kascad-app/shared-types";
 
 @Injectable()
 export class MarketplaceService {
@@ -11,16 +12,10 @@ export class MarketplaceService {
   ) {}
 
   async getBasicMarketplace(profileType: string) {
-    let query;
-    if (profileType === "rider") {
-      query = this._ridersService.aggregate(getLast5Riders);
-    }
-
-    if (profileType === "sponsor") {
-      query = this._sponsorsService.aggregate(getLast3Sponsors);
-    }
-
-    const result = await query;
+    const result =
+      profileType === "rider"
+        ? this.getLastThreeSponsors()
+        : this.getLastFiveRiders();
 
     if (!result) {
       return {
@@ -34,5 +29,31 @@ export class MarketplaceService {
       success: true,
       data: result,
     };
+  }
+
+  /**
+   *
+   *--------------------------------------------------
+   * ---------------- PRIVATE METHODS ----------------
+   *--------------------------------------------------
+   *
+   */
+
+  /**
+   *
+   *   RIDERS
+   *
+   */
+  private async getLastFiveRiders() {
+    return this._ridersService.aggregate(getLast5Riders);
+  }
+  /**
+   *
+   *   SPONSOR
+   *
+   */
+
+  private async getLastThreeSponsors() {
+    return this._sponsorsService.aggregate(getLast3Sponsors);
   }
 }
