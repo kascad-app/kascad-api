@@ -13,8 +13,8 @@ export class MarketplaceService {
   async getBasicMarketplace(profileType: string) {
     const result =
       profileType === "rider"
-        ? this.getLastThreeSponsors()
-        : this.getLastFiveRiders();
+        ? await this.getLastThreeSponsors()
+        : await this.getLastFiveRiders();
 
     if (!result) {
       return {
