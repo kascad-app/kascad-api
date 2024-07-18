@@ -10,7 +10,7 @@ export class MarketplaceService {
     private _sponsorsService: SponsorsService,
   ) {}
 
-  async getBasicMarketplace(profileType: string) {
+  async getBasicMarketplace(profileType: "rider" | "sponsor") {
     const result =
       profileType === "sponsor"
         ? await this.getLastThreeSponsors()
