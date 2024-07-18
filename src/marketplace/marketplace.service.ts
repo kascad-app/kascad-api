@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { RidersService } from "src/riders/riders.service";
 import { SponsorsService } from "src/sponsors/sponsors.service";
 import { getLast5Riders, getLast3Sponsors } from "./utils/aggregates";
-import { Rider, Sponsor } from "@kascad-app/shared-types";
 
 @Injectable()
 export class MarketplaceService {
