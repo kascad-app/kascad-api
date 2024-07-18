@@ -12,7 +12,7 @@ export class MarketplaceService {
 
   async getBasicMarketplace(profileType: string) {
     const result =
-      profileType === "rider"
+      profileType === "sponsor"
         ? await this.getLastThreeSponsors()
         : await this.getLastFiveRiders();
 
