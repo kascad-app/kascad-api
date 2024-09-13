@@ -4,12 +4,17 @@ import {
   type RiderPreferences as RiderPreferencesType,
   type RiderIdentifier as RiderIdentifierType,
   type Rider as IRider,
+  TricksVideo as TricksVideoType,
   type Language,
+  Performance as RiderPerformanceType,
+  NonCompetitionAward as NonCompetitionAwardType,
+  TrainingFrequency as TrainingFrequencyType,
   SocialNetwork,
   type Sport,
   ProfileType,
   ProfileRole,
   AccountStatus,
+  WeatherCondition,
 } from "@kascad-app/shared-types";
 import * as bcrypt from "bcrypt";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
@@ -55,6 +60,26 @@ class RiderIdentity implements RiderIdentityType {
     type: Date,
   })
   birthDate: Date;
+
+  @Prop({
+    type: String,
+  })
+  country: string;
+
+  @Prop({
+    type: [String],
+  })
+  languageSpoken: string[];
+
+  @Prop({
+    type: String,
+  })
+  city: string;
+
+  @Prop({
+    type: String,
+  })
+  practiceLocation: string;
 }
 
 @Schema({
@@ -80,9 +105,7 @@ class RiderIdentifier implements RiderIdentifierType {
   username?: string;
 }
 
-@Schema({
-  _id: false,
-})
+@Schema()
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
     type: [String],
@@ -102,6 +125,128 @@ class RiderPreferences implements RiderPreferencesType {
     default: [],
   })
   networks: SocialNetwork[];
+}
+
+@Schema({
+  id: false,
+})
+class RiderPerformance implements RiderPerformanceType {
+  @Prop({
+    type: Date,
+  })
+  startDate: Date;
+
+  @Prop({
+    type: Date,
+  })
+  endDate: Date;
+
+  @Prop({
+    type: String,
+  })
+  eventName: string;
+
+  @Prop({
+    type: String,
+  })
+  category: string;
+
+  @Prop({
+    type: Number,
+  })
+  ranking?: number;
+
+  @Prop({
+    type: {
+      country: String,
+      city: String,
+    },
+  })
+  location: {
+    country: string;
+    city: string;
+  };
+
+  @Prop({
+    type: String,
+    enum: Object.values(WeatherCondition),
+  })
+  weather: WeatherCondition;
+
+  @Prop({
+    type: String,
+  })
+  notes?: string;
+}
+
+@Schema({
+  id: false,
+})
+class TricksVideo implements TricksVideoType {
+  @Prop({
+    type: String,
+  })
+  url: string;
+
+  @Prop({
+    type: String,
+  })
+  title: string;
+
+  @Prop({
+    type: String,
+  })
+  description?: string;
+
+  @Prop({
+    type: Date,
+  })
+  uploadDate: Date;
+
+  @Prop({
+    type: RiderPerformance,
+  })
+  relatedPerformance?: RiderPerformance;
+}
+
+@Schema({
+  _id: false,
+})
+class TrainingFrequency implements TrainingFrequencyType {
+  @Prop({
+    type: Number,
+  })
+  sessionsPerWeek: number;
+
+  @Prop({
+    type: Number,
+  })
+  hoursPerSession: number;
+}
+
+@Schema({
+  _id: false,
+})
+class NonCompetitionAward implements NonCompetitionAwardType {
+  @Prop({
+    type: Date,
+  })
+  date: Date;
+
+  @Prop({
+    type: String,
+  })
+  title: string;
+
+  @Prop({
+    type: String,
+  })
+  description: string;
+
+  @Prop({
+    type: String,
+  })
+  source: string;
 }
 
 @Schema({
@@ -194,6 +339,35 @@ class Rider implements IRider {
     default: Date.now,
   })
   createdAt: Date;
+
+  @Prop({
+    type: [RiderPerformance],
+    default: [],
+  })
+  performances: RiderPerformance[];
+
+  @Prop({
+    type: [TricksVideo],
+    default: [],
+  })
+  performanceVideos: TricksVideo[];
+
+  @Prop({
+    type: TrainingFrequency,
+  })
+  trainingFrequency: TrainingFrequency;
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  currentSponsors: string[];
+
+  @Prop({
+    type: [NonCompetitionAward],
+    default: [],
+  })
+  nonCompetitionAwards: NonCompetitionAward[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
