@@ -58,6 +58,7 @@ export class AuthController {
     if (result instanceof BadRequest) {
       throw result;
     }
+
     res.setCookie(
       "access-token",
       await this._authService.generateAccessToken(result),

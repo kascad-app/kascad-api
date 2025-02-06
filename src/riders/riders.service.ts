@@ -67,8 +67,6 @@ export class RidersService {
   }
 
   async updateOne(id: string, rider: Rider) {
-    console.log("RIIIIDER", rider);
-
     const newRider: Rider = {
       ...rider,
       displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
