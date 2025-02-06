@@ -57,22 +57,36 @@ export class RidersService {
       fullName: `${registerDto.firstName} ${registerDto.lastName}`,
       gender: registerDto.gender,
       birthDate: registerDto.birthDate,
+      country: "",
+      languageSpoken: [],
+      city: "",
+      practiceLocation: "",
     };
 
     return await newRider.save();
   }
 
-  async updateOne(id: string, rider: registerRiderDto) {
-    const newRider = {
+  async updateOne(id: string, rider: Rider) {
+    console.log("RIIIIDER", rider);
+
+    const newRider: Rider = {
       ...rider,
+      displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
+      description: rider.description,
       identity: {
-        firstName: rider.firstName,
-        lastName: rider.lastName,
-        fullName: `${rider.firstName} ${rider.lastName}`,
-        gender: rider.gender,
-        birthDate: rider.birthDate,
-      },
+        ...rider.identity,
+        firstName: rider.identity.firstName,
+        lastName: rider.identity.lastName,
+        fullName: `${rider.identity.firstName} ${rider.identity.lastName}`,
+        birthDate: rider.identity.birthDate,
+        city: rider.identity.city,
+        country: rider.identity.country,
+        gender: rider.identity.gender as GenderIdentity,
+        languageSpoken: rider.identity.languageSpoken,
+        practiceLocation: rider.identity.practiceLocation,
+      } as RiderIdentity,
     };
+
     return await this._riderModel.findByIdAndUpdate(id, newRider, {
       new: true,
     });

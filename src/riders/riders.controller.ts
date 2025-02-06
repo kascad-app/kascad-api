@@ -21,7 +21,7 @@ export class RidersController {
   @Put(":id")
   async updateRider(
     @Param("id") id: string,
-    @Body() updateRider: registerRiderDto,
+    @Body() updateRider: Rider,
   ): Promise<Rider> {
     return this._ridersService.updateOne(id, updateRider);
   }

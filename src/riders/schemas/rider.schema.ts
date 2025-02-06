@@ -1,11 +1,11 @@
 import {
   GenderIdentity,
+  Language,
   type RiderIdentity as RiderIdentityType,
   type RiderPreferences as RiderPreferencesType,
   type RiderIdentifier as RiderIdentifierType,
   type Rider as IRider,
   TricksVideo as TricksVideoType,
-  type Language,
   Performance as RiderPerformanceType,
   NonCompetitionAward as NonCompetitionAwardType,
   TrainingFrequency as TrainingFrequencyType,
@@ -115,7 +115,7 @@ class RiderPreferences implements RiderPreferencesType {
 
   @Prop({
     type: String,
-    default: [],
+    default: Language.FR,
   })
   languages: Language;
 
