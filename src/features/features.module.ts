@@ -12,11 +12,11 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     AuthModule,
     RouterModule.register([
       {
-        path: "rider",
+        path: "riders",
         module: RidersModule,
       },
       {
-        path: "sponsor",
+        path: "sponsors",
         module: SponsorsModule,
       },
     ]),

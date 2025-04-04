@@ -6,7 +6,7 @@ import { RidersService } from "../services/riders.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
 
-@Controller("riders")
+@Controller()
 @Logged()
 export class RidersController {
   constructor(private _ridersService: RidersService) {}

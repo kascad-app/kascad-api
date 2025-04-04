@@ -14,7 +14,7 @@ import { SponsorsService } from "../services/sponsors.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
 
-@Controller("sponsors")
+@Controller()
 @Logged()
 export class SponsorsController {
   constructor(private _sponsorsService: SponsorsService) {}
