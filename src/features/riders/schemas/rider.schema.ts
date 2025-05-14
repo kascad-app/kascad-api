@@ -17,6 +17,9 @@ import {
   TrainingFrequency as TrainingFrequencyType,
   TricksVideo as TricksVideoType,
   WeatherCondition,
+  type CurrentSponsorSummary as CurrentSponsorSummaryType,
+  type Image as ImageType,
+  type PerformanceSummary as PerformanceSummaryType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -212,6 +215,28 @@ class TricksVideo implements TricksVideoType {
 }
 
 @Schema({
+  id: false,
+})
+class RiderPerformanceSummary implements PerformanceSummaryType {
+  @Prop({
+    type: Number,
+  })
+  totalPodiums: number;
+
+  @Prop({
+    type: [RiderPerformance],
+    default: [],
+  })
+  performances: RiderPerformance[];
+
+  @Prop({
+    type: [TricksVideo],
+    default: [],
+  })
+  performanceVideos: TricksVideo[];
+}
+
+@Schema({
   _id: false,
 })
 class TrainingFrequency implements TrainingFrequencyType {
@@ -224,6 +249,42 @@ class TrainingFrequency implements TrainingFrequencyType {
     type: Number,
   })
   hoursPerSession: number;
+}
+
+@Schema({
+  _id: false,
+})
+class CurrentSponsorSummary implements CurrentSponsorSummaryType {
+  @Prop({
+    type: Number,
+  })
+  totalSponsors: number;
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  currentSponsors: string[];
+}
+
+@Schema({
+  _id: false,
+})
+class RiderImage implements ImageType {
+  @Prop({
+    type: String,
+  })
+  url: string;
+
+  @Prop({
+    type: String,
+  })
+  alt?: string;
+
+  @Prop({
+    type: Date,
+  })
+  uploadDate: Date;
 }
 
 @Schema({
@@ -343,21 +404,25 @@ class Rider implements IRider {
   createdAt: Date;
 
   @Prop({
-    type: [RiderPerformance],
-    default: [],
+    type: RiderPerformanceSummary,
   })
-  performances: RiderPerformance[];
-
-  @Prop({
-    type: [TricksVideo],
-    default: [],
-  })
-  performanceVideos: TricksVideo[];
+  performanceSummary: PerformanceSummaryType;
 
   @Prop({
     type: TrainingFrequency,
   })
   trainingFrequency: TrainingFrequency;
+
+  @Prop({
+    type: CurrentSponsorSummary,
+  })
+  currentSponsorSummary: CurrentSponsorSummaryType;
+
+  @Prop({
+    type: [RiderImage],
+    default: [],
+  })
+  images: ImageType[];
 
   @Prop({
     type: [String],
