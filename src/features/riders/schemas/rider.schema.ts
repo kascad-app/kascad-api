@@ -220,6 +220,7 @@ class TricksVideo implements TricksVideoType {
 class RiderPerformanceSummary implements PerformanceSummaryType {
   @Prop({
     type: Number,
+    default: 0,
   })
   totalPodiums: number;
 
@@ -257,6 +258,7 @@ class TrainingFrequency implements TrainingFrequencyType {
 class CurrentSponsorSummary implements CurrentSponsorSummaryType {
   @Prop({
     type: Number,
+    default: 0,
   })
   totalSponsors: number;
 
@@ -423,12 +425,6 @@ class Rider implements IRider {
     default: [],
   })
   images: ImageType[];
-
-  @Prop({
-    type: [String],
-    default: [],
-  })
-  currentSponsors: string[];
 
   @Prop({
     type: [NonCompetitionAward],
