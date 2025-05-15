@@ -407,6 +407,7 @@ class Rider implements IRider {
 
   @Prop({
     type: RiderPerformanceSummary,
+    default: () => ({}),
   })
   performanceSummary: PerformanceSummaryType;
 
@@ -417,6 +418,7 @@ class Rider implements IRider {
 
   @Prop({
     type: CurrentSponsorSummary,
+    default: () => ({}),
   })
   currentSponsorSummary: CurrentSponsorSummaryType;
 
