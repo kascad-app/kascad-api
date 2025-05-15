@@ -215,7 +215,7 @@ class TricksVideo implements TricksVideoType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class RiderPerformanceSummary implements PerformanceSummaryType {
   @Prop({
@@ -261,6 +261,12 @@ class CurrentSponsorSummary implements CurrentSponsorSummaryType {
     default: 0,
   })
   totalSponsors: number;
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  wishListSponsors: string[];
 
   @Prop({
     type: [String],
@@ -325,6 +331,7 @@ class NonCompetitionAward implements NonCompetitionAwardType {
     versionKey: false,
     transform: transformValue,
   },
+  minimize: false,
   id: true,
 })
 class Rider implements IRider {
@@ -351,12 +358,6 @@ class Rider implements IRider {
     type: RiderPreferences,
   })
   preferences: RiderPreferences;
-
-  @Prop({
-    default: [],
-  })
-  partnerships: string[];
-
   @Prop({
     type: String,
     enum: Object.values(ProfileType),
