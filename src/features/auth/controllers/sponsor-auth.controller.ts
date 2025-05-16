@@ -38,7 +38,7 @@ export class SponsorAuthController {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path: "/auth/refresh-token",
+      path: "/auth/rider/refresh-token",
       maxAge: eval(this._configService.get<string>("JWT_REFRESH_TOKEN_MAXAGE")),
     },
   };

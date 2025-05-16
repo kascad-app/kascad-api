@@ -60,14 +60,12 @@ export class RiderAuthService {
   async generateAccessToken(user: Rider): Promise<string> {
     return this._accessTokenService.sign({
       user: user._id,
-      accountType: user.type,
     });
   }
 
   async generateRefreshToken(user: Rider): Promise<string> {
     return this._refreshTokenService.sign({
       user: user._id,
-      accountType: user.type,
     });
   }
 }
