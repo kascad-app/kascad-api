@@ -39,7 +39,6 @@ export class SponsorsService {
   async create(createSponsorDto: registerSponsorDto): Promise<Sponsor> {
     const newSponsor = new this._sponsorModel({
       password: createSponsorDto.password,
-      type: createSponsorDto.type,
     });
     newSponsor.identifier = { email: createSponsorDto.email };
 

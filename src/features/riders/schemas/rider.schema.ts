@@ -17,6 +17,9 @@ import {
   TrainingFrequency as TrainingFrequencyType,
   TricksVideo as TricksVideoType,
   WeatherCondition,
+  type CurrentSponsorSummary as CurrentSponsorSummaryType,
+  type Image as ImageType,
+  type PerformanceSummary as PerformanceSummaryType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -214,6 +217,29 @@ class TricksVideo implements TricksVideoType {
 @Schema({
   _id: false,
 })
+class RiderPerformanceSummary implements PerformanceSummaryType {
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  totalPodiums: number;
+
+  @Prop({
+    type: [RiderPerformance],
+    default: [],
+  })
+  performances: RiderPerformance[];
+
+  @Prop({
+    type: [TricksVideo],
+    default: [],
+  })
+  performanceVideos: TricksVideo[];
+}
+
+@Schema({
+  _id: false,
+})
 class TrainingFrequency implements TrainingFrequencyType {
   @Prop({
     type: Number,
@@ -224,6 +250,49 @@ class TrainingFrequency implements TrainingFrequencyType {
     type: Number,
   })
   hoursPerSession: number;
+}
+
+@Schema({
+  _id: false,
+})
+class CurrentSponsorSummary implements CurrentSponsorSummaryType {
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  totalSponsors: number;
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  wishListSponsors: string[];
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  currentSponsors: string[];
+}
+
+@Schema({
+  _id: false,
+})
+class RiderImage implements ImageType {
+  @Prop({
+    type: String,
+  })
+  url: string;
+
+  @Prop({
+    type: String,
+  })
+  alt?: string;
+
+  @Prop({
+    type: Date,
+  })
+  uploadDate: Date;
 }
 
 @Schema({
@@ -262,6 +331,7 @@ class NonCompetitionAward implements NonCompetitionAwardType {
     versionKey: false,
     transform: transformValue,
   },
+  minimize: false,
   id: true,
 })
 class Rider implements IRider {
@@ -286,14 +356,9 @@ class Rider implements IRider {
 
   @Prop({
     type: RiderPreferences,
+    default: () => ({}),
   })
   preferences: RiderPreferences;
-
-  @Prop({
-    default: [],
-  })
-  partnerships: string[];
-
   @Prop({
     type: String,
     enum: Object.values(ProfileType),
@@ -343,16 +408,10 @@ class Rider implements IRider {
   createdAt: Date;
 
   @Prop({
-    type: [RiderPerformance],
-    default: [],
+    type: RiderPerformanceSummary,
+    default: () => ({}),
   })
-  performances: RiderPerformance[];
-
-  @Prop({
-    type: [TricksVideo],
-    default: [],
-  })
-  performanceVideos: TricksVideo[];
+  performanceSummary: PerformanceSummaryType;
 
   @Prop({
     type: TrainingFrequency,
@@ -360,10 +419,16 @@ class Rider implements IRider {
   trainingFrequency: TrainingFrequency;
 
   @Prop({
-    type: [String],
+    type: CurrentSponsorSummary,
+    default: () => ({}),
+  })
+  currentSponsorSummary: CurrentSponsorSummaryType;
+
+  @Prop({
+    type: [RiderImage],
     default: [],
   })
-  currentSponsors: string[];
+  images: ImageType[];
 
   @Prop({
     type: [NonCompetitionAward],
