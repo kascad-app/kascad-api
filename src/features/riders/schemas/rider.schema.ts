@@ -438,7 +438,6 @@ class Rider implements IRider {
 
   @Prop({
     type: [String],
-    default: [],
   })
   sports: string[];
 
