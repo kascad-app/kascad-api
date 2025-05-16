@@ -356,6 +356,7 @@ class Rider implements IRider {
 
   @Prop({
     type: RiderPreferences,
+    default: () => ({}),
   })
   preferences: RiderPreferences;
   @Prop({

@@ -28,7 +28,7 @@ async function bootstrap() {
   });
 
   await app.register(fastifyCookie, {
-    secret: configService.get("COOKIE_SECRET"),
+    secret: configService.get<string>("COOKIE_SECRET"),
   });
 
   await app.listen(process.env.PORT || 1337);
