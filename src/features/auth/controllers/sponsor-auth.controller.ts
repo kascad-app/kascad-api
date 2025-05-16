@@ -77,10 +77,7 @@ export class SponsorAuthController {
       this.cookieSerializeOptions.refreshToken,
     );
 
-    return {
-      success: true,
-      data: result,
-    };
+    return result;
   }
 
   @Post("login")
@@ -111,10 +108,7 @@ export class SponsorAuthController {
       this.cookieSerializeOptions.refreshToken,
     );
 
-    return {
-      success: true,
-      data: result,
-    };
+    return result;
   }
 
   @Post("refresh-token")
@@ -141,10 +135,7 @@ export class SponsorAuthController {
       this.cookieSerializeOptions.refreshToken,
     );
 
-    return {
-      success: true,
-      data: user,
-    };
+    return user;
   }
 
   @Post("logout")
@@ -165,8 +156,6 @@ export class SponsorAuthController {
       httpOnly: false,
     });
 
-    return {
-      success: true,
-    };
+    return;
   }
 }
