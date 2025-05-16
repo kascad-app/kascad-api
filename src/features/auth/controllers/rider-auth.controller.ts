@@ -30,16 +30,16 @@ export class RiderAuthController {
   } = {
     accessToken: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
       maxAge: eval(this._configService.get<string>("JWT_ACCESSTOKEN_MAXAGE")),
     },
     refreshToken: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/auth/refresh-token",
+      secure: false,
+      sameSite: "lax",
+      path: "/auth/rider/refresh-token",
       maxAge: eval(this._configService.get<string>("JWT_REFRESH_TOKEN_MAXAGE")),
     },
   };
@@ -167,7 +167,8 @@ export class RiderAuthController {
     });
 
     return {
-      success: true,
+      success: false,
+      message: "Logged out successfully",
     };
   }
 }
