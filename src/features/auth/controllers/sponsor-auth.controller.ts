@@ -166,7 +166,8 @@ export class SponsorAuthController {
     });
 
     return {
-      success: true,
+      success: false,
+      message: "Logged out successfully",
     };
   }
 }

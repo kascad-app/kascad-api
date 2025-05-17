@@ -1,15 +1,45 @@
-import { Body, Controller, Delete, Get, Param, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Res,
+} from "@nestjs/common";
 
-import { Article } from "@kascad-app/shared-types";
+import { Article, registerArticleDto } from "@kascad-app/shared-types";
 
 import { ArticlesService } from "../services/articles.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
+import { FastifyReply } from "fastify";
+import { BadRequest } from "src/common/exceptions/bad-request.exception";
 
 @Controller()
 @Logged()
 export class ArticlesController {
   constructor(private _articlesService: ArticlesService) {}
+
+  @Post()
+  async create(
+    @Res({ passthrough: true }) res: FastifyReply,
+    @Body() registerDto: registerArticleDto,
+  ) {
+    const result = await this._articlesService.create(registerDto);
+
+    console.log(res);
+
+    if (result instanceof BadRequest) {
+      throw result;
+    }
+
+    return {
+      success: true,
+      data: result,
+    };
+  }
 
   @Get()
   async getRiders(): Promise<Article[]> {

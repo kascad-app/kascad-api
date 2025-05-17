@@ -14,25 +14,24 @@ export type ArticleDocument = HydratedDocument<Article>;
     versionKey: false,
   },
   id: true,
+  minimize: false,
 })
 export class Article implements IArticle {
   _id: string;
 
-  @Prop({
-    type: String,
-  })
+  @Prop({ type: String, required: true })
   title: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
   urlImage: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
   content: string;
 
   @Prop({ type: String })
-  excerpt: string;
+  excerpt?: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: true })
   description: string;
 
   @Prop({ type: Date, default: Date.now })

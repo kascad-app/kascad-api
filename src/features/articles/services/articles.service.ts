@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
-import { Article } from "@kascad-app/shared-types";
+import { Article, registerArticleDto } from "@kascad-app/shared-types";
 import { ArticleDocument } from "../schemas/article.schema";
 
 type ArticleSearchParams = {
@@ -34,7 +34,7 @@ export class ArticlesService {
     return await this._articleModel.findById(id).exec();
   }
 
-  async create(createArticleDto: Partial<Article>): Promise<Article> {
+  async create(createArticleDto: registerArticleDto): Promise<Article> {
     const newArticle = new this._articleModel(createArticleDto);
     return await newArticle.save();
   }
