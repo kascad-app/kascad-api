@@ -437,11 +437,6 @@ class Rider implements IRider {
   sponsorSummary: SponsorSummaryType;
 
   @Prop({
-    type: [String],
-  })
-  sports: string[];
-
-  @Prop({
     type: [RiderImage],
     default: [],
   })
