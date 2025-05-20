@@ -33,7 +33,12 @@ export class RiderAuthService {
     if (isRiderExist && isRiderExist.length > 0)
       return new BadRequest("Rider already exists");
 
-    return await this._ridersService.create(registerDto);
+    const slugRider = await this._ridersService.generateSlug(
+      registerDto.firstName,
+      registerDto.lastName,
+    );
+
+    return await this._ridersService.create(registerDto, slugRider);
   }
 
   async login(loginDto: loginRiderDto) {

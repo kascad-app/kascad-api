@@ -102,6 +102,13 @@ class RiderIdentifier implements RiderIdentifierType {
   })
   email: string;
 
+  @Prop({
+    type: String,
+    unique: true,
+    required: true,
+  })
+  slug: string;
+
   phoneNumber?: string;
 
   @Prop({
@@ -112,7 +119,9 @@ class RiderIdentifier implements RiderIdentifierType {
   username?: string;
 }
 
-@Schema()
+@Schema({
+  id: false,
+})
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
     type: [String],
