@@ -34,23 +34,76 @@ export class RidersService {
   }
 
   async findAll(): Promise<Rider[]> {
-    return await this._riderModel.find().exec();
+    return await this._riderModel
+      .find()
+      .select("-_id -__v")
+      .where("status.status")
+      .equals(AccountStatus.ACTIVE)
+      .exec();
   }
 
   async findById(id: string): Promise<Rider> {
     return await this._riderModel.findById(id);
   }
 
+  async findBySlug(slug: string): Promise<Rider> {
+    return await this._riderModel
+      .findOne({ "identifier.slug": slug })
+      .select("-_id -__v")
+      .where("status.status")
+      .equals(AccountStatus.ACTIVE)
+      .exec();
+  }
+
   async aggregate(pipeline: any[]): Promise<Rider[]> {
     return await this._riderModel.aggregate(pipeline).exec();
   }
 
-  async create(registerDto: registerRiderDto): Promise<Rider> {
+  async generateSlug(firstName: string, lastName: string): Promise<string> {
+    const fullName = firstName + "-" + lastName;
+    const baseSlug = fullName
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .substring(0, 20);
+
+    const regex = new RegExp(`^${baseSlug}(-\\d+)?$`);
+    const existingSlugs = await this._riderModel
+      .find({ "identifier.slug": { $regex: regex } })
+      .select("identifier.slug")
+      .lean();
+
+    const takenSlugs = existingSlugs.map((doc) => doc.identifier.slug);
+
+    if (!takenSlugs.includes(baseSlug)) {
+      return baseSlug;
+    }
+
+    let maxSuffix = 0;
+    takenSlugs.forEach((slug) => {
+      const match = slug.match(new RegExp(`^${baseSlug}-(\\d+)$`));
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxSuffix) {
+          maxSuffix = num;
+        }
+      }
+    });
+
+    return `${baseSlug}-${maxSuffix + 1}`;
+  }
+
+  async create(
+    registerDto: registerRiderDto,
+    slugRider: string,
+  ): Promise<Rider> {
     const newRider = new this._riderModel({
       password: registerDto.password,
     });
 
-    newRider.identifier = { email: registerDto.email };
+    newRider.identifier = { email: registerDto.email, slug: slugRider };
 
     newRider.identity = {
       firstName: registerDto.firstName,

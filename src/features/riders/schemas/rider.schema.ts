@@ -102,6 +102,13 @@ class RiderIdentifier implements RiderIdentifierType {
   })
   email: string;
 
+  @Prop({
+    type: String,
+    unique: true,
+    required: true,
+  })
+  slug: string;
+
   phoneNumber?: string;
 
   @Prop({
@@ -112,7 +119,9 @@ class RiderIdentifier implements RiderIdentifierType {
   username?: string;
 }
 
-@Schema()
+@Schema({
+  _id: false,
+})
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
     type: [String],
@@ -135,7 +144,7 @@ class RiderPreferences implements RiderPreferencesType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class RiderPerformance implements RiderPerformanceType {
   @Prop({
@@ -187,7 +196,7 @@ class RiderPerformance implements RiderPerformanceType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class TricksVideo implements TricksVideoType {
   @Prop({

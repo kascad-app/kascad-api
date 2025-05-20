@@ -16,11 +16,12 @@ export class RidersController {
     return await this._ridersService.findAll();
   }
 
-  @Get(":id")
-  async getRider(@Param("id") id: string): Promise<Rider> {
-    return await this._ridersService.findById(id);
+  @Get(":slug")
+  async getRider(@Param("slug") slugRider: string): Promise<Rider> {
+    return await this._ridersService.findBySlug(slugRider);
   }
 
+  // A supprimer si on conserve le updateME
   @Put(":id")
   async updateRider(
     @Param("id") id: string,
