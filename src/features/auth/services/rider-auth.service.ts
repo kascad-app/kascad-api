@@ -2,9 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import {
+  GenderIdentity,
   loginRiderDto,
   registerRiderDto,
   Rider,
+  RiderIdentity,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -72,5 +74,9 @@ export class RiderAuthService {
     return this._refreshTokenService.sign({
       user: user._id,
     });
+  }
+
+  async updateMe(id: string, rider: Rider) {
+    return await this._ridersService.updateOne(id, rider);
   }
 }

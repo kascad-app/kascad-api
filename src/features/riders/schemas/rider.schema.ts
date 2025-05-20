@@ -120,7 +120,7 @@ class RiderIdentifier implements RiderIdentifierType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
@@ -144,7 +144,7 @@ class RiderPreferences implements RiderPreferencesType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class RiderPerformance implements RiderPerformanceType {
   @Prop({
@@ -196,7 +196,7 @@ class RiderPerformance implements RiderPerformanceType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class TricksVideo implements TricksVideoType {
   @Prop({

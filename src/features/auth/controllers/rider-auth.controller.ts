@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import { CookieSerializeOptions } from "@fastify/cookie";
@@ -170,5 +178,16 @@ export class RiderAuthController {
       success: false,
       message: "Logged out successfully",
     };
+  }
+
+  // A supprimer si on conserve le update par id
+
+  @Logged()
+  @Put("update")
+  async updateMe(
+    @User("user") user: Rider,
+    @Body() updateRider: Rider,
+  ): Promise<Rider> {
+    return this._authService.updateMe(user._id, updateRider);
   }
 }
