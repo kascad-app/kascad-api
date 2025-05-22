@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import { CookieSerializeOptions } from "@fastify/cookie";
@@ -30,16 +38,16 @@ export class RiderAuthController {
   } = {
     accessToken: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
       maxAge: eval(this._configService.get<string>("JWT_ACCESSTOKEN_MAXAGE")),
     },
     refreshToken: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/auth/refresh-token",
+      secure: false,
+      sameSite: "lax",
+      path: "/auth/rider/refresh-token",
       maxAge: eval(this._configService.get<string>("JWT_REFRESH_TOKEN_MAXAGE")),
     },
   };
@@ -167,7 +175,19 @@ export class RiderAuthController {
     });
 
     return {
-      success: true,
+      success: false,
+      message: "Logged out successfully",
     };
+  }
+
+  // A supprimer si on conserve le update par id
+
+  @Logged()
+  @Put("update")
+  async updateMe(
+    @User("user") user: Rider,
+    @Body() updateRider: Rider,
+  ): Promise<Rider> {
+    return this._authService.updateMe(user._id, updateRider);
   }
 }

@@ -17,9 +17,11 @@ import {
   TrainingFrequency as TrainingFrequencyType,
   TricksVideo as TricksVideoType,
   WeatherCondition,
-  type CurrentSponsorSummary as CurrentSponsorSummaryType,
+  type SponsorSummary as SponsorSummaryType,
   type Image as ImageType,
   type PerformanceSummary as PerformanceSummaryType,
+  type Availibility as AvailibilityType,
+  ContractType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -100,6 +102,13 @@ class RiderIdentifier implements RiderIdentifierType {
   })
   email: string;
 
+  @Prop({
+    type: String,
+    unique: true,
+    required: true,
+  })
+  slug: string;
+
   phoneNumber?: string;
 
   @Prop({
@@ -110,7 +119,9 @@ class RiderIdentifier implements RiderIdentifierType {
   username?: string;
 }
 
-@Schema()
+@Schema({
+  _id: false,
+})
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
     type: [String],
@@ -133,7 +144,7 @@ class RiderPreferences implements RiderPreferencesType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class RiderPerformance implements RiderPerformanceType {
   @Prop({
@@ -185,7 +196,7 @@ class RiderPerformance implements RiderPerformanceType {
 }
 
 @Schema({
-  id: false,
+  _id: false,
 })
 class TricksVideo implements TricksVideoType {
   @Prop({
@@ -255,7 +266,7 @@ class TrainingFrequency implements TrainingFrequencyType {
 @Schema({
   _id: false,
 })
-class CurrentSponsorSummary implements CurrentSponsorSummaryType {
+class SponsorSummary implements SponsorSummaryType {
   @Prop({
     type: Number,
     default: 0,
@@ -318,6 +329,22 @@ class NonCompetitionAward implements NonCompetitionAwardType {
     type: String,
   })
   source: string;
+}
+
+@Schema({
+  _id: false,
+})
+class Availibility implements AvailibilityType {
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isAvailable: boolean;
+
+  @Prop({
+    type: String,
+  })
+  contractType: ContractType;
 }
 
 @Schema({
@@ -390,12 +417,6 @@ class Rider implements IRider {
   verified: boolean;
 
   @Prop({
-    type: Boolean,
-    default: false,
-  })
-  isAvailable: boolean;
-
-  @Prop({
     type: Date,
     default: Date.now,
   })
@@ -419,10 +440,10 @@ class Rider implements IRider {
   trainingFrequency: TrainingFrequency;
 
   @Prop({
-    type: CurrentSponsorSummary,
+    type: SponsorSummary,
     default: () => ({}),
   })
-  currentSponsorSummary: CurrentSponsorSummaryType;
+  sponsorSummary: SponsorSummaryType;
 
   @Prop({
     type: [RiderImage],
@@ -435,6 +456,12 @@ class Rider implements IRider {
     default: [],
   })
   nonCompetitionAwards: NonCompetitionAward[];
+
+  @Prop({
+    type: Availibility,
+    default: () => ({}),
+  })
+  availibility: AvailibilityType;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

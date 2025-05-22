@@ -2,9 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import {
+  GenderIdentity,
   loginRiderDto,
   registerRiderDto,
   Rider,
+  RiderIdentity,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -33,7 +35,12 @@ export class RiderAuthService {
     if (isRiderExist && isRiderExist.length > 0)
       return new BadRequest("Rider already exists");
 
-    return await this._ridersService.create(registerDto);
+    const slugRider = await this._ridersService.generateSlug(
+      registerDto.firstName,
+      registerDto.lastName,
+    );
+
+    return await this._ridersService.create(registerDto, slugRider);
   }
 
   async login(loginDto: loginRiderDto) {
@@ -60,14 +67,18 @@ export class RiderAuthService {
   async generateAccessToken(user: Rider): Promise<string> {
     return this._accessTokenService.sign({
       user: user._id,
-      accountType: user.type,
+      accountType: "rider",
     });
   }
 
   async generateRefreshToken(user: Rider): Promise<string> {
     return this._refreshTokenService.sign({
       user: user._id,
-      accountType: user.type,
+      accountType: "rider",
     });
+  }
+
+  async updateMe(id: string, rider: Rider) {
+    return await this._ridersService.updateOne(id, rider);
   }
 }
