@@ -121,10 +121,18 @@ export class RidersService {
   }
 
   async updateOne(id: string, rider: Rider) {
+    const current = await this._riderModel.findById(id).lean();
+
     const newRider: Rider = {
       ...rider,
-      displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
+      availibility: rider.availibility,
+      trainingFrequency: rider.trainingFrequency,
+      images: rider.images,
       description: rider.description,
+      identifier: {
+        email: current.identifier.email,
+        slug: current.identifier.slug,
+      },
       identity: {
         ...rider.identity,
         firstName: rider.identity.firstName,

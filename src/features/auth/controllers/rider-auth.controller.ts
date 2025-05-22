@@ -183,7 +183,7 @@ export class RiderAuthController {
   // A supprimer si on conserve le update par id
 
   @Logged()
-  @Put("update")
+  @Put("me")
   async updateMe(
     @User("user") user: Rider,
     @Body() updateRider: Rider,

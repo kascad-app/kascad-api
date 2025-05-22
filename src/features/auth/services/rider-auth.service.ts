@@ -78,7 +78,8 @@ export class RiderAuthService {
     });
   }
 
-  async updateMe(id: string, rider: Rider) {
+  async updateMe(id: string, rider: Rider): Promise<Rider> {
+    console.log(id, rider);
     return await this._ridersService.updateOne(id, rider);
   }
 }
