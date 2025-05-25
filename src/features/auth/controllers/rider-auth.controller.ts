@@ -180,8 +180,6 @@ export class RiderAuthController {
     };
   }
 
-  // A supprimer si on conserve le update par id
-
   @Logged()
   @Put("update")
   async updateMe(

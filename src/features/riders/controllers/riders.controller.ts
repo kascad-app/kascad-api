@@ -21,7 +21,7 @@ export class RidersController {
     return await this._ridersService.findBySlug(slugRider);
   }
 
-  // A supprimer si on conserve le updateME
+  // A supprimer lors du deploy de l'API
   @Put(":id")
   async updateRider(
     @Param("id") id: string,
