@@ -1,11 +1,37 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {
   ContractType,
+  Message as MessageType,
   type ContractOffer as IContractOffer,
 } from "@kascad-app/shared-types";
 import { HydratedDocument } from "mongoose";
 
 export type ContractOfferDocument = HydratedDocument<ContractOffer>;
+
+@Schema({
+  toObject: {
+    virtuals: true,
+    versionKey: false,
+  },
+  toJSON: {
+    virtuals: true,
+    versionKey: false,
+  },
+  id: true,
+  minimize: false,
+})
+export class Message implements MessageType {
+  _id: string;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: String, required: true })
+  authorName: string;
+
+  @Prop({ type: String, required: true })
+  content;
+}
 
 @Schema({
   toObject: {
@@ -66,6 +92,9 @@ export class ContractOffer implements IContractOffer {
 
   @Prop({ type: [String] })
   perks?: string[];
+
+  @Prop({ type: [Message], default: [] })
+  messages: MessageType[];
 }
 
 export const ContractOfferSchema =
