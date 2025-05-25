@@ -36,6 +36,13 @@ export class ContractsOffersController {
     return await this._contractsService.findById(id);
   }
 
+  @Post()
+  async create(
+    @Body() createContractOfferDto: ContractOffer,
+  ): Promise<ContractOffer> {
+    return await this._contractsService.create(createContractOfferDto);
+  }
+
   @Post(":id/sendMessage")
   async sendMessage(
     @Param("id") id: string,

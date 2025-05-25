@@ -109,6 +109,8 @@ export class RidersService {
       strava: { isLinked: false },
     };
 
+    newRider.displayName = `${registerDto.firstName} ${registerDto.lastName}`;
+
     newRider.identity = {
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,

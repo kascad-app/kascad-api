@@ -40,6 +40,11 @@ export class ContractsOffersService {
     return await this._contractModel.findById(id).exec();
   }
 
+  async create(createContractOfferDto: ContractOffer): Promise<ContractOffer> {
+    const newContractOffer = new this._contractModel(createContractOfferDto);
+    return await newContractOffer.save();
+  }
+
   async insertMessage(
     id: string,
     user: Rider | Sponsor,
@@ -49,6 +54,7 @@ export class ContractsOffersService {
     if (!contractOffer) {
       throw new Error("Contract not found");
     }
+    console.log("User:", user);
     if (!user || !user.displayName) {
       throw new Error("User not found or displayName is missing");
     }

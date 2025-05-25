@@ -42,6 +42,8 @@ export class SponsorsService {
     });
     newSponsor.identifier = { email: createSponsorDto.email };
 
+    newSponsor.displayName = createSponsorDto.companyName;
+
     newSponsor.identity = {
       companyName: createSponsorDto.companyName,
       website: "",
