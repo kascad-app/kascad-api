@@ -103,7 +103,11 @@ export class RidersService {
       password: registerDto.password,
     });
 
-    newRider.identifier = { email: registerDto.email, slug: slugRider };
+    newRider.identifier = {
+      email: registerDto.email,
+      slug: slugRider,
+      strava: { isLinked: false },
+    };
 
     newRider.identity = {
       firstName: registerDto.firstName,
