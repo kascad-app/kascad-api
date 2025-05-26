@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 import {
   ContractOffer,
@@ -34,18 +34,16 @@ export class ContractsOffersService {
   }
 
   async findAll(): Promise<getContractsDto[]> {
-    const contractsDto = await this._contractModel
+    return await this._contractModel
       .aggregate([
-        // Join avec la collection sponsors
         {
           $lookup: {
-            from: "sponsors", // nom de la collection MongoDB (attention à la casse)
+            from: "sponsors",
             localField: "authorMail",
             foreignField: "identifier.email",
             as: "authorSponsor",
           },
         },
-        // Join avec la collection riders
         {
           $lookup: {
             from: "riders",
@@ -54,20 +52,14 @@ export class ContractsOffersService {
             as: "riderProfile",
           },
         },
-        // Déstructure les résultats des lookups (prend le premier résultat)
         {
           $addFields: {
             authorAvatar: { $arrayElemAt: ["$authorSponsor.avatarUrl", 0] },
             authorName: {
               $arrayElemAt: ["$authorSponsor.identity.companyName", 0],
             },
-            riderName: {
-              $arrayElemAt: ["$riderProfile.identity.fullName", 0],
-            },
-            riderAvatar: { $arrayElemAt: ["$riderProfile.avatarUrl", 0] },
           },
         },
-        // Projection des champs voulus
         {
           $project: {
             _id: 1,
@@ -80,8 +72,6 @@ export class ContractsOffersService {
             description: 1,
             sport: 1,
             riderMail: 1,
-            riderName: 1,
-            riderAvatar: 1,
             termsAndConditions: 1,
             status: 1,
           },
@@ -89,14 +79,66 @@ export class ContractsOffersService {
       ])
       .exec();
 
-    console.log(JSON.stringify(contractsDto, null, 2));
-    // Convertir les résultats en getContractsDto
-
-    return contractsDto;
+    // TODO filter by rider's mail
   }
 
-  async findById(id: string): Promise<ContractOffer> {
-    return await this._contractModel.findById(id).exec();
+  async findById(id: string): Promise<getContractsDto> {
+    const result = await this._contractModel
+      .aggregate([
+        { $match: { _id: new (mongoose as any).Types.ObjectId(id) } },
+        {
+          $lookup: {
+            from: "sponsors",
+            localField: "authorMail",
+            foreignField: "identifier.email",
+            as: "authorSponsor",
+          },
+        },
+        {
+          $lookup: {
+            from: "riders",
+            localField: "riderMail",
+            foreignField: "identifier.email",
+            as: "riderProfile",
+          },
+        },
+        {
+          $addFields: {
+            authorAvatar: { $arrayElemAt: ["$authorSponsor.avatarUrl", 0] },
+            authorName: {
+              $arrayElemAt: ["$authorSponsor.identity.companyName", 0],
+            },
+            riderName: {
+              $arrayElemAt: ["$riderProfile.identity.fullName", 0],
+            },
+            riderAvatar: { $arrayElemAt: ["$riderProfile.avatarUrl", 0] },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            authorMail: 1,
+            authorName: 1,
+            authorAvatar: 1,
+            isNew: 1,
+            type: 1,
+            title: 1,
+            description: 1,
+            sport: 1,
+            startDate: 1,
+            endDate: 1,
+            riderMail: 1,
+            riderName: 1,
+            riderAvatar: 1,
+            termsAndConditions: 1,
+            perks: 1,
+            status: 1,
+            messages: 1,
+          },
+        },
+      ])
+      .exec();
+    return result[0] as getContractsDto;
   }
 
   async create(createContractOfferDto: ContractOffer): Promise<ContractOffer> {
@@ -118,6 +160,7 @@ export class ContractsOffersService {
     }
 
     const message: Message = {
+      authorType: user.type,
       authorMail: user.identifier.email,
       content: messageDto.content,
     };

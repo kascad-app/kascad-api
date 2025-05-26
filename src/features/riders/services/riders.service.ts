@@ -4,6 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import {
   AccountStatus,
   GenderIdentity,
+  ProfileType,
   registerRiderDto,
   Rider,
   RiderIdentity,
@@ -102,6 +103,8 @@ export class RidersService {
     const newRider = new this._riderModel({
       password: registerDto.password,
     });
+
+    newRider.type = ProfileType.RIDER;
 
     newRider.identifier = {
       email: registerDto.email,

@@ -23,7 +23,7 @@ export class ContractsOffersController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string): Promise<ContractOffer> {
+  async getOne(@Param("id") id: string): Promise<getContractsDto> {
     return await this._contractsService.findById(id);
   }
 

@@ -448,6 +448,7 @@ class Rider implements IRider {
   preferences: RiderPreferences;
   @Prop({
     type: String,
+    required: true,
     enum: Object.values(ProfileType),
   })
   type: ProfileType;

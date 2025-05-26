@@ -3,6 +3,7 @@ import {
   ContractStatus,
   ContractType,
   Message as MessageType,
+  ProfileType,
   type ContractOffer as IContractOffer,
 } from "@kascad-app/shared-types";
 import { HydratedDocument } from "mongoose";
@@ -30,8 +31,8 @@ export class Message implements MessageType {
   @Prop({ type: String, required: true })
   authorMail: string;
 
-  @Prop({ type: String })
-  authorName?: string;
+  @Prop({ type: String, required: true, enum: Object.values(ProfileType) })
+  authorType: ProfileType;
 
   @Prop({ type: String, required: true })
   content;
