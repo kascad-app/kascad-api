@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Res,
-} from "@nestjs/common";
-import { FastifyReply } from "fastify";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 
 import {
   ContractOffer,
-  messagePayloadDto,
+  getContractsDto,
+  Message,
   registerMessageDto,
   Rider,
   Sponsor,
@@ -27,7 +18,7 @@ export class ContractsOffersController {
   constructor(private _contractsService: ContractsOffersService) {}
 
   @Get()
-  async getAll(): Promise<ContractOffer[]> {
+  async getAll(): Promise<getContractsDto[]> {
     return await this._contractsService.findAll();
   }
 
@@ -47,8 +38,8 @@ export class ContractsOffersController {
   async sendMessage(
     @Param("id") id: string,
     @User("user") user: Rider | Sponsor,
-    @Body() messageDto: messagePayloadDto,
-  ): Promise<registerMessageDto> {
+    @Body() messageDto: registerMessageDto,
+  ): Promise<Message> {
     return await this._contractsService.insertMessage(id, user, messageDto);
   }
 }

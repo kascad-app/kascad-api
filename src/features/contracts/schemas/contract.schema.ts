@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {
+  ContractStatus,
   ContractType,
   Message as MessageType,
   type ContractOffer as IContractOffer,
@@ -27,7 +28,10 @@ export class Message implements MessageType {
   createdAt: Date;
 
   @Prop({ type: String, required: true })
-  authorName: string;
+  authorMail: string;
+
+  @Prop({ type: String })
+  authorName?: string;
 
   @Prop({ type: String, required: true })
   content;
@@ -57,9 +61,6 @@ export class ContractOffer implements IContractOffer {
   @Prop({ type: String, required: true })
   authorMail: string;
 
-  @Prop({ type: String })
-  authorName: string;
-
   @Prop({ type: Boolean, default: true })
   isNew: boolean;
 
@@ -85,13 +86,13 @@ export class ContractOffer implements IContractOffer {
   riderMail: string;
 
   @Prop({ type: String })
-  riderFullName: string;
-
-  @Prop({ type: String })
   termsAndConditions?: string;
 
   @Prop({ type: [String] })
   perks?: string[];
+
+  @Prop({ type: String, enum: Object.values(ContractStatus) })
+  status: ContractStatus;
 
   @Prop({ type: [Message], default: [] })
   messages: MessageType[];
