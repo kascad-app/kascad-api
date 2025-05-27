@@ -181,9 +181,9 @@ export class RiderAuthController {
   }
 
   @Logged()
-  @Put("update")
+  @Put("me")
   async updateMe(
-    @User("user") user: Rider,
+    @User() user: Rider,
     @Body() updateRider: Rider,
   ): Promise<Rider> {
     return this._authService.updateMe(user._id, updateRider);
