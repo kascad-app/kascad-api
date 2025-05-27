@@ -18,18 +18,13 @@ import { FastifyReply } from "fastify";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 
 @Controller()
-@Logged()
 export class ArticlesController {
   constructor(private _articlesService: ArticlesService) {}
 
   @Post()
-  async create(
-    @Res({ passthrough: true }) res: FastifyReply,
-    @Body() registerDto: registerArticleDto,
-  ) {
+  @Logged()
+  async create(@Body() registerDto: registerArticleDto) {
     const result = await this._articlesService.create(registerDto);
-
-    console.log(res);
 
     if (result instanceof BadRequest) {
       throw result;
@@ -42,16 +37,19 @@ export class ArticlesController {
   }
 
   @Get()
+  @Logged()
   async getRiders(): Promise<Article[]> {
     return await this._articlesService.findAll();
   }
 
   @Get(":id")
+  @Logged()
   async getRider(@Param("id") id: string): Promise<Article> {
     return await this._articlesService.findById(id);
   }
 
   @Put(":id")
+  @Logged()
   async updateRider(
     @Param("id") id: string,
     @Body() updateArticle: Article,
@@ -60,6 +58,7 @@ export class ArticlesController {
   }
 
   @Delete(":id")
+  @Logged()
   async deleteRider(@Param("id") id: string): Promise<void> {
     return await this._articlesService.remove(id);
   }

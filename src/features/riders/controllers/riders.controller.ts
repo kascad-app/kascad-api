@@ -7,16 +7,17 @@ import { RidersService } from "../services/riders.service";
 import { Logged } from "src/common/decorators/logged.decorator";
 
 @Controller()
-@Logged()
 export class RidersController {
   constructor(private _ridersService: RidersService) {}
 
   @Get()
+  @Logged()
   async getRiders(): Promise<Rider[]> {
     return await this._ridersService.findAll();
   }
 
   @Get(":slug")
+  @Logged()
   async getRider(@Param("slug") slugRider: string): Promise<Rider> {
     return await this._ridersService.findBySlug(slugRider);
   }
@@ -30,8 +31,9 @@ export class RidersController {
     return this._ridersService.updateOne(id, updateRider);
   }
 
-  @Delete(":id")
-  async deleteRider(@Param("id") id: string): Promise<void> {
-    return await this._ridersService.remove(id);
-  }
+  // @Delete(":id")
+  // @Logged()
+  // async deleteRider(@Param("id") id: string): Promise<void> {
+  //   return await this._ridersService.remove(id);
+  // }
 }

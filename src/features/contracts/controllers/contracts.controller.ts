@@ -13,21 +13,23 @@ import { ContractsOffersService } from "../services/contracts.service";
 import { User } from "src/common/decorators/user.decorator";
 
 @Controller()
-@Logged()
 export class ContractsOffersController {
   constructor(private _contractsService: ContractsOffersService) {}
 
   @Get()
+  @Logged()
   async getAll(): Promise<getContractsDto[]> {
     return await this._contractsService.findAll();
   }
 
   @Get(":id")
+  @Logged()
   async getOne(@Param("id") id: string): Promise<getContractsDto> {
     return await this._contractsService.findById(id);
   }
 
   @Post()
+  @Logged()
   async create(
     @Body() createContractOfferDto: ContractOffer,
   ): Promise<ContractOffer> {
@@ -35,9 +37,10 @@ export class ContractsOffersController {
   }
 
   @Post(":id/sendMessage")
+  @Logged()
   async sendMessage(
     @Param("id") id: string,
-    @User("user") user: Rider | Sponsor,
+    @User() user: Rider | Sponsor,
     @Body() messageDto: registerMessageDto,
   ): Promise<Message> {
     return await this._contractsService.insertMessage(id, user, messageDto);
