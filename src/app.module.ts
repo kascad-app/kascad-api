@@ -6,6 +6,7 @@ import { MongoDBConfigService } from "./config/database/mongodb.config";
 import { FeaturesModule } from "./features/features.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AppService } from "./app.service";
       inject: [ConfigService],
     }),
     FeaturesModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

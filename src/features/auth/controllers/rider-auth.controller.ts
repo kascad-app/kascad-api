@@ -15,6 +15,7 @@ import {
   loginRiderDto,
   registerRiderDto,
   Rider,
+  RiderMe,
 } from "@kascad-app/shared-types";
 
 import { RefreshAuthGuard } from "../guards/refresh-auth.guard";
@@ -54,7 +55,7 @@ export class RiderAuthController {
 
   @Logged()
   @Get("me")
-  async getMe(@User() user: Rider) {
+  async getMe(@User() user: RiderMe) {
     return user;
   }
 
