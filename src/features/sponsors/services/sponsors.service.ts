@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
-import { registerSponsorDto, Sponsor } from "@kascad-app/shared-types";
+import {
+  ProfileType,
+  registerSponsorDto,
+  Sponsor,
+} from "@kascad-app/shared-types";
 
 import { SponsorDocument } from "../schemas/sponsor.schema";
 
@@ -41,6 +45,10 @@ export class SponsorsService {
       password: createSponsorDto.password,
     });
     newSponsor.identifier = { email: createSponsorDto.email };
+
+    newSponsor.type = ProfileType.SPONSOR;
+
+    newSponsor.displayName = createSponsorDto.companyName;
 
     newSponsor.identity = {
       companyName: createSponsorDto.companyName,

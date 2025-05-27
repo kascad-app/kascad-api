@@ -22,6 +22,8 @@ import {
   type PerformanceSummary as PerformanceSummaryType,
   type Availibility as AvailibilityType,
   ContractType,
+  Strava as StravaType,
+  StravaIdentifier as StravaIdentifierType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -92,6 +94,58 @@ class RiderIdentity implements RiderIdentityType {
 @Schema({
   _id: false,
 })
+class StravaIdentifier implements StravaIdentifierType {
+  @Prop({
+    type: String,
+  })
+  token_type: string;
+
+  @Prop({
+    type: Number,
+  })
+  expires_at: number;
+
+  @Prop({
+    type: Number,
+  })
+  expires_in: number;
+
+  @Prop({
+    type: String,
+  })
+  refresh_token: string;
+
+  @Prop({
+    type: String,
+  })
+  access_token: string;
+
+  @Prop({
+    type: String,
+  })
+  athlete: string;
+}
+
+@Schema({
+  _id: false,
+})
+class Strava implements StravaType {
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isLinked: boolean;
+
+  @Prop({
+    type: StravaIdentifier,
+    default: () => ({}),
+  })
+  identifier?: StravaIdentifierType;
+}
+
+@Schema({
+  _id: false,
+})
 class RiderIdentifier implements RiderIdentifierType {
   @Prop({
     type: String,
@@ -117,6 +171,12 @@ class RiderIdentifier implements RiderIdentifierType {
     sparse: true,
   })
   username?: string;
+
+  @Prop({
+    type: Strava,
+    default: () => ({}),
+  })
+  strava: StravaType;
 }
 
 @Schema({
@@ -388,6 +448,7 @@ class Rider implements IRider {
   preferences: RiderPreferences;
   @Prop({
     type: String,
+    required: true,
     enum: Object.values(ProfileType),
   })
   type: ProfileType;

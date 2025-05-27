@@ -126,6 +126,7 @@ export class Sponsor implements ISponsor {
 
   @Prop({
     type: String,
+    required: true,
     enum: Object.values(ProfileType),
   })
   type: ProfileType;
