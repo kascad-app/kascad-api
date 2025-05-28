@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 
 import {
   AccountStatus,
@@ -39,6 +40,32 @@ export type RiderDocument = HydratedDocument<
     compareEncryptedPassword: (_password: string) => Promise<boolean>;
   }
 >;
+
+export interface RiderModel extends Model<RiderDocument> {
+  archiveAndClearMonthlyViews(): Promise<void>;
+}
+
+@Schema({
+  _id: true,
+})
+class ViewEntry {
+  _id: string;
+
+  @Prop({ type: String, required: true })
+  idUser: string;
+
+  @Prop({ type: Date, required: true })
+  timestamp: Date;
+}
+
+@Schema({ _id: false })
+class View {
+  @Prop({ type: Number, default: 0 })
+  lastMonthViews: number;
+
+  @Prop({ type: [ViewEntry], default: [] })
+  viewEntries: ViewEntry[];
+}
 
 @Schema({
   _id: false,
@@ -523,6 +550,9 @@ class Rider implements IRider {
     default: () => ({}),
   })
   availibility: AvailibilityType;
+
+  @Prop({ type: View, default: () => ({}) })
+  views: View;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -564,3 +594,52 @@ RiderSchema.pre("updateOne", function (next: any) {
   this.updateOne({}, { $set: { updatedAt: new Date() } });
   next();
 });
+
+RiderSchema.virtual("tempViewsStats").get(function (this: RiderDocument) {
+  const now = new Date();
+
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const startOfWeek = new Date(now);
+  const day = startOfWeek.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1) - day;
+  startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const viewEntries = this.views.viewEntries || [];
+
+  const monthlyViews = viewEntries.filter(
+    (v: ViewEntry) => new Date(v.timestamp) >= firstDayOfMonth,
+  ).length;
+
+  const weeklyViews = viewEntries.filter(
+    (v: ViewEntry) => new Date(v.timestamp) >= startOfWeek,
+  ).length;
+
+  return {
+    weeklyViews,
+    monthlyViews,
+  };
+});
+
+RiderSchema.statics.archiveAndClearMonthlyViews = async function () {
+  const now = new Date();
+  const monthAgo = new Date(now);
+  monthAgo.setMonth(now.getMonth() - 1);
+  const riders = await this.find();
+  for (const rider of riders) {
+    const viewObj = rider.views;
+    if (!viewObj) continue;
+    const viewEntries = viewObj.viewEntries || [];
+    const lastMonthViewsArr = viewEntries.filter(
+      (v: ViewEntry) => v.timestamp >= monthAgo && v.timestamp < now,
+    );
+    viewObj.lastMonthViews = lastMonthViewsArr.length;
+
+    viewObj.viewEntries = viewEntries.filter(
+      (v: ViewEntry) => v.timestamp >= now,
+    );
+
+    await rider.save();
+  }
+};

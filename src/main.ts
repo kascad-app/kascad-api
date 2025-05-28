@@ -1,3 +1,5 @@
+global.crypto = require("crypto");
+
 import { NestFactory } from "@nestjs/core";
 import {
   FastifyAdapter,

@@ -1,10 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from "@nestjs/common";
 
-import { Rider } from "@kascad-app/shared-types";
+import { Rider, RiderMe } from "@kascad-app/shared-types";
 
 import { RidersService } from "../services/riders.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
+import { User } from "src/common/decorators/user.decorator";
 
 @Controller()
 export class RidersController {
@@ -18,7 +27,11 @@ export class RidersController {
 
   @Get(":slug")
   @Logged()
-  async getRider(@Param("slug") slugRider: string): Promise<Rider> {
+  async getRider(
+    @Param("slug") slugRider: string,
+    @User() user: RiderMe,
+  ): Promise<Rider> {
+    await this._ridersService.addViewEntry(user._id, slugRider);
     return await this._ridersService.findBySlug(slugRider);
   }
 
