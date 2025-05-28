@@ -8,6 +8,7 @@ import {
   registerRiderDto,
   Rider,
   RiderIdentity,
+  ViewEntry,
 } from "@kascad-app/shared-types";
 
 import { RiderDocument, RiderModel } from "../schemas/rider.schema";
@@ -55,6 +56,40 @@ export class RidersService {
       .where("status.status")
       .equals(AccountStatus.ACTIVE)
       .exec();
+  }
+
+  async addViewEntry(idUser: string, slug: string) {
+    const rider = await this._riderModel.findOne({ "identifier.slug": slug });
+
+    if (!rider) return null;
+
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const day = startOfWeek.getDay();
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+    startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const alreadyVisited = (rider.views?.viewEntries || []).some(
+      (entry: ViewEntry) =>
+        String(entry.idUser) === String(idUser) &&
+        new Date(entry.timestamp) >= startOfWeek,
+    );
+
+    if (!alreadyVisited) {
+      await this._riderModel.findOneAndUpdate(
+        { "identifier.slug": slug },
+        {
+          $push: {
+            "views.viewEntries": {
+              idUser,
+              timestamp: new Date(),
+            },
+          },
+        },
+        { new: true },
+      );
+    }
   }
 
   async aggregate(pipeline: any[]): Promise<Rider[]> {
