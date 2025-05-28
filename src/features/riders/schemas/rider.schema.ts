@@ -595,27 +595,25 @@ RiderSchema.pre("updateOne", function (next: any) {
   next();
 });
 
-RiderSchema.virtual("tempViewsStats").get(function (this: any) {
+RiderSchema.virtual("tempViewsStats").get(function (this: RiderDocument) {
   const now = new Date();
 
-  // Premier jour du mois courant
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  // Début de la semaine courante (lundi)
   const startOfWeek = new Date(now);
-  const day = startOfWeek.getDay(); // 0 = dimanche, 1 = lundi, ...
-  const diffToMonday = (day === 0 ? -6 : 1) - day; // ramène à lundi
+  const day = startOfWeek.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1) - day;
   startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
   startOfWeek.setHours(0, 0, 0, 0);
 
   const viewEntries = this.views.viewEntries || [];
 
   const monthlyViews = viewEntries.filter(
-    (v: any) => new Date(v.timestamp) >= firstDayOfMonth,
+    (v: ViewEntry) => new Date(v.timestamp) >= firstDayOfMonth,
   ).length;
 
   const weeklyViews = viewEntries.filter(
-    (v: any) => new Date(v.timestamp) >= startOfWeek,
+    (v: ViewEntry) => new Date(v.timestamp) >= startOfWeek,
   ).length;
 
   return {
@@ -634,11 +632,13 @@ RiderSchema.statics.archiveAndClearMonthlyViews = async function () {
     if (!viewObj) continue;
     const viewEntries = viewObj.viewEntries || [];
     const lastMonthViewsArr = viewEntries.filter(
-      (v: any) => v.timestamp >= monthAgo && v.timestamp < now,
+      (v: ViewEntry) => v.timestamp >= monthAgo && v.timestamp < now,
     );
     viewObj.lastMonthViews = lastMonthViewsArr.length;
 
-    viewObj.viewEntries = viewEntries.filter((v: any) => v.timestamp >= now);
+    viewObj.viewEntries = viewEntries.filter(
+      (v: ViewEntry) => v.timestamp >= now,
+    );
 
     await rider.save();
   }
