@@ -45,7 +45,7 @@ jobs:
             exit 1
           fi
 
-      - name: Load and compute final env
+      - name: Compute Docker image URI
         run: |
           source $GITHUB_ENV
           echo "IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
@@ -77,15 +77,32 @@ jobs:
 
       - name: Format .env for Cloud Run
         run: |
-          ENV_VARS=$(grep -v '^#' .env | grep -v '^\s*$' | xargs | tr ' ' ',')
+          # Extrait uniquement les variables non commentées, non vides
+          ENV_VARS=$(grep -v '^#' .env | grep -v '^\s*$' | grep -v '="*\s*"*$' | xargs | tr ' ' ',')
+          if [ -z "$ENV_VARS" ]; then
+            echo "⚠️ No environment variables found to inject"
+          else
+            echo "✅ ENV_VARS=$ENV_VARS"
+          fi
           echo "ENV_VARS=$ENV_VARS" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --project=$PROJECT_ID \
-            --image=$IMAGE_URI \
-            --region=$REGION \
-            --platform=managed \
-            --allow-unauthenticated \
-            --set-env-vars="$ENV_VARS"
+          if [ -z "$ENV_VARS" ]; then
+            echo "🚫 No env vars detected, deploying without --set-env-vars"
+            gcloud run deploy $SERVICE_NAME \
+              --project=$PROJECT_ID \
+              --image=$IMAGE_URI \
+              --region=$REGION \
+              --platform=managed \
+              --allow-unauthenticated
+          else
+            echo "🚀 Deploying with env vars"
+            gcloud run deploy $SERVICE_NAME \
+              --project=$PROJECT_ID \
+              --image=$IMAGE_URI \
+              --region=$REGION \
+              --platform=managed \
+              --allow-unauthenticated \
+              --set-env-vars="$ENV_VARS"
+          fi
