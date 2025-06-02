@@ -1,9 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
 
 import { Article, registerArticleDto } from "@kascad-app/shared-types";
+
 import { ArticleDocument } from "../schemas/article.schema";
+
+import { Model } from "mongoose";
 
 type ArticleSearchParams = {
   [key: string]: string | number | boolean;

@@ -1,12 +1,15 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Model } from "mongoose";
 
 import {
   AccountStatus,
+  type Availibility as AvailibilityType,
+  ContractType,
   GenderIdentity,
+  type Image as ImageType,
   Language,
   NonCompetitionAward as NonCompetitionAwardType,
   Performance as RiderPerformanceType,
+  type PerformanceSummary as PerformanceSummaryType,
   ProfileRole,
   ProfileType,
   type Rider as IRider,
@@ -14,21 +17,18 @@ import {
   type RiderIdentity as RiderIdentityType,
   type RiderPreferences as RiderPreferencesType,
   SocialNetwork,
+  type SponsorSummary as SponsorSummaryType,
   type Sport,
+  Strava as StravaType,
+  StravaIdentifier as StravaIdentifierType,
   TrainingFrequency as TrainingFrequencyType,
   TricksVideo as TricksVideoType,
   WeatherCondition,
-  type SponsorSummary as SponsorSummaryType,
-  type Image as ImageType,
-  type PerformanceSummary as PerformanceSummaryType,
-  type Availibility as AvailibilityType,
-  ContractType,
-  Strava as StravaType,
-  StravaIdentifier as StravaIdentifierType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
 import type { HydratedDocument } from "mongoose";
+import { Model } from "mongoose";
 import { ProfileStatus } from "src/config/database/base.schema";
 
 const SALT_ROUNDS = 12;

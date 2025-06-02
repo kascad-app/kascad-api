@@ -2,11 +2,9 @@ import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import {
-  GenderIdentity,
   loginRiderDto,
   registerRiderDto,
   Rider,
-  RiderIdentity,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";

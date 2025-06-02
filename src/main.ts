@@ -1,14 +1,16 @@
 // A rajouter si utilisation de Node.js avec une version < 19
 // global.crypto = require("crypto");
 
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import {
   FastifyAdapter,
   type NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { AppModule } from "./app.module";
+
 import fastifyCookie from "@fastify/cookie";
-import { ConfigService } from "@nestjs/config";
+
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

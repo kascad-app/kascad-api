@@ -11,10 +11,9 @@ import {
   ViewEntry,
 } from "@kascad-app/shared-types";
 
-import { RiderDocument, RiderModel } from "../schemas/rider.schema";
+import { RiderDocument } from "../schemas/rider.schema";
 
 import { Model } from "mongoose";
-import { Cron } from "@nestjs/schedule";
 
 type RiderSearchParams = {
   [key: string]: string | number | boolean;

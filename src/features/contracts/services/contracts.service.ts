@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
 
 import {
   ContractOffer,
@@ -10,7 +9,10 @@ import {
   Rider,
   Sponsor,
 } from "@kascad-app/shared-types";
+
 import { ContractOfferDocument } from "../schemas/contract.schema";
+
+import mongoose, { Model } from "mongoose";
 
 type ContractSearchParams = {
   [key: string]: string | number | boolean;

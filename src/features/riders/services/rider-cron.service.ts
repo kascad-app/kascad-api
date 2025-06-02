@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
 import { InjectModel } from "@nestjs/mongoose";
+import { Cron } from "@nestjs/schedule";
+
 import { RiderModel } from "../schemas/rider.schema";
 
 @Injectable()

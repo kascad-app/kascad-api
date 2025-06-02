@@ -1,5 +1,6 @@
-import { AccountStatus, type ProfileStatus } from "@kascad-app/shared-types";
 import { Prop, Schema } from "@nestjs/mongoose";
+
+import { AccountStatus, type ProfileStatus } from "@kascad-app/shared-types";
 
 @Schema({
   _id: false,
