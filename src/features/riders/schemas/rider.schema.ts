@@ -116,6 +116,11 @@ class RiderIdentity implements RiderIdentityType {
     type: String,
   })
   practiceLocation: string;
+
+  @Prop({
+    type: String,
+  })
+  bio?: string;
 }
 
 @Schema({
