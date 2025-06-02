@@ -20,4 +20,6 @@ COPY ./src ./src
 
 RUN pnpm build
 
+EXPOSE 8080
+
 ENTRYPOINT ["pnpm", "start:prod"]
