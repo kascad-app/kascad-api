@@ -1,4 +1,5 @@
-global.crypto = require("crypto");
+// A rajouter si utilisation de Node.js avec une version < 19
+// global.crypto = require("crypto");
 
 import { NestFactory } from "@nestjs/core";
 import {

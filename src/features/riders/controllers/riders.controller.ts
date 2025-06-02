@@ -14,10 +14,20 @@ import { RidersService } from "../services/riders.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
+import { RidersCronService } from "../services/rider-cron.service";
 
 @Controller()
 export class RidersController {
-  constructor(private _ridersService: RidersService) {}
+  constructor(
+    private _ridersService: RidersService,
+    private _ridersCronService: RidersCronService, // Ajoute l'injection ici
+  ) {}
+
+  @Post("test-cron")
+  async testCron(): Promise<string> {
+    await this._ridersCronService.handleMonthlyViews();
+    return "Cron exécuté avec succès";
+  }
 
   @Get()
   @Logged()

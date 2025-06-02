@@ -8,6 +8,7 @@ import { RidersService } from "./services/riders.service";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
+import { RidersCronService } from "./services/rider-cron.service";
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
     ]),
   ],
   controllers: [RidersController],
-  providers: [RidersService],
+  providers: [RidersService, RidersCronService],
   exports: [RidersService],
 })
 export class RidersModule {}
