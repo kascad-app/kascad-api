@@ -46,6 +46,7 @@ jobs:
             echo "SERVICE_NAME=${SERVICE_NAME_STAGING}" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
           fi
+
           echo "IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud
