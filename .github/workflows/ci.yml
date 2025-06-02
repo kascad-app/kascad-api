@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["*"]
+    branches: [main, staging]
   pull_request:
-    branches: ["*"]
+    branches: [main, staging]
 
 jobs:
   lint:
@@ -23,6 +23,12 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: latest
+
+      - name: Create .npmrc
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+          echo "@kascad-app:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "always-auth=true" >> .npmrc
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
