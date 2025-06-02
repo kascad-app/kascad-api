@@ -33,11 +33,13 @@ jobs:
             echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
             echo "SERVICE_NAME=api" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
+            echo "ENV_SECRET=ENV_FILE_PRODUCTION" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
             echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
+            echo "ENV_SECRET=ENV_FILE_STAGING" >> $GITHUB_ENV
           else
             echo "Unsupported branch: ${{ github.ref }}"
             exit 1
@@ -70,6 +72,14 @@ jobs:
           secrets: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
 
+      - name: Write .env file from GitHub Secret
+        run: echo "${{ secrets[env.ENV_SECRET] }}" > .env
+
+      - name: Format .env for Cloud Run
+        run: |
+          ENV_VARS=$(grep -v '^#' .env | grep -v '^\s*$' | xargs | tr ' ' ',')
+          echo "ENV_VARS=$ENV_VARS" >> $GITHUB_ENV
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $SERVICE_NAME \
@@ -77,4 +87,5 @@ jobs:
             --image=$IMAGE_URI \
             --region=$REGION \
             --platform=managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars="$ENV_VARS"
