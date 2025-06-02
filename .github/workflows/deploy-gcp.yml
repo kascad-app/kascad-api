@@ -34,7 +34,10 @@ jobs:
           fi
           echo "REGION=europe-west1" >> $GITHUB_ENV
           echo "IMAGE_NAME=kascad-api" >> $GITHUB_ENV
-          echo "IMAGE_URI=europe-west1-docker.pkg.dev/$PROJECT_ID/kascad/$IMAGE_NAME:${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Set image URI
+        run: |
+          echo "IMAGE_URI=europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/kascad/${{ env.IMAGE_NAME }}:${GITHUB_SHA}" >> $GITHUB_ENV
 
       - name: Debug variables
         run: |
