@@ -33,14 +33,12 @@ jobs:
             echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
             echo "SERVICE_NAME=api" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
-            echo "ENV_SECRET=ENV_FILE_PRODUCTION" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
             echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
-            echo "ENV_SECRET=ENV_FILE_STAGING" >> $GITHUB_ENV
-          else
+           else
             echo "Unsupported branch: ${{ github.ref }}"
             exit 1
           fi
@@ -72,37 +70,11 @@ jobs:
           secrets: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Write .env file from GitHub Secret
-        run: echo "${{ secrets[env.ENV_SECRET] }}" > .env
-
-      - name: Format .env for Cloud Run
-        run: |
-          # Extrait uniquement les variables non commentées, non vides
-          ENV_VARS=$(grep -v '^#' .env | grep -v '^\s*$' | grep -v '="*\s*"*$' | xargs | tr ' ' ',')
-          if [ -z "$ENV_VARS" ]; then
-            echo "⚠️ No environment variables found to inject"
-          else
-            echo "✅ ENV_VARS=$ENV_VARS"
-          fi
-          echo "ENV_VARS=$ENV_VARS" >> $GITHUB_ENV
-
       - name: Deploy to Cloud Run
         run: |
-          if [ -z "$ENV_VARS" ]; then
-            echo "🚫 No env vars detected, deploying without --set-env-vars"
-            gcloud run deploy $SERVICE_NAME \
-              --project=$PROJECT_ID \
-              --image=$IMAGE_URI \
-              --region=$REGION \
-              --platform=managed \
-              --allow-unauthenticated
-          else
-            echo "🚀 Deploying with env vars"
-            gcloud run deploy $SERVICE_NAME \
-              --project=$PROJECT_ID \
-              --image=$IMAGE_URI \
-              --region=$REGION \
-              --platform=managed \
-              --allow-unauthenticated \
-              --set-env-vars="$ENV_VARS"
-          fi
+          gcloud run deploy $SERVICE_NAME \
+            --project=$PROJECT_ID \
+            --image=$IMAGE_URI \
+            --region=$REGION \
+            --platform=managed \
+            --allow-unauthenticated
