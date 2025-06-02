@@ -26,7 +26,7 @@ jobs:
             echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
             echo "SERVICE_NAME=api" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
-          else if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
             echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
