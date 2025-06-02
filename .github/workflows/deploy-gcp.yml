@@ -57,7 +57,14 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_URI }}
+          tags: |
+            ${{ env.IMAGE_URI }}
+            europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/kascad/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            "NPM_TOKEN=${{ secrets.NPM_TOKEN }}"
+            "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
 
       - name: Deploy to Cloud Run
         run: |
