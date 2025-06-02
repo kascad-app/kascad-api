@@ -38,35 +38,8 @@ jobs:
             echo "❌ Unsupported branch: ${{ github.ref }}"
             exit 1
           fi
-          echo "IMAGE_URI=${{ env.REGION }}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
 
-      - name: Debug environment
+      - name: Load env variables for build
         run: |
-          echo "BRANCH = ${{ github.ref }}"
-          echo "PROJECT_ID = $PROJECT_ID"
-          echo "IMAGE_URI = $IMAGE_URI"
-          echo "SERVICE_NAME = $SERVICE_NAME"
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets[env.CREDENTIALS_SECRET] }}
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ env.IMAGE_URI }}
-
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy $SERVICE_NAME \
-            --project=$PROJECT_ID \
-            --image=$IMAGE_URI \
-            --region=$REGION \
-            --platform=managed \
-            --allow-unauthenticated
+          source $GITHUB_ENV
+          echo "IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE
