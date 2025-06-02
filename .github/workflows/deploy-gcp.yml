@@ -63,8 +63,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secrets: |
-            "NPM_TOKEN=${{ secrets.NPM_TOKEN }}"
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
+          build-args: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Cloud Run
         run: |
