@@ -1,8 +1,8 @@
-FROM node:23-alpine AS pnpm-23-alpine
+FROM node:22-alpine AS pnpm-22-alpine
 
 RUN npm install -g pnpm
 
-FROM pnpm-23-alpine
+FROM pnpm-22-alpine
 
 WORKDIR /kascad-api
 

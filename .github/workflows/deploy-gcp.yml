@@ -11,6 +11,10 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
 
+    env:
+      REGION: europe-west1
+      IMAGE_NAME: kascad-api
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,22 +23,29 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set environment variables
-        id: vars
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENV=production" >> $GITHUB_ENV
             echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
             echo "SERVICE_NAME=api" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
-          else
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
             echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
+          else
+            echo "❌ Unsupported branch: ${{ github.ref }}"
+            exit 1
           fi
-          echo "REGION=europe-west1" >> $GITHUB_ENV
-          echo "IMAGE_NAME=kascad-api" >> $GITHUB_ENV
-          echo "IMAGE_URI=europe-west1-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "IMAGE_URI=${{ env.REGION }}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Debug environment
+        run: |
+          echo "BRANCH = ${{ github.ref }}"
+          echo "PROJECT_ID = $PROJECT_ID"
+          echo "IMAGE_URI = $IMAGE_URI"
+          echo "SERVICE_NAME = $SERVICE_NAME"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -42,7 +53,7 @@ jobs:
           credentials_json: ${{ secrets[env.CREDENTIALS_SECRET] }}
 
       - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
