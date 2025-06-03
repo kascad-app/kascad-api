@@ -14,12 +14,15 @@ WORKDIR /usr/src/app
 
 ARG GITHUB_TOKEN
 
-RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc 
-
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN pnpm install && rm .npmrc
+RUN test -n "$GITHUB_TOKEN" || (echo "GITHUB_TOKEN is not set" && exit 1)
+
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
+    cat .npmrc && \
+    pnpm install && \
+    rm .npmrc
 
 COPY --chown=node:node . .
 
