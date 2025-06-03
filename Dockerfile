@@ -12,22 +12,26 @@ FROM base AS builder
 
 WORKDIR /usr/src/app
 
-# Copy package files
-COPY --chown=node:node package.json pnpm-lock.yaml ./
-
+# Argument pour injecter le token GitHub depuis Cloud Build
 ARG GITHUB_TOKEN
 
-# Setup npm registry for private packages
+# Crée un .npmrc local avec le token
 RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
-# Install dependencies
+# Copy uniquement les fichiers de dépendances
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+# Installer les dépendances
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+RUN rm -f .npmrc
+
+
+# Copier le reste du code
 COPY --chown=node:node . .
 
-# Build application
+# Build de l'app
 RUN pnpm build
 
 ###################
@@ -37,19 +41,22 @@ FROM base AS production
 
 WORKDIR /usr/src/app
 
-# Copy package files
-COPY --chown=node:node package.json pnpm-lock.yaml ./
-
 ARG GITHUB_TOKEN
 
-# Setup npm registry for private packages
+# Crée un .npmrc local avec le token pour install prod-only
 RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
-# Install only production dependencies
+# Copy uniquement les fichiers nécessaires
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+# Installer uniquement les dépendances de production
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy built application from builder
+RUN rm -f .npmrc
+
+
+# Copier l'app buildée depuis le builder
 COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
 
 USER node

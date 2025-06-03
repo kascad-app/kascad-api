@@ -3,7 +3,7 @@ steps:
     args:
       - "build"
       - "--build-arg"
-      - "GITHUB_TOKEN=$$_GITHUB_TOKEN_GCP"
+      - "GITHUB_TOKEN=${_GITHUB_TOKEN_GCP}"
       - "-t"
       - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA}"
       - "--progress=plain"
@@ -21,7 +21,6 @@ options:
 substitutions:
   _REGION: europe-west1
   _IMAGE_NAME: kascad-api
-  _GITHUB_TOKEN_GCP: ""
 
 images:
   - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA}"
