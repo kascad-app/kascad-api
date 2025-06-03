@@ -13,7 +13,6 @@ RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc \
   && echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
 COPY package.json pnpm-lock.yaml ./
-COPY .env .env
 RUN pnpm install --frozen-lockfile && rm .npmrc
 
 COPY . .
@@ -29,7 +28,6 @@ RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc \
   && echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
 COPY package.json pnpm-lock.yaml ./
-COPY .env .env
 RUN pnpm install --prod --frozen-lockfile && rm .npmrc
 
 COPY --from=builder /usr/src/app/dist ./dist

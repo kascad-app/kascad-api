@@ -23,6 +23,9 @@ jobs:
       - name: Docker login to Artifact Registry
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
+      - name: Create .env file from GitHub Secret
+        run: echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
+
       - name: Build and push Docker image
         run: |
           echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
