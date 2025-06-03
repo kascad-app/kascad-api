@@ -29,7 +29,7 @@ steps:
         echo "Testing token availability..."
         if [ -n "$$_GITHUB_TOKEN_GCP" ]; then
           echo "Token available for docker build"
-          echo "Building with token..."
+          echo "Building with token as build arg..."
           docker build \
             --build-arg GITHUB_TOKEN="$$_GITHUB_TOKEN_GCP" \
             -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA} \
@@ -40,8 +40,6 @@ steps:
           exit 1
         fi
     secretEnv: ["_GITHUB_TOKEN_GCP"]
-    env:
-      - "DOCKER_BUILDKIT=1"
 
 availableSecrets:
   secretManager:

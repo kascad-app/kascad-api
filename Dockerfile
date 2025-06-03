@@ -14,9 +14,8 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN --mount=type=secret,id=github_token \
-    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
-    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+ARG GITHUB_TOKEN
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
     pnpm install && \
     rm .npmrc
