@@ -14,12 +14,15 @@ WORKDIR /usr/src/app
 
 ARG GITHUB_TOKEN
 
-RUN echo "@kascad-app:registry=https://npm.pkg.github.com" >> .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
+    echo "always-auth=true" >> .npmrc && \
+    echo "registry=https://registry.npmjs.org/" >> .npmrc
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN pnpm install && rm .npmrc
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    pnpm install && rm .npmrc
 
 COPY --chown=node:node . .
 
