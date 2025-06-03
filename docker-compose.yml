@@ -1,14 +1,17 @@
+# docker-compose.yml
 version: "3.8"
 
 services:
-  app:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN_GCP}
+        - GITHUB_TOKEN=${GH_TOKEN_GCP}
     ports:
-      - "1337:1337"
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - GH_TOKEN_GCP=${GH_TOKEN_GCP}
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/usr/src/app
