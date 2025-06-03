@@ -21,8 +21,7 @@ RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    pnpm install && rm .npmrc
+RUN pnpm install && rm .npmrc
 
 COPY --chown=node:node . .
 
