@@ -4,9 +4,16 @@ steps:
     args:
       - "-c"
       - |
+        # Remove any existing .npmrc that might have placeholder variables
+        rm -f .npmrc
+
+        # Create new .npmrc with actual token
         echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc
         echo "//npm.pkg.github.com/:_authToken=$$_GITHUB_TOKEN_GCP" >> .npmrc
-        cat .npmrc
+
+        echo "Generated .npmrc content (token hidden):"
+        sed 's/ghp_[a-zA-Z0-9]*/[HIDDEN_TOKEN]/g' .npmrc
+
     secretEnv: ["_GITHUB_TOKEN_GCP"]
 
   - name: "gcr.io/cloud-builders/docker"

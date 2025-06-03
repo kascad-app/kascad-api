@@ -12,7 +12,12 @@ FROM base AS builder
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node package.json pnpm-lock.yaml .npmrc ./
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+# Copy the .npmrc file created by Cloud Build
+COPY --chown=node:node .npmrc ./
+
+RUN echo "Using .npmrc file:" && cat .npmrc && echo ""
 
 RUN pnpm install && rm .npmrc
 
