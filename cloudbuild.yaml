@@ -18,5 +18,8 @@ substitutions:
   _REGION: europe-west1
   _IMAGE_NAME: kascad-api
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 images:
   - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA}"
