@@ -15,14 +15,8 @@ WORKDIR /usr/src/app
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
 ARG GITHUB_TOKEN
-
-RUN echo $GITHUB_TOKEN
-
-RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
-    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
-    echo "=== DEBUG: .npmrc content ===" && \
-    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
     pnpm install && \
     rm .npmrc
 
@@ -40,11 +34,8 @@ WORKDIR /usr/src/app
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
 ARG GITHUB_TOKEN
-RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
-    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
-    echo "=== DEBUG: .npmrc content ===" && \
-    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
     pnpm install --prod && \
     rm .npmrc && \
     npm cache clean --force
