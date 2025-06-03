@@ -11,14 +11,13 @@ steps:
         echo ""
         if [ -n "$$_GITHUB_TOKEN_GCP" ]; then
           echo "Token is set - first 10 chars: $$(echo $$_GITHUB_TOKEN_GCP | cut -c1-10)"
-          # Créer un fichier temporaire pour le token
-          echo "$$_GITHUB_TOKEN_GCP" > /tmp/github_token
+          # Créer un fichier temporaire pour le token sans retour à la ligne
+          echo -n "$$_GITHUB_TOKEN_GCP" > /tmp/github_token
           echo "=== DOCKER BUILD STEP ==="
           echo "Building with token from file..."
           docker build \
-            --build-arg GITHUB_TOKEN="$$(cat /tmp/github_token)" \
-            --build-arg NODE_ENV=production \
             -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA} \
+            --build-arg "GITHUB_TOKEN=$$(cat /tmp/github_token)" \
             --progress=plain \
             .
           # Nettoyer

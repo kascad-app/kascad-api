@@ -21,11 +21,11 @@ RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
     echo "=== DEBUG: .npmrc content ===" && \
     cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
     echo "=== DEBUG: Testing GitHub registry access ===" && \
-    curl -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
          -H "Accept: application/vnd.npm.install-v1+json" \
          https://npm.pkg.github.com/@kascad-app/shared-types || echo "Curl test failed" && \
     echo "=== DEBUG: Running pnpm install ===" && \
-    pnpm install && \
+    pnpm install --no-frozen-lockfile && \
     rm .npmrc
 
 COPY --chown=node:node . .
@@ -48,11 +48,11 @@ RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
     echo "=== DEBUG: .npmrc content ===" && \
     cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
     echo "=== DEBUG: Testing GitHub registry access ===" && \
-    curl -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
          -H "Accept: application/vnd.npm.install-v1+json" \
          https://npm.pkg.github.com/@kascad-app/shared-types || echo "Curl test failed" && \
     echo "=== DEBUG: Running pnpm install ===" && \
-    pnpm install --prod && \
+    pnpm install --prod --no-frozen-lockfile && \
     rm .npmrc && \
     npm cache clean --force
 
