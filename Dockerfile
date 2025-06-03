@@ -13,13 +13,16 @@ FROM base AS builder
 WORKDIR /usr/src/app
 
 ARG GITHUB_TOKEN
-    
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    sed -i "s|\${GITHUB_TOKEN}|$(cat /run/secrets/GITHUB_TOKEN)|g" .npmrc \
-    && pnpm install \
-    && rm .npmrc
+
+# Create .npmrc with proper authentication
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
+    echo "always-auth=true" >> .npmrc && \
+    echo "registry=https://registry.npmjs.org/" >> .npmrc
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+RUN pnpm install && rm .npmrc
 
 COPY --chown=node:node . .
 
