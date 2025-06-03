@@ -14,15 +14,18 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "registry=https://registry.npmjs.org/" >> .npmrc && \
+ARG GITHUB_TOKEN
+RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
+    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
+    echo "=== DEBUG: .npmrc content ===" && \
+    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
     pnpm install && \
     rm .npmrc
 
 COPY --chown=node:node . .
 
 RUN pnpm build
-RUN pnpm install --prod && npm cache clean --force
 
 ###################
 # PRODUCTION
@@ -31,7 +34,18 @@ FROM base AS production
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+ARG GITHUB_TOKEN
+RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
+    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
+    echo "=== DEBUG: .npmrc content ===" && \
+    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
+    pnpm install --prod && \
+    rm .npmrc && \
+    npm cache clean --force
+
 COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
 
 USER node
