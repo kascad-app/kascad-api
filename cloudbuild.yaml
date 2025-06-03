@@ -13,6 +13,7 @@ steps:
           echo "Token is set - first 10 chars: $$(echo $$_GITHUB_TOKEN_GCP | cut -c1-10)"
           docker build \
             --build-arg GITHUB_TOKEN="$$_GITHUB_TOKEN_GCP" \
+            --build-arg NODE_ENV=production \
             -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA} \
             --progress=plain \
             .
@@ -20,6 +21,8 @@ steps:
           echo "ERROR: Token not available in docker build step"
           exit 1
         fi
+    env:
+      - "GITHUB_TOKEN=$$_GITHUB_TOKEN_GCP"
     secretEnv: ["_GITHUB_TOKEN_GCP"]
 
 availableSecrets:

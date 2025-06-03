@@ -14,7 +14,7 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=""
 RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
     echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
@@ -36,7 +36,7 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=""
 RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
     echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
