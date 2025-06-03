@@ -12,12 +12,11 @@ FROM base AS builder
 
 WORKDIR /usr/src/app
 
-ARG GITHUB_TOKEN
-RUN test -n "$GITHUB_TOKEN" || (echo "GITHUB_TOKEN build arg is required" && exit 1)
-
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
     pnpm install && \
     rm .npmrc

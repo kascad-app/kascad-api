@@ -4,10 +4,8 @@ steps:
     args:
       - "-c"
       - |
-        echo "Starting secure build..."
-        export GITHUB_TOKEN="$$_GITHUB_TOKEN_GCP"
-        docker build \
-          --build-arg GITHUB_TOKEN="$$GITHUB_TOKEN" \
+        echo "$$_GITHUB_TOKEN_GCP" | docker build \
+          --secret id=github_token,src=/dev/stdin \
           -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA} \
           --progress=plain \
           .
