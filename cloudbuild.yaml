@@ -1,32 +1,16 @@
 steps:
   - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
     args:
-      - "-c"
-      - |
-        echo "=== DEBUG INFORMATION ==="
-        echo "GITHUB_TOKEN_GCP variable:"
-        echo "Value: '$$_GITHUB_TOKEN_GCP'"
-        echo "Length: $${#_GITHUB_TOKEN_GCP}"
-        echo ""
-        if [ -n "$$_GITHUB_TOKEN_GCP" ]; then
-          echo "Token is set - first 10 chars: $$(echo $$_GITHUB_TOKEN_GCP | cut -c1-10)"
-          # Créer un fichier temporaire pour le token sans retour à la ligne
-          echo -n "$$_GITHUB_TOKEN_GCP" > /tmp/github_token
-          echo "=== DOCKER BUILD STEP ==="
-          echo "Building with token from file..."
-          docker build \
-            -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA} \
-            --build-arg "GITHUB_TOKEN=$$(cat /tmp/github_token)" \
-            --progress=plain \
-            .
-          # Nettoyer
-          rm -f /tmp/github_token
-        else
-          echo "ERROR: Token not available in docker build step"
-          exit 1
-        fi
+      - "build"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${_IMAGE_NAME}:${SHORT_SHA}"
+      - "--build-arg"
+      - "GITHUB_TOKEN=${_GITHUB_TOKEN_GCP}"
+      - "--progress=plain"
+      - "."
     secretEnv: ["_GITHUB_TOKEN_GCP"]
+    env:
+      - "DOCKER_BUILDKIT=1"
 
 availableSecrets:
   secretManager:
