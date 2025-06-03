@@ -36,6 +36,6 @@ async function bootstrap() {
     secret: configService.get<string>("COOKIE_SECRET"),
   });
 
-  await app.listen(process.env.PORT || 1337);
+  await app.listen(parseInt(process.env.PORT || "1337", 10), "0.0.0.0");
 }
 bootstrap();

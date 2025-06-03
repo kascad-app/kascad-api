@@ -22,5 +22,6 @@ RUN pnpm install --prod --frozen-lockfile && rm .npmrc
 COPY --from=builder /usr/src/app/dist ./dist
 
 USER node
+ENV PORT=8080
 EXPOSE 8080
 CMD ["node", "dist/main.js"]
