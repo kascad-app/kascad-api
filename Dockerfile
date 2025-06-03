@@ -12,25 +12,22 @@ FROM base AS builder
 
 WORKDIR /usr/src/app
 
+# Copy package files
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
 ARG GITHUB_TOKEN
-RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
-    echo "=== DEBUG: Token first 10 chars: $(echo $GITHUB_TOKEN | cut -c1-10)" && \
-    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
-    echo "=== DEBUG: .npmrc content ===" && \
-    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
-    echo "=== DEBUG: Testing GitHub registry access ===" && \
-    curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-         -H "Accept: application/vnd.npm.install-v1+json" \
-         https://npm.pkg.github.com/@kascad-app/shared-types || echo "Curl test failed" && \
-    echo "=== DEBUG: Running pnpm install ===" && \
-    pnpm install && \
-    rm .npmrc
 
+# Setup npm registry for private packages
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
 COPY --chown=node:node . .
 
+# Build application
 RUN pnpm build
 
 ###################
@@ -40,24 +37,19 @@ FROM base AS production
 
 WORKDIR /usr/src/app
 
+# Copy package files
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
 ARG GITHUB_TOKEN
-RUN echo "=== DEBUG: Token length: ${#GITHUB_TOKEN} ===" && \
-    echo "=== DEBUG: Token first 10 chars: $(echo $GITHUB_TOKEN | cut -c1-10)" && \
-    echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
-    echo "=== DEBUG: .npmrc content ===" && \
-    cat .npmrc | sed 's/:_authToken=.*/:_authToken=***/' && \
-    echo "=== DEBUG: Testing GitHub registry access ===" && \
-    curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-         -H "Accept: application/vnd.npm.install-v1+json" \
-         https://npm.pkg.github.com/@kascad-app/shared-types || echo "Curl test failed" && \
-    echo "=== DEBUG: Running pnpm install ===" && \
-    pnpm install --prod && \
-    rm .npmrc && \
-    npm cache clean --force
 
+# Setup npm registry for private packages
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built application from builder
 COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
 
 USER node
