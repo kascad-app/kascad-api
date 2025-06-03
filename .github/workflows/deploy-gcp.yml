@@ -1,80 +1,80 @@
-name: Deploy to Cloud Run
+# name: Deploy to Cloud Run
 
-on:
-  push:
-    branches:
-      - main
-      - staging
+# on:
+#   push:
+#     branches:
+#       - main
+#       - staging
 
-jobs:
-  deploy:
-    name: Build & Deploy
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     name: Build & Deploy
+#     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: read
+#     permissions:
+#       contents: read
+#       packages: read
 
-    env:
-      REGION: europe-west1
-      IMAGE_NAME: kascad-api
+#     env:
+#       REGION: europe-west1
+#       IMAGE_NAME: kascad-api
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
 
-      - name: Set environment variables
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENV=production" >> $GITHUB_ENV
-            echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
-            echo "SERVICE_NAME=api" >> $GITHUB_ENV
-            echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
-           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            echo "ENV=staging" >> $GITHUB_ENV
-            echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
-            echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
-            echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
-           else
-            echo "Unsupported branch: ${{ github.ref }}"
-            exit 1
-          fi
+#       - name: Set environment variables
+#         run: |
+#           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+#             echo "ENV=production" >> $GITHUB_ENV
+#             echo "PROJECT_ID=kascad-production" >> $GITHUB_ENV
+#             echo "SERVICE_NAME=api" >> $GITHUB_ENV
+#             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_PRODUCTION" >> $GITHUB_ENV
+#            elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+#             echo "ENV=staging" >> $GITHUB_ENV
+#             echo "PROJECT_ID=kascad-staging" >> $GITHUB_ENV
+#             echo "SERVICE_NAME=api-staging" >> $GITHUB_ENV
+#             echo "CREDENTIALS_SECRET=GCP_CREDENTIALS_STAGING" >> $GITHUB_ENV
+#            else
+#             echo "Unsupported branch: ${{ github.ref }}"
+#             exit 1
+#           fi
 
-      - name: Compute Docker image URI
-        run: |
-          source $GITHUB_ENV
-          echo "IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
+#       - name: Compute Docker image URI
+#         run: |
+#           source $GITHUB_ENV
+#           echo "IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/kascad/${IMAGE_NAME}:${GITHUB_SHA}" >> $GITHUB_ENV
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets[env.CREDENTIALS_SECRET] }}
-          token_format: access_token
+#       - name: Authenticate to Google Cloud
+#         uses: google-github-actions/auth@v2
+#         with:
+#           credentials_json: ${{ secrets[env.CREDENTIALS_SECRET] }}
+#           token_format: access_token
 
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+#       - name: Configure Docker for Artifact Registry
+#         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.IMAGE_URI }}
-            europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/kascad/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          secrets: |
-            "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: .
+#           push: true
+#           tags: |
+#             ${{ env.IMAGE_URI }}
+#             europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/kascad/${{ env.IMAGE_NAME }}:latest
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
+#           secrets: |
+#             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy $SERVICE_NAME \
-            --project=$PROJECT_ID \
-            --image=$IMAGE_URI \
-            --region=$REGION \
-            --platform=managed \
-            --allow-unauthenticated
+#       - name: Deploy to Cloud Run
+#         run: |
+#           gcloud run deploy $SERVICE_NAME \
+#             --project=$PROJECT_ID \
+#             --image=$IMAGE_URI \
+#             --region=$REGION \
+#             --platform=managed \
+#             --allow-unauthenticated
