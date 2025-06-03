@@ -1,0 +1,17 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        echo "🔐 Secret is: $${_GITHUB_TOKEN_GCP:0:5}"
+
+    secretEnv: ["_GITHUB_TOKEN_GCP"]
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/kascad-production/secrets/github-token-gcp/versions/1
+      env: "_GITHUB_TOKEN_GCP"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
