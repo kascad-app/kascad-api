@@ -51,3 +51,4 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/kascad/${{ env.IMAGE_NAME }}:${{ github.sha }}
           region: ${{ env.REGION }}
           allow-unauthenticated: true
+          timeout: 600s
