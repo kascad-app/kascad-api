@@ -2,45 +2,47 @@ name: Deploy API to Cloud Run
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
+  deploy:
+    name: Build and Deploy API
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
-      id-token: write
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS_PRODUCTION }}
-
-      - name: Set up Docker auth for Artifact Registry
+      - name: Set up Docker auth for Google Artifact Registry
         uses: docker/login-action@v3
         with:
           registry: europe-west1-docker.pkg.dev
           username: _json_key
           password: ${{ secrets.GCP_CREDENTIALS_PRODUCTION }}
 
-      - name: Inject GitHub Token into .npmrc
-        run: |
-          echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN_GCP }}" >> .npmrc
+      - name: Set up gcloud CLI
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_PRODUCTION }}
 
-      - name: Build Docker image
+      - name: Set up gcloud project
         run: |
-          docker build \
-            --build-arg GITHUB_TOKEN_GCP=${{ secrets.GH_TOKEN_GCP }} \
-            -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
+          gcloud config set project kascad-production
+          gcloud config set run/region europe-west1
 
-      - name: Push Docker image
+      - name: Create .env file
+        run: echo "$ENV_FILE_PRODUCTION" > .env
+        env:
+          ENV_FILE_PRODUCTION: ${{ secrets.ENV_FILE_PRODUCTION }}
+
+      - name: Build and push Docker image
         run: |
+          docker build -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
           docker push europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }}
 
       - name: Deploy to Cloud Run
