@@ -1,25 +1,42 @@
-FROM node:22-alpine AS pnpm-22-alpine
+###################
+# BASE IMAGE
+###################
+FROM node:22-alpine AS base
 
-RUN npm install -g pnpm
+RUN npm i -g pnpm@latest
 
-FROM pnpm-22-alpine
+###################
+# BUILD FOR PRODUCTION
+###################
+FROM base AS builder
 
-WORKDIR /kascad-api
+WORKDIR /usr/src/app
 
-COPY package.json .
-COPY pnpm-lock.yaml .
-COPY tsconfig.json .
-COPY .npmrc .
+COPY --chown=node:node package.json pnpm-lock.yaml .npmrc ./
 
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    sed -i "s|\${GITHUB_TOKEN}|$(cat /run/secrets/GITHUB_TOKEN)|g" .npmrc \
+ARG GITHUB_TOKEN
+RUN sed -i "s|\${GITHUB_TOKEN}|${GITHUB_TOKEN}|g" .npmrc \
     && pnpm install \
     && rm .npmrc
 
-COPY ./src ./src
+COPY --chown=node:node . .
 
 RUN pnpm build
 
+RUN pnpm install --prod && npm cache clean --force
+
+###################
+# PRODUCTION
+###################
+FROM base AS production
+
+WORKDIR /usr/src/app
+
+COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
+
+USER node
+
 EXPOSE 8080
 
-ENTRYPOINT ["pnpm", "start:prod"]
+CMD [ "node", "dist/main.js" ]
