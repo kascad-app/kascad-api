@@ -52,3 +52,11 @@ jobs:
           region: ${{ env.REGION }}
           allow-unauthenticated: true
           timeout: 600s
+
+      - name: Make Cloud Run service public
+        run: |
+          gcloud run services add-iam-policy-binding ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker" \
+            --project ${{ env.PROJECT_ID }}
