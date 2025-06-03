@@ -4,24 +4,19 @@ RUN npm i -g pnpm@latest
 FROM base AS builder
 WORKDIR /usr/src/app
 
-COPY .npmrc .npmrc
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install --frozen-lockfile && rm .npmrc
 COPY . .
 
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 FROM base AS production
 WORKDIR /usr/src/app
 
-COPY .npmrc .npmrc
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --prod --frozen-lockfile && rm .npmrc
+RUN pnpm install --prod --frozen-lockfile
 
 COPY --from=builder /usr/src/app/dist ./dist
 
 USER node
-ENV PORT=8080
 EXPOSE 8080
 CMD ["node", "dist/main.js"]

@@ -1,17 +1,14 @@
-# docker-compose.yml
-version: "3.8"
+version: "3.9"
 
 services:
-  api:
+  kascad-api:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - GITHUB_TOKEN=${GH_TOKEN_GCP}
+        - GITHUB_TOKEN_GCP=${GITHUB_TOKEN_GCP}
     ports:
       - "8080:8080"
     environment:
       - NODE_ENV=production
-      - GH_TOKEN_GCP=${GH_TOKEN_GCP}
-    volumes:
-      - .:/usr/src/app
+    restart: unless-stopped
