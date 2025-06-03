@@ -35,7 +35,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
+          docker build \
+            --build-arg GITHUB_TOKEN_GCP=${{ secrets.GH_TOKEN_GCP }} \
+            -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
