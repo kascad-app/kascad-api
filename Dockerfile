@@ -12,17 +12,18 @@ FROM base AS builder
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node package.json pnpm-lock.yaml .npmrc ./
-
 ARG GITHUB_TOKEN
-RUN sed -i "s|\${GITHUB_TOKEN}|${GITHUB_TOKEN}|g" .npmrc \
-    && pnpm install \
-    && rm .npmrc
+
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" >> .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+RUN pnpm install && rm .npmrc
 
 COPY --chown=node:node . .
 
 RUN pnpm build
-
 RUN pnpm install --prod && npm cache clean --force
 
 ###################
