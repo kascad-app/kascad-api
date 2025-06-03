@@ -5,12 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # args:
-      #   - GITHUB_TOKEN=${GITHUB_TOKEN}
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     ports:
       - "1337:1337"
     volumes:
       - .:/app
       - /app/node_modules
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
