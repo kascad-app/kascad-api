@@ -12,9 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Auth to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -28,7 +25,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
           docker build --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN_GCP }} -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
           docker push europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }}
 
