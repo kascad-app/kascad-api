@@ -13,12 +13,13 @@ FROM base AS builder
 WORKDIR /usr/src/app
 
 ARG GITHUB_TOKEN
-
-COPY .npmrc .npmrc
+    
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    sed -i "s|\${GITHUB_TOKEN}|$(cat /run/secrets/GITHUB_TOKEN)|g" .npmrc \
+    && pnpm install \
+    && rm .npmrc
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
-
-RUN pnpm install && rm .npmrc
 
 COPY --chown=node:node . .
 
