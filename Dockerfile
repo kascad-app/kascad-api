@@ -4,7 +4,14 @@ RUN npm i -g pnpm@latest
 FROM base AS builder
 WORKDIR /usr/src/app
 
-COPY .npmrc .npmrc
+# Token GitHub pour GitHub Packages (via ARG pour build local ou GitHub Actions)
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
+
+# Injecte token dans .npmrc
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc \
+  && echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
 COPY package.json pnpm-lock.yaml ./
 COPY .env .env
 RUN pnpm install --frozen-lockfile && rm .npmrc
@@ -15,7 +22,12 @@ RUN pnpm build
 FROM base AS production
 WORKDIR /usr/src/app
 
-COPY .npmrc .npmrc
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
+
+RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc \
+  && echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+
 COPY package.json pnpm-lock.yaml ./
 COPY .env .env
 RUN pnpm install --prod --frozen-lockfile && rm .npmrc
