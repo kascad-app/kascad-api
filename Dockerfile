@@ -16,7 +16,9 @@ ARG GITHUB_TOKEN
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN test -n "$GITHUB_TOKEN" || (echo "GITHUB_TOKEN is not set" && exit 1)
+RUN echo "Available environment variables:" && env | grep -i github || true
+RUN echo "GITHUB_TOKEN value: '$GITHUB_TOKEN'"
+RUN echo "Build args:" && env | grep -i arg || true
 
 RUN echo "@kascad-app:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
