@@ -17,25 +17,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  console.log("🌱 ENV DEBUG");
-  console.log("CORS_ORIGIN:", configService.get<string>("CORS_ORIGIN"));
-  console.log(
-    "CORS_ORIGIN SPLIT:",
-    configService.get<string>("CORS_ORIGIN").split(", "),
-  );
-  console.log(
-    "CORS_EXPOSED_HEADERS:",
-    configService.get<string>("CORS_EXPOSED_HEADERS"),
-  );
-  console.log(
-    "CORS_ALLOWED_METHODS:",
-    configService.get<string>("CORS_ALLOWED_METHODS"),
-  );
-  console.log(
-    "CORS_ALLOWED_HEADERS:",
-    configService.get<string>("CORS_ALLOWED_HEADERS"),
-  );
-
   app.enableCors({
     origin: configService
       .get<string>("CORS_ORIGIN")
