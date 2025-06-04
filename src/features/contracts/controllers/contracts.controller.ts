@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 
 import {
   ContractOffer,
-  getContractsDto,
+  contractOfferDto,
   Message,
   registerMessageDto,
   Rider,
@@ -30,13 +30,13 @@ export class ContractsOffersController {
 
   @Get()
   @Logged()
-  async getAll(): Promise<getContractsDto[]> {
+  async getAll(): Promise<contractOfferDto[]> {
     return await this._contractsService.findAll();
   }
 
   @Get(":id")
   @Logged()
-  async getOne(@Param("id") id: string): Promise<getContractsDto> {
+  async getOne(@Param("id") id: string): Promise<contractOfferDto> {
     return await this._contractsService.findById(id);
   }
 
