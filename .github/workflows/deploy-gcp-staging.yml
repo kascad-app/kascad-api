@@ -4,6 +4,12 @@ on:
   push:
     branches: [staging]
 
+env:
+  GCP_PROJECT_ID: kascad-staging
+  SERVICE_NAME: kascad-api
+  REGION: europe-west1
+  DOCKER_REGISTRY: europe-west1-docker.pkg.dev
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -18,7 +24,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS_STAGING }}
 
       - name: Docker login to Artifact Registry
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.DOCKER_REGISTRY }} --quiet
 
       - name: Create .env file from GitHub Secret
         run: echo "${{ secrets.ENV_FILE_STAGING }}" > .env
@@ -27,18 +33,18 @@ jobs:
         run: |
           docker build \
             --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN_GCP }} \
-            -t europe-west1-docker.pkg.dev/kascad-staging/kascad/kascad-api:${{ github.sha }} \
+            -t ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
             .
-          docker push europe-west1-docker.pkg.dev/kascad-staging/kascad/kascad-api:${{ github.sha }}
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: kascad-api
-          region: europe-west1
-          image: europe-west1-docker.pkg.dev/kascad-staging/kascad/kascad-api:${{ github.sha }}
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           timeout: 600s
-          project_id: kascad-staging
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Clean up
         run: rm .env
