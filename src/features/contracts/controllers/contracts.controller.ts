@@ -40,6 +40,9 @@ export class ContractsOffersController {
     @Param("id") id: string,
     @User() user: RiderMe,
   ): Promise<contractOfferDto> {
+    if (!id) {
+      throw new Error("Contract ID is required");
+    }
     await this._contractsService.messageViewedBy(id, user);
     return await this._contractsService.findById(id);
   }
