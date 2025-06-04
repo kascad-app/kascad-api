@@ -1,11 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+
 import {
+  type ContractOffer as IContractOffer,
   ContractStatus,
   ContractType,
   Message as MessageType,
   ProfileType,
-  type ContractOffer as IContractOffer,
 } from "@kascad-app/shared-types";
+
 import { HydratedDocument } from "mongoose";
 
 export type ContractOfferDocument = HydratedDocument<ContractOffer>;

@@ -2,17 +2,17 @@ import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 
 import { Rider, RiderMe } from "@kascad-app/shared-types";
 
+import { RidersCronService } from "../services/rider-cron.service";
 import { RidersService } from "../services/riders.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
-import { RidersCronService } from "../services/rider-cron.service";
 
 @Controller()
 export class RidersController {
   constructor(
     private _ridersService: RidersService,
-    private _ridersCronService: RidersCronService, // Ajoute l'injection ici
+    private _ridersCronService: RidersCronService,
   ) {}
 
   @Post("test-cron")

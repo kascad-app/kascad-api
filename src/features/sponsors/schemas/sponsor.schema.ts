@@ -1,17 +1,19 @@
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+
 import {
+  AccountStatus,
+  type Language,
+  ProfileRole,
+  ProfileType,
+  SocialNetwork,
+  type Sponsor as ISponsor,
+  type SponsorIdentifier as SponsorIdentifierType,
   type SponsorIdentity as SponsorIdentityType,
   type SponsorPreferences as SponsorPreferencesType,
-  type SponsorIdentifier as SponsorIdentifierType,
-  type Sponsor as ISponsor,
-  type Language,
-  SocialNetwork,
   type Sport,
-  ProfileType,
-  ProfileRole,
-  AccountStatus,
 } from "@kascad-app/shared-types";
+
 import * as bcrypt from "bcrypt";
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import type { HydratedDocument } from "mongoose";
 import { ProfileStatus } from "src/config/database/base.schema";
 

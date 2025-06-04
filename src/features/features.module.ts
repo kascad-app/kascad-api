@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
 
+import { ArticlesModule } from "./articles/articles.module";
 import { AuthModule } from "./auth/auth.module";
+import { ContractOfferModule } from "./contracts/contracts.module";
 import { RidersModule } from "./riders/riders.module";
 import { SponsorsModule } from "./sponsors/sponsors.module";
-import { ArticlesModule } from "./articles/articles.module";
-import { ContractOfferModule } from "./contracts/contracts.module";
 
 @Module({
   imports: [

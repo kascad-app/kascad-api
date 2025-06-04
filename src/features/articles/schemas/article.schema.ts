@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+
 import { type Article as IArticle } from "@kascad-app/shared-types";
+
 import { HydratedDocument } from "mongoose";
 
 export type ArticleDocument = HydratedDocument<Article>;

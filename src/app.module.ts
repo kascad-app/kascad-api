@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
+import { ScheduleModule } from "@nestjs/schedule";
 
 import { MongoDBConfigService } from "./config/database/mongodb.config";
 import { FeaturesModule } from "./features/features.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [

@@ -8,8 +8,10 @@ import {
   Rider,
   Sponsor,
 } from "@kascad-app/shared-types";
-import { Logged } from "src/common/decorators/logged.decorator";
+
 import { ContractsOffersService } from "../services/contracts.service";
+
+import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 
 @Controller()

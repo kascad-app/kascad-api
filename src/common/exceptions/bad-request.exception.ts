@@ -1,5 +1,6 @@
-import { APIError, StatusCode } from "@kascad-app/shared-types";
 import { HttpException, HttpStatus } from "@nestjs/common";
+
+import { APIError, StatusCode } from "@kascad-app/shared-types";
 
 export class BadRequest extends HttpException {
   constructor(message: string, errors?: { [key: string]: string }) {

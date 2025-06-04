@@ -2,9 +2,9 @@ import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
+import { ArticlesController } from "./controllers/articles.controller";
 import { ArticleSchema } from "./schemas/article.schema";
 import { ArticlesService } from "./services/articles.service";
-import { ArticlesController } from "./controllers/articles.controller";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
