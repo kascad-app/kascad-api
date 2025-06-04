@@ -77,6 +77,8 @@ export class ContractsOffersService {
             riderMail: 1,
             termsAndConditions: 1,
             status: 1,
+            isOpenByRider: 1,
+            isOpenBySponsor: 1,
           },
         },
       ])
