@@ -1,0 +1,20 @@
+name: Block Non-Staging PRs to Main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR is not from 'staging'
+        run: |
+          echo "PR from: ${{ github.head_ref }}"
+          if [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "❌ Pull requests to 'main' must come from 'staging'."
+            exit 1
+          else
+            echo "✅ PR source is 'staging'."
+          fi
