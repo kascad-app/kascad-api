@@ -17,6 +17,13 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  console.log("🌱 ENV DEBUG");
+  console.log("CORS_ORIGIN:", configService.get<string>("CORS_ORIGIN"));
+  console.log(
+    "CORS_ORIGIN SPLIT:",
+    configService.get<string>("CORS_ORIGIN").split(", "),
+  );
+
   app.enableCors({
     origin: configService.get<string>("CORS_ORIGIN").split(", "),
     credentials: true,
