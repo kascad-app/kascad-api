@@ -5,6 +5,7 @@ import {
   ContractOffer,
   contractOfferDto,
   Message,
+  ProfileType,
   registerMessageDto,
   Rider,
   Sponsor,
@@ -153,7 +154,7 @@ export class ContractsOffersService {
     return this._contractModel
       .countDocuments({
         riderMail,
-        isNew: true,
+        isOpenByRider: false,
       })
       .exec();
   }
@@ -178,6 +179,11 @@ export class ContractsOffersService {
     };
 
     contractOffer.messages.push(message);
+    if (user.type === ProfileType.RIDER) {
+      contractOffer.isOpenByRider = true;
+    } else if (user.type === ProfileType.SPONSOR) {
+      contractOffer.isOpenBySponsor = true;
+    }
     await contractOffer.save();
     return message;
   }
