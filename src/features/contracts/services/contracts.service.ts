@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 
 import {
   ContractOffer,
-  getContractsDto,
+  contractOfferDto,
   Message,
   registerMessageDto,
   Rider,
@@ -35,15 +35,15 @@ export class ContractsOffersService {
     return await this._contractModel.find(query).exec();
   }
 
-  async findAll(): Promise<getContractsDto[]> {
+  async findAll(): Promise<contractOfferDto[]> {
     return await this._contractModel
       .aggregate([
         {
           $lookup: {
             from: "sponsors",
-            localField: "authorMail",
+            localField: "sponsorMail",
             foreignField: "identifier.email",
-            as: "authorSponsor",
+            as: "sponsor",
           },
         },
         {
@@ -51,23 +51,23 @@ export class ContractsOffersService {
             from: "riders",
             localField: "riderMail",
             foreignField: "identifier.email",
-            as: "riderProfile",
+            as: "rider",
           },
         },
         {
           $addFields: {
-            authorAvatar: { $arrayElemAt: ["$authorSponsor.avatarUrl", 0] },
-            authorName: {
-              $arrayElemAt: ["$authorSponsor.identity.companyName", 0],
+            sponsorAvatar: { $arrayElemAt: ["$sponsor.avatarUrl", 0] },
+            sponsorName: {
+              $arrayElemAt: ["$sponsor.identity.companyName", 0],
             },
           },
         },
         {
           $project: {
             _id: 1,
-            authorMail: 1,
-            authorName: 1,
-            authorAvatar: 1,
+            sponsorMail: 1,
+            sponsorName: 1,
+            sponsorAvatar: 1,
             isNew: 1,
             type: 1,
             title: 1,
@@ -84,7 +84,7 @@ export class ContractsOffersService {
     // TODO filter by rider's mail
   }
 
-  async findById(id: string): Promise<getContractsDto> {
+  async findById(id: string): Promise<contractOfferDto> {
     const result = await this._contractModel
       .aggregate([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,9 +92,9 @@ export class ContractsOffersService {
         {
           $lookup: {
             from: "sponsors",
-            localField: "authorMail",
+            localField: "sponsorMail",
             foreignField: "identifier.email",
-            as: "authorSponsor",
+            as: "sponsor",
           },
         },
         {
@@ -102,27 +102,27 @@ export class ContractsOffersService {
             from: "riders",
             localField: "riderMail",
             foreignField: "identifier.email",
-            as: "riderProfile",
+            as: "rider",
           },
         },
         {
           $addFields: {
-            authorAvatar: { $arrayElemAt: ["$authorSponsor.avatarUrl", 0] },
-            authorName: {
-              $arrayElemAt: ["$authorSponsor.identity.companyName", 0],
+            sponsorAvatar: { $arrayElemAt: ["$sponsor.avatarUrl", 0] },
+            sponsorName: {
+              $arrayElemAt: ["$sponsor.identity.companyName", 0],
             },
             riderName: {
-              $arrayElemAt: ["$riderProfile.identity.fullName", 0],
+              $arrayElemAt: ["$rider.identity.fullName", 0],
             },
-            riderAvatar: { $arrayElemAt: ["$riderProfile.avatarUrl", 0] },
+            riderAvatar: { $arrayElemAt: ["$rider.avatarUrl", 0] },
           },
         },
         {
           $project: {
             _id: 0,
-            authorMail: 1,
-            authorName: 1,
-            authorAvatar: 1,
+            sponsorMail: 1,
+            sponsorName: 1,
+            sponsorAvatar: 1,
             isNew: 1,
             type: 1,
             title: 1,
@@ -141,12 +141,21 @@ export class ContractsOffersService {
         },
       ])
       .exec();
-    return result[0] as getContractsDto;
+    return result[0] as contractOfferDto;
   }
 
   async create(createContractOfferDto: ContractOffer): Promise<ContractOffer> {
     const newContractOffer = new this._contractModel(createContractOfferDto);
     return await newContractOffer.save();
+  }
+
+  async countNewMessagesForRider(riderMail: string): Promise<number> {
+    return this._contractModel
+      .countDocuments({
+        riderMail,
+        isNew: true,
+      })
+      .exec();
   }
 
   async insertMessage(

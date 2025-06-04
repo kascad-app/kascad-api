@@ -62,7 +62,7 @@ export class ContractOffer implements IContractOffer {
   updatedAt: Date;
 
   @Prop({ type: String, required: true })
-  authorMail: string;
+  sponsorMail: string;
 
   @Prop({ type: Boolean, default: true })
   isNew: boolean;
@@ -99,6 +99,12 @@ export class ContractOffer implements IContractOffer {
 
   @Prop({ type: [Message], default: [] })
   messages: MessageType[];
+
+  @Prop({ type: Boolean, default: false })
+  isOpenByRider: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  isOpenBySponsor: boolean;
 }
 
 export const ContractOfferSchema =
