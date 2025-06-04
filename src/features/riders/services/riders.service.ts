@@ -167,14 +167,18 @@ export class RidersService {
 
   async updateOne(id: string, rider: Rider) {
     const current = await this._riderModel.findById(id).lean();
-
     const newRider: Rider = {
       ...rider,
       displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
       identifier: {
         email: current.identifier.email,
         slug: current.identifier.slug,
-        ...rider.identifier,
+        phoneNumber: rider.identifier.phoneNumber,
+        username: rider.identifier.username,
+        strava: {
+          isLinked: current.identifier.strava.isLinked,
+          identifier: current.identifier.strava.identifier,
+        },
       },
       verified: current.verified,
       password: current.password,
