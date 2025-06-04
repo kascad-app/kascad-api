@@ -1,4 +1,4 @@
-name: Deploy API
+name: Deploy API - Production
 
 on:
   push:
@@ -24,11 +24,14 @@ jobs:
         run: echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
 
       - name: Debug .env content (first 10 lines)
-        run: head -n 10 .env
+        run: grep -E "JWT_SECRET|DB_URI|COOKIE_SECRET" .env || echo "No env variables found"
 
       - name: Build and push Docker image
         run: |
-          docker build --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN_GCP }} -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} .
+          docker build \
+            --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN_GCP }} \
+            -t europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }} \
+            .
           docker push europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }}
 
       - name: Deploy to Cloud Run
@@ -39,3 +42,7 @@ jobs:
           image: europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }}
           timeout: 600s
           project_id: kascad-production
+          env_vars_file: .env
+
+      - name: Clean up
+        run: rm .env
