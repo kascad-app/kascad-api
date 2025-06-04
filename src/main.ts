@@ -32,11 +32,6 @@ async function bootstrap() {
       .split(", "),
   });
 
-  console.log("🌱 ENV DEBUG");
-  console.log("JWT_SECRET:", process.env.JWT_ACCESSTOKEN_SECRET);
-  console.log("DB_URI:", process.env.JWT_ACCESSTOKEN_EXPIRESIN);
-  console.log("PORT:", process.env.PORT);
-
   await app.register(fastifyCookie, {
     secret: configService.get<string>("COOKIE_SECRET"),
   });
