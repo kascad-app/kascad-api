@@ -19,7 +19,7 @@ import { User } from "src/common/decorators/user.decorator";
 export class ContractsOffersController {
   constructor(private _contractsService: ContractsOffersService) {}
 
-  @Get("me/new-messages")
+  @Get("me/countNewMessages")
   @Logged()
   async getNewMessages(@User() user: RiderMe): Promise<{ count: number }> {
     const count = await this._contractsService.countNewMessagesForRider(
@@ -36,7 +36,11 @@ export class ContractsOffersController {
 
   @Get(":id")
   @Logged()
-  async getOne(@Param("id") id: string): Promise<contractOfferDto> {
+  async getOne(
+    @Param("id") id: string,
+    @User() user: RiderMe,
+  ): Promise<contractOfferDto> {
+    await this._contractsService.messageViewedBy(id, user);
     return await this._contractsService.findById(id);
   }
 

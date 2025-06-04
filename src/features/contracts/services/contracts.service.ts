@@ -145,6 +145,23 @@ export class ContractsOffersService {
     return result[0] as contractOfferDto;
   }
 
+  async messageViewedBy(id: string, user: Rider | Sponsor): Promise<void> {
+    const contractOffer = await this._contractModel.findById(id).exec();
+    if (!contractOffer) {
+      throw new Error("Contract not found");
+    }
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.type === ProfileType.RIDER) {
+      contractOffer.isOpenByRider = true;
+    } else if (user.type === ProfileType.SPONSOR) {
+      contractOffer.isOpenBySponsor = true;
+    }
+    await contractOffer.save();
+  }
+
   async create(createContractOfferDto: ContractOffer): Promise<ContractOffer> {
     const newContractOffer = new this._contractModel(createContractOfferDto);
     return await newContractOffer.save();
@@ -181,8 +198,10 @@ export class ContractsOffersService {
     contractOffer.messages.push(message);
     if (user.type === ProfileType.RIDER) {
       contractOffer.isOpenByRider = true;
+      contractOffer.isOpenBySponsor = false;
     } else if (user.type === ProfileType.SPONSOR) {
       contractOffer.isOpenBySponsor = true;
+      contractOffer.isOpenByRider = false;
     }
     await contractOffer.save();
     return message;
