@@ -103,7 +103,7 @@ export class ContractOffer implements IContractOffer {
   @Prop({ type: Boolean, default: false })
   isOpenByRider: boolean;
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Boolean, default: true })
   isOpenBySponsor: boolean;
 }
 
