@@ -12,11 +12,6 @@ import fastifyCookie from "@fastify/cookie";
 
 import { AppModule } from "./app.module";
 
-console.log("🌱 ENV DEBUG");
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
-console.log("DB_URI:", process.env.DATABASE_URL);
-console.log("PORT:", process.env.PORT);
-
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,

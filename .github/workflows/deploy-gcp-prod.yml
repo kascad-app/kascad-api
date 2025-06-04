@@ -24,7 +24,7 @@ jobs:
         run: echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
 
       - name: Debug .env content (first 10 lines)
-        run: grep -E "JWT_SECRET|DB_URI|COOKIE_SECRET" .env || echo "No env variables found"
+        run: head -n 10 .env || echo "No env variables found"
 
       - name: Build and push Docker image
         run: |
@@ -42,7 +42,6 @@ jobs:
           image: europe-west1-docker.pkg.dev/kascad-production/kascad/kascad-api:${{ github.sha }}
           timeout: 600s
           project_id: kascad-production
-          env_vars_file: .env
 
       - name: Clean up
         run: rm .env
