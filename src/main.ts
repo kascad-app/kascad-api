@@ -12,6 +12,11 @@ import fastifyCookie from "@fastify/cookie";
 
 import { AppModule } from "./app.module";
 
+console.log("🌱 ENV DEBUG");
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+console.log("DB_URI:", process.env.DATABASE_URL);
+console.log("PORT:", process.env.PORT);
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -31,6 +36,11 @@ async function bootstrap() {
       .get<string>("CORS_ALLOWED_HEADERS", "")
       .split(", "),
   });
+
+  console.log("🌱 ENV DEBUG");
+  console.log("JWT_SECRET:", process.env.JWT_ACCESSTOKEN_SECRET);
+  console.log("DB_URI:", process.env.JWT_ACCESSTOKEN_EXPIRESIN);
+  console.log("PORT:", process.env.PORT);
 
   await app.register(fastifyCookie, {
     secret: configService.get<string>("COOKIE_SECRET"),
