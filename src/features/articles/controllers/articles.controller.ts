@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Res,
 } from "@nestjs/common";
 
 import { Article, registerArticleDto } from "@kascad-app/shared-types";
@@ -14,7 +13,6 @@ import { Article, registerArticleDto } from "@kascad-app/shared-types";
 import { ArticlesService } from "../services/articles.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
-import { FastifyReply } from "fastify";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 
 @Controller()

@@ -11,10 +11,9 @@ import {
   ViewEntry,
 } from "@kascad-app/shared-types";
 
-import { RiderDocument, RiderModel } from "../schemas/rider.schema";
+import { RiderDocument } from "../schemas/rider.schema";
 
 import { Model } from "mongoose";
-import { Cron } from "@nestjs/schedule";
 
 type RiderSearchParams = {
   [key: string]: string | number | boolean;
@@ -92,6 +91,7 @@ export class RidersService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async aggregate(pipeline: any[]): Promise<Rider[]> {
     return await this._riderModel.aggregate(pipeline).exec();
   }
@@ -167,14 +167,18 @@ export class RidersService {
 
   async updateOne(id: string, rider: Rider) {
     const current = await this._riderModel.findById(id).lean();
-
     const newRider: Rider = {
       ...rider,
       displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
       identifier: {
         email: current.identifier.email,
         slug: current.identifier.slug,
-        ...rider.identifier,
+        phoneNumber: rider.identifier.phoneNumber,
+        username: rider.identifier.username,
+        strava: {
+          isLinked: current.identifier.strava.isLinked,
+          identifier: current.identifier.strava.identifier,
+        },
       },
       verified: current.verified,
       password: current.password,
