@@ -6,6 +6,7 @@ import {
   Message,
   registerMessageDto,
   Rider,
+  RiderMe,
   Sponsor,
 } from "@kascad-app/shared-types";
 
@@ -17,6 +18,15 @@ import { User } from "src/common/decorators/user.decorator";
 @Controller()
 export class ContractsOffersController {
   constructor(private _contractsService: ContractsOffersService) {}
+
+  @Get("me/new-messages")
+  @Logged()
+  async getNewMessages(@User() user: RiderMe): Promise<{ count: number }> {
+    const count = await this._contractsService.countNewMessagesForRider(
+      user.identifier.email,
+    );
+    return { count };
+  }
 
   @Get()
   @Logged()

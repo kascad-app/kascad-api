@@ -149,6 +149,15 @@ export class ContractsOffersService {
     return await newContractOffer.save();
   }
 
+  async countNewMessagesForRider(riderMail: string): Promise<number> {
+    return this._contractModel
+      .countDocuments({
+        riderMail,
+        isNew: true,
+      })
+      .exec();
+  }
+
   async insertMessage(
     id: string,
     user: Rider | Sponsor,
