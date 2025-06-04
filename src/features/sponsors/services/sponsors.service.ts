@@ -59,6 +59,7 @@ export class SponsorsService {
     return await newSponsor.save();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async aggregate(pipeline: any[]): Promise<Sponsor[]> {
     return await this._sponsorModel.aggregate(pipeline).exec();
   }

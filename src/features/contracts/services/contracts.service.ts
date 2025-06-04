@@ -85,6 +85,7 @@ export class ContractsOffersService {
   async findById(id: string): Promise<getContractsDto> {
     const result = await this._contractModel
       .aggregate([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         { $match: { _id: new (mongoose as any).Types.ObjectId(id) } },
         {
           $lookup: {
