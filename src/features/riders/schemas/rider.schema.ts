@@ -195,6 +195,9 @@ class RiderIdentifier implements RiderIdentifierType {
   })
   slug: string;
 
+  @Prop({
+    type: String,
+  })
   phoneNumber?: string;
 
   @Prop({
