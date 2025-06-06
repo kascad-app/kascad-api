@@ -5,6 +5,7 @@ import { ArticlesModule } from "./articles/articles.module";
 import { AuthModule } from "./auth/auth.module";
 import { ContractOfferModule } from "./contracts/contracts.module";
 import { RidersModule } from "./riders/riders.module";
+import { ScoutingModule } from "./scouting/scouting.module";
 import { SponsorsModule } from "./sponsors/sponsors.module";
 
 @Module({
@@ -14,6 +15,7 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     AuthModule,
     ArticlesModule,
     ContractOfferModule,
+    ScoutingModule,
     RouterModule.register([
       {
         path: "riders",
@@ -31,6 +33,10 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
         path: "contracts",
         module: ContractOfferModule,
       },
+      {
+        path: "scouting",
+        module: ScoutingModule,
+      },
     ]),
   ],
   controllers: [],
@@ -40,6 +46,7 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     AuthModule,
     ArticlesModule,
     ContractOfferModule,
+    ScoutingModule,
   ],
 })
 export class FeaturesModule {}
