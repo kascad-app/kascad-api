@@ -13,7 +13,7 @@ import {
 
 import { RiderDocument } from "../schemas/rider.schema";
 
-import { Model } from "mongoose";
+import { Model, PipelineStage } from "mongoose";
 
 type RiderSearchParams = {
   [key: string]: string | number | boolean;
@@ -91,8 +91,7 @@ export class RidersService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async aggregate(pipeline: any[]): Promise<Rider[]> {
+  async aggregate(pipeline: PipelineStage[]): Promise<Rider[]> {
     return await this._riderModel.aggregate(pipeline).exec();
   }
 
