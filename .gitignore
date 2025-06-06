@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# google cloud storage
+bucket-uploader-key.json
+
 # Logs
 logs
 *.log

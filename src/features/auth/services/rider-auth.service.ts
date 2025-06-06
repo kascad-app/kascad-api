@@ -10,6 +10,7 @@ import {
 import * as bcrypt from "bcrypt";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { RidersService } from "src/features/riders/services/riders.service";
+import { StorageService } from "src/shared/gcp/services/storage.service";
 
 @Injectable()
 export class RiderAuthService {
@@ -19,6 +20,7 @@ export class RiderAuthService {
     private readonly _accessTokenService: JwtService,
     @Inject("JwtRefreshTokenService")
     private readonly _refreshTokenService: JwtService,
+    private readonly storageService: StorageService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -77,6 +79,10 @@ export class RiderAuthService {
   }
 
   async updateMe(id: string, rider: Rider): Promise<Rider> {
+    console.log("Updating rider with ID:", rider);
+    if (rider.images && rider.images.length > 0) {
+      await this.storageService.uploadImage("image.jpg", "images/image.jpg");
+    }
     return await this._ridersService.updateOne(id, rider);
   }
 }
