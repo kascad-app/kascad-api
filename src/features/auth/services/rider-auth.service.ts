@@ -81,7 +81,15 @@ export class RiderAuthService {
   async updateMe(id: string, rider: Rider): Promise<Rider> {
     console.log("Updating rider with ID:", rider);
     if (rider.images && rider.images.length > 0) {
-      await this.storageService.uploadImage("image.jpg", "images/image.jpg");
+      for (const image of rider.images) {
+        if (image.url) {
+          const imagePath = image.url.split(/[\\/]/).pop()!;
+          await this.storageService.updateRiderImages(
+            [imagePath],
+            rider.identifier.slug,
+          );
+        }
+      }
     }
     return await this._ridersService.updateOne(id, rider);
   }
