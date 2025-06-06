@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
+import { getSearchPipeline } from "../aggregates/get-search-pipeline";
+
 import { RidersService } from "src/features/riders/services/riders.service";
 
 type SearchDto = {
@@ -12,6 +14,6 @@ export class SearchService {
 
   search(search: SearchDto) {
     console.log(search);
-    return this._riderService.aggregate([]);
+    return this._riderService.aggregate(getSearchPipeline(search));
   }
 }
