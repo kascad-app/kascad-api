@@ -5,6 +5,8 @@ import {
   loginRiderDto,
   registerRiderDto,
   Rider,
+  RiderMe,
+  updateRiderDto,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -78,19 +80,12 @@ export class RiderAuthService {
     });
   }
 
-  async updateMe(id: string, rider: Rider): Promise<Rider> {
+  async updateMe(user: RiderMe, rider: updateRiderDto): Promise<Rider> {
     console.log("Updating rider with ID:", rider);
-    if (rider.images && rider.images.length > 0) {
-      for (const image of rider.images) {
-        if (image.url) {
-          const imagePath = image.url.split(/[\\/]/).pop()!;
-          await this.storageService.updateRiderImages(
-            [imagePath],
-            rider.identifier.slug,
-          );
-        }
-      }
-    }
-    return await this._ridersService.updateOne(id, rider);
+    await this.storageService.updateRiderImages(
+      rider.images,
+      user.identifier.slug,
+    );
+    return await this._ridersService.updateOne(user._id, rider);
   }
 }

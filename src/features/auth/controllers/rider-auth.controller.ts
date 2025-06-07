@@ -16,6 +16,7 @@ import {
   registerRiderDto,
   Rider,
   RiderMe,
+  updateRiderDto,
 } from "@kascad-app/shared-types";
 
 import { RefreshAuthGuard } from "../guards/refresh-auth.guard";
@@ -182,11 +183,11 @@ export class RiderAuthController {
   }
 
   @Logged()
-  @Put("me")
+  @Put("me/update")
   async updateMe(
-    @User() user: Rider,
-    @Body() updateRider: Rider,
+    @User() user: RiderMe,
+    @Body() updateRider: updateRiderDto,
   ): Promise<Rider> {
-    return this._authService.updateMe(user._id, updateRider);
+    return this._authService.updateMe(user, updateRider);
   }
 }

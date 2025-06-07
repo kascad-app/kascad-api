@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Storage } from "@google-cloud/storage";
+import { Storage, TransferManager } from "@google-cloud/storage";
+import { ImageDto } from "@kascad-app/shared-types";
+import { Express } from "express";
 
 @Injectable()
 export class StorageService {
@@ -14,40 +16,53 @@ export class StorageService {
     this.bucketName = process.env.GCP_BUCKET_IMAGES;
   }
 
-  async updateRiderImages(
-    imagePaths: string[],
-    userSlug: string,
-  ): Promise<void> {
+  async updateRiderImages(images: ImageDto[], userSlug: string): Promise<void> {
     const bucket = this.storage.bucket(this.bucketName);
-    const [files] = await bucket.getFiles({ prefix: `images/${userSlug}/` });
-    const existingFileNames = files.map((file) =>
-      file.name.replace(`images/${userSlug}/`, ""),
-    );
+    const transferManager = new TransferManager(bucket);
 
-    // Delete files in GCP that are not in imagePaths
-    for (const file of files) {
-      const fileName = file.name.replace(`images/${userSlug}/`, "");
-      if (!imagePaths.includes(fileName)) {
-        await file.delete();
-        console.log(`🗑️ Image supprimée de GCP: ${file.name}`);
+    if (images && images.length > 0) {
+      const imagesToUpload = images.filter((image) => image.fileToUpload);
+      const imagesToDelete = images.filter((image) => image.isToDelete);
+
+      // for (const image of imagesToUpload) {
+      //   await this.storage.bucket(this.bucketName).upload(image.fileToUpload, {
+      //     destination: `images/${userSlug}/`,
+      //     metadata: {
+      //       contentType: "image/jpeg",
+      //     },
+      //   });
+      // }
+
+      for (const image of imagesToDelete) {
+        if (image) {
+          await this.deleteImage(image);
+        }
       }
     }
-
-    // Filter imagePaths to only those not already in GCP
-    const filesToUpload = imagePaths.filter((path) => {
-      const fileName = path.split(/[\\/]/).pop()!;
-      return !existingFileNames.includes(fileName);
-    });
-
-    for (const file of filesToUpload) {
-      await this.storage.bucket(this.bucketName).upload(file, {
-        destination: `images/${userSlug}/`,
-        metadata: {
-          contentType: "image/jpeg",
-        },
-      });
-    }
   }
+
+  // async uploadFileToGCP(file: File, userSlug: string): Promise<string> {
+  //   const destination = `images/${userSlug}/${file.name}`;
+  //   const bucket = this.storage.bucket(this.bucketName);
+
+  //   // Upload depuis le buffer
+  //   const blob = bucket.file(destination);
+  //   const stream = blob.createWriteStream({
+  //     metadata: {
+  //       contentType: file.type,
+  //     },
+  //   });
+
+  //   return new Promise<string>((resolve, reject) => {
+  //     stream.on("error", (err) => reject(err));
+  //     stream.on("finish", () => {
+  //       // URL publique (si le bucket est public)
+  //       const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${destination}`;
+  //       resolve(publicUrl);
+  //     });
+  //     stream.end(file.buffer);
+  //   });
+  // }
 
   async uploadAvatar(imagePath: string, userSlug: string): Promise<void> {
     await this.storage
@@ -67,8 +82,10 @@ export class StorageService {
     console.log(`✅ Avatar uploadé !`);
   }
 
-  async deleteImage(imagePath: string): Promise<void> {
-    await this.storage.bucket(this.bucketName).file(imagePath).delete();
+  async deleteImage(image: ImageDto): Promise<void> {
+    const match = image.url.match(/\/images\/.+/);
+    const fileToDelete = match ? match[0] : image.url;
+    await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
     console.log(`✅ Image supprimée !`);
   }
 

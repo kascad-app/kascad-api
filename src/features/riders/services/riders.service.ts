@@ -8,6 +8,7 @@ import {
   registerRiderDto,
   Rider,
   RiderIdentity,
+  updateRiderDto,
   ViewEntry,
 } from "@kascad-app/shared-types";
 
@@ -165,7 +166,7 @@ export class RidersService {
     return await newRider.save();
   }
 
-  async updateOne(id: string, rider: Rider) {
+  async updateOne(id: string, rider: updateRiderDto) {
     const current = await this._riderModel.findById(id).lean();
     const newRider: Rider = {
       ...rider,
