@@ -82,7 +82,7 @@ export class RiderAuthService {
 
   async updateMe(user: RiderMe, rider: updateRiderDto): Promise<Rider> {
     console.log("Updating rider with ID:", rider);
-    await this.storageService.updateRiderImages(
+    rider.images = await this.storageService.updateRiderImages(
       rider.images,
       user.identifier.slug,
     );

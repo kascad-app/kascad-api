@@ -18,6 +18,7 @@ import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
 import { RidersModule } from "src/features/riders/riders.module";
 import { SponsorsModule } from "src/features/sponsors/sponsors.module";
+import { GcpModule } from "src/shared/gcp/gcp.module";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SponsorsModule } from "src/features/sponsors/sponsors.module";
       inject: [ConfigService],
       connectionName: MongoDBConnection.AUTH,
     }),
+    GcpModule,
   ],
 
   controllers: [RiderAuthController, SponsorAuthController],

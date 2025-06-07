@@ -19,8 +19,6 @@ export class StorageService {
     images: ImageDto[],
     userSlug: string,
   ): Promise<ImageDto[]> {
-    const bucket = this.storage.bucket(this.bucketName);
-
     if (images && images.length > 0) {
       for (const image of images) {
         if (image.fileToUpload) {
