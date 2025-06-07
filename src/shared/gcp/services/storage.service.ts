@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Storage, TransferManager } from "@google-cloud/storage";
+import { Storage } from "@google-cloud/storage";
 import { ImageDto } from "@kascad-app/shared-types";
-import { Express } from "express";
 
 @Injectable()
 export class StorageService {
@@ -16,53 +15,49 @@ export class StorageService {
     this.bucketName = process.env.GCP_BUCKET_IMAGES;
   }
 
-  async updateRiderImages(images: ImageDto[], userSlug: string): Promise<void> {
+  async updateRiderImages(
+    images: ImageDto[],
+    userSlug: string,
+  ): Promise<ImageDto[]> {
     const bucket = this.storage.bucket(this.bucketName);
-    const transferManager = new TransferManager(bucket);
 
     if (images && images.length > 0) {
-      const imagesToUpload = images.filter((image) => image.fileToUpload);
-      const imagesToDelete = images.filter((image) => image.isToDelete);
-
-      // for (const image of imagesToUpload) {
-      //   await this.storage.bucket(this.bucketName).upload(image.fileToUpload, {
-      //     destination: `images/${userSlug}/`,
-      //     metadata: {
-      //       contentType: "image/jpeg",
-      //     },
-      //   });
-      // }
-
-      for (const image of imagesToDelete) {
-        if (image) {
+      for (const image of images) {
+        if (image.fileToUpload) {
+          const file = await this.uploadFileToGCP(image.fileToUpload, userSlug);
+          image.url = file;
+        } else if (image.isToDelete) {
           await this.deleteImage(image);
         }
       }
     }
+
+    return images;
   }
 
-  // async uploadFileToGCP(file: File, userSlug: string): Promise<string> {
-  //   const destination = `images/${userSlug}/${file.name}`;
-  //   const bucket = this.storage.bucket(this.bucketName);
+  async uploadFileToGCP(
+    file: Express.Multer.File,
+    userSlug: string,
+  ): Promise<string> {
+    const destination = `images/${userSlug}/${file.originalname}`;
+    const bucket = this.storage.bucket(this.bucketName);
 
-  //   // Upload depuis le buffer
-  //   const blob = bucket.file(destination);
-  //   const stream = blob.createWriteStream({
-  //     metadata: {
-  //       contentType: file.type,
-  //     },
-  //   });
+    const blob = bucket.file(destination);
+    const stream = blob.createWriteStream({
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
 
-  //   return new Promise<string>((resolve, reject) => {
-  //     stream.on("error", (err) => reject(err));
-  //     stream.on("finish", () => {
-  //       // URL publique (si le bucket est public)
-  //       const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${destination}`;
-  //       resolve(publicUrl);
-  //     });
-  //     stream.end(file.buffer);
-  //   });
-  // }
+    return new Promise<string>((resolve, reject) => {
+      stream.on("error", (err) => reject(err));
+      stream.on("finish", () => {
+        const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${destination}`;
+        resolve(publicUrl);
+      });
+      stream.end(file.buffer);
+    });
+  }
 
   async uploadAvatar(imagePath: string, userSlug: string): Promise<void> {
     await this.storage
