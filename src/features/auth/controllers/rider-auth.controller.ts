@@ -200,24 +200,11 @@ export class RiderAuthController {
   @Post("me/uploadImages")
   async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
     try {
-      const files = [];
-      for await (const file of req.files()) {
-        const chunks = [];
-        for await (const chunk of file.file) {
-          chunks.push(chunk);
-        }
-        const buffer = Buffer.concat(chunks);
-        files.push({
-          filename: file.filename,
-          mimetype: file.mimetype,
-          fieldname: file.fieldname,
-          buffer,
-        });
-      }
-      console.log(files);
-
       console.log("Updating rider with ID:", user._id);
-      await this.storageService.updateRiderImages(files, user.identifier.slug);
+      await this.storageService.updateRiderImages(
+        () => req.files(),
+        user.identifier.slug,
+      );
       return {
         success: true,
         message: "Files uploaded successfully",
