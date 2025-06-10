@@ -78,7 +78,17 @@ export class RiderAuthService {
     });
   }
 
-  async updateMe(user: RiderMe, rider: updateRiderDto): Promise<Rider> {
+  async updateInfo(user: RiderMe, rider: updateRiderDto): Promise<Rider> {
     return await this._ridersService.updateOne(user._id, rider);
+  }
+
+  async updateImages(user: RiderMe, imageUrl: string[]): Promise<Rider> {
+    return await this._ridersService.updateImages(
+      user._id,
+      imageUrl.map((url) => ({
+        url,
+        uploadDate: new Date(),
+      })),
+    );
   }
 }

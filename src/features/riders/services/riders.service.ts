@@ -4,6 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import {
   AccountStatus,
   GenderIdentity,
+  Image,
   ProfileType,
   registerRiderDto,
   Rider,
@@ -197,6 +198,16 @@ export class RidersService {
     return await this._riderModel.findByIdAndUpdate(id, newRider, {
       new: true,
     });
+  }
+
+  async updateImages(id: string, images: Image[]): Promise<Rider> {
+    const rider = await this._riderModel.findById(id).exec();
+
+    if (!rider) throw new Error("Rider not found");
+
+    rider.images.push(...images);
+
+    return await rider.save();
   }
 
   async compareEncryptedPassword(

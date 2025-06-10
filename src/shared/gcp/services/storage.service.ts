@@ -22,7 +22,7 @@ export class StorageService {
       options?: Omit<BusboyConfig, "headers">,
     ) => AsyncIterableIterator<MultipartFile>,
     userSlug: string,
-  ) {
+  ): Promise<string[]> {
     const imagesToUpload = [];
     for await (const file of files()) {
       const chunks = [];
@@ -38,12 +38,15 @@ export class StorageService {
       });
     }
 
+    let imagesUrl: string[] = [];
     if (imagesToUpload.length > 0) {
       for (const image of imagesToUpload) {
-        await this.uploadFileToGCP(image, userSlug);
-        // image.url = file;
+        const fileUrl: string = await this.uploadFileToGCP(image, userSlug);
+        if (fileUrl) imagesUrl.push(fileUrl);
       }
     }
+
+    return imagesUrl;
   }
 
   async uploadFileToGCP(file: any, userSlug: string): Promise<string> {

@@ -30,6 +30,7 @@ import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { StorageService } from "src/shared/gcp/services/storage.service";
+import { log } from "console";
 
 @Controller("auth/rider")
 export class RiderAuthController {
@@ -193,7 +194,7 @@ export class RiderAuthController {
     @User() user: RiderMe,
     @Body() updateRider: updateRiderDto,
   ): Promise<Rider> {
-    return this._authService.updateMe(user, updateRider);
+    return this._authService.updateInfo(user, updateRider);
   }
 
   @Logged()
@@ -201,10 +202,16 @@ export class RiderAuthController {
   async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
     try {
       console.log("Updating rider with ID:", user._id);
-      await this.storageService.updateRiderImages(
+      const imagesUrl = await this.storageService.updateRiderImages(
         () => req.files(),
         user.identifier.slug,
       );
+
+      console.log("Images URL:", imagesUrl);
+      if (imagesUrl || imagesUrl.length > 0) {
+        await this._authService.updateImages(user, imagesUrl);
+      }
+
       return {
         success: true,
         message: "Files uploaded successfully",
