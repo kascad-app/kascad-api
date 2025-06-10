@@ -12,7 +12,6 @@ import {
 import * as bcrypt from "bcrypt";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { RidersService } from "src/features/riders/services/riders.service";
-import { StorageService } from "src/shared/gcp/services/storage.service";
 
 @Injectable()
 export class RiderAuthService {
@@ -22,7 +21,6 @@ export class RiderAuthService {
     private readonly _accessTokenService: JwtService,
     @Inject("JwtRefreshTokenService")
     private readonly _refreshTokenService: JwtService,
-    private readonly storageService: StorageService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -81,11 +79,6 @@ export class RiderAuthService {
   }
 
   async updateMe(user: RiderMe, rider: updateRiderDto): Promise<Rider> {
-    console.log("Updating rider with ID:", rider);
-    rider.images = await this.storageService.updateRiderImages(
-      rider.images,
-      user.identifier.slug,
-    );
     return await this._ridersService.updateOne(user._id, rider);
   }
 }

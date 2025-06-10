@@ -4,8 +4,11 @@ import {
   Get,
   Post,
   Put,
+  Req,
   Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
@@ -22,16 +25,18 @@ import {
 import { RefreshAuthGuard } from "../guards/refresh-auth.guard";
 import { RiderAuthService } from "../services/rider-auth.service";
 
-import { FastifyReply } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { StorageService } from "src/shared/gcp/services/storage.service";
 
 @Controller("auth/rider")
 export class RiderAuthController {
   constructor(
     private _authService: RiderAuthService,
     private readonly _configService: ConfigService,
+    private readonly storageService: StorageService,
   ) {}
 
   private readonly cookieSerializeOptions: {
@@ -189,5 +194,37 @@ export class RiderAuthController {
     @Body() updateRider: updateRiderDto,
   ): Promise<Rider> {
     return this._authService.updateMe(user, updateRider);
+  }
+
+  @Logged()
+  @Post("me/uploadImages")
+  async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
+    try {
+      const files = [];
+      for await (const file of req.files()) {
+        const chunks = [];
+        for await (const chunk of file.file) {
+          chunks.push(chunk);
+        }
+        const buffer = Buffer.concat(chunks);
+        files.push({
+          filename: file.filename,
+          mimetype: file.mimetype,
+          fieldname: file.fieldname,
+          buffer,
+        });
+      }
+      console.log(files);
+
+      console.log("Updating rider with ID:", user._id);
+      await this.storageService.updateRiderImages(files, user.identifier.slug);
+      return {
+        success: true,
+        message: "Files uploaded successfully",
+      };
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      throw new BadRequest("Failed to upload files");
+    }
   }
 }
