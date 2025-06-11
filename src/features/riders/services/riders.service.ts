@@ -210,6 +210,16 @@ export class RidersService {
     return await rider.save();
   }
 
+  async updateAvatar(id: string, avatarUrl: string) {
+    const rider = await this._riderModel.findById(id).exec();
+
+    if (!rider) throw new Error("Rider not found");
+
+    rider.avatarUrl = avatarUrl;
+
+    await rider.save();
+  }
+
   async compareEncryptedPassword(
     riderId: string,
     password: string,

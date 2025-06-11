@@ -492,6 +492,7 @@ class Rider implements IRider {
 
   description?: string;
 
+  @Prop({ type: String })
   avatarUrl?: string;
 
   @Prop({

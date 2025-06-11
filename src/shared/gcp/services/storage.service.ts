@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Storage } from "@google-cloud/storage";
-import { ImageDto } from "@kascad-app/shared-types";
+import { ImageDto, RiderMe } from "@kascad-app/shared-types";
 import { BusboyConfig } from "@fastify/busboy";
 import { MultipartFile } from "@fastify/multipart";
 
@@ -41,7 +41,11 @@ export class StorageService {
     let imagesUrl: string[] = [];
     if (imagesToUpload.length > 0) {
       for (const image of imagesToUpload) {
-        const fileUrl: string = await this.uploadFileToGCP(image, userSlug);
+        const fileUrl: string = await this.uploadFileToGCP(
+          image,
+          userSlug,
+          false,
+        );
         if (fileUrl) imagesUrl.push(fileUrl);
       }
     }
@@ -49,9 +53,53 @@ export class StorageService {
     return imagesUrl;
   }
 
-  async uploadFileToGCP(file: any, userSlug: string): Promise<string> {
+  async updateRiderAvatar(
+    file: (options?: Omit<BusboyConfig, "headers">) => Promise<MultipartFile>,
+    user: RiderMe,
+  ): Promise<string> {
+    const avatarFile = await file();
+    if (!avatarFile) {
+      throw new Error("No avatar file provided");
+    }
+    if (
+      user.avatarUrl != null &&
+      user.avatarUrl != undefined &&
+      user.avatarUrl !== ""
+    ) {
+      await this.deleteAvatar(user.identifier.slug);
+    }
+
+    const chunks = [];
+    for await (const chunk of avatarFile.file) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    const image = {
+      filename: avatarFile.filename,
+      mimetype: avatarFile.mimetype,
+      fieldname: "avatar-" + user.identifier.slug,
+      buffer,
+    };
+
+    const fileUrl: string = await this.uploadFileToGCP(
+      image,
+      user.identifier.slug,
+      true,
+    );
+
+    return fileUrl;
+  }
+
+  async uploadFileToGCP(
+    file: any,
+    userSlug: string,
+    isAvatar: boolean,
+  ): Promise<string> {
     try {
-      const destination = `images/${userSlug}/${file.fieldname}.jpg`;
+      const destination = isAvatar
+        ? `avatars/${file.fieldname}`
+        : `images/${userSlug}/${file.fieldname}`;
       const bucket = this.storage.bucket(this.bucketName);
 
       const blob = bucket.file(destination);
@@ -97,6 +145,12 @@ export class StorageService {
     const fileToDelete = match ? match[0] : image.url;
     await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
     console.log(`✅ Image supprimée !`);
+  }
+
+  async deleteAvatar(userSlug: string): Promise<void> {
+    const fileToDelete = `avatars/avatar-${userSlug}`;
+    await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
+    console.log(`✅ Avatar supprimé !`);
   }
 
   async;

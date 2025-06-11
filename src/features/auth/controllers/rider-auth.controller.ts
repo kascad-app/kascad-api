@@ -25,19 +25,16 @@ import {
 import { RefreshAuthGuard } from "../guards/refresh-auth.guard";
 import { RiderAuthService } from "../services/rider-auth.service";
 
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply } from "fastify";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
-import { StorageService } from "src/shared/gcp/services/storage.service";
-import { log } from "console";
 
 @Controller("auth/rider")
 export class RiderAuthController {
   constructor(
     private _authService: RiderAuthService,
     private readonly _configService: ConfigService,
-    private readonly storageService: StorageService,
   ) {}
 
   private readonly cookieSerializeOptions: {
@@ -186,39 +183,5 @@ export class RiderAuthController {
       success: false,
       message: "Logged out successfully",
     };
-  }
-
-  @Logged()
-  @Put("me/update")
-  async updateMe(
-    @User() user: RiderMe,
-    @Body() updateRider: updateRiderDto,
-  ): Promise<Rider> {
-    return this._authService.updateInfo(user, updateRider);
-  }
-
-  @Logged()
-  @Post("me/uploadImages")
-  async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
-    try {
-      console.log("Updating rider with ID:", user._id);
-      const imagesUrl = await this.storageService.updateRiderImages(
-        () => req.files(),
-        user.identifier.slug,
-      );
-
-      console.log("Images URL:", imagesUrl);
-      if (imagesUrl || imagesUrl.length > 0) {
-        await this._authService.updateImages(user, imagesUrl);
-      }
-
-      return {
-        success: true,
-        message: "Files uploaded successfully",
-      };
-    } catch (error) {
-      console.error("Error uploading files:", error);
-      throw new BadRequest("Failed to upload files");
-    }
   }
 }
