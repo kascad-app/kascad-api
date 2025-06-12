@@ -66,7 +66,7 @@ export class StorageService {
       user.avatarUrl != undefined &&
       user.avatarUrl !== ""
     ) {
-      await this.deleteAvatar(user.identifier.slug);
+      await this.deleteAvatar(user.avatarUrl);
     }
 
     const chunks = [];
@@ -122,36 +122,33 @@ export class StorageService {
     }
   }
 
-  // async uploadAvatar(imagePath: string, userSlug: string): Promise<void> {
-  //   await this.storage
-  //     .bucket(this.bucketName)
-  //     .file(`avatar/${userSlug}`)
-  //     .delete()
-  //     .catch(() => {
-  //       console.log(`⚠️ Aucun avatar à supprimer, on continue...`);
-  //     });
-
-  //   await this.storage.bucket(this.bucketName).upload(imagePath, {
-  //     destination: `avatars/${userSlug}`,
-  //     metadata: {
-  //       contentType: "image/jpeg",
-  //     },
-  //   });
-  //   console.log(`✅ Avatar uploadé !`);
-  // }
-
-  async deleteImage(image: ImageDto): Promise<void> {
-    const match = image.url.match(/\/images\/.+/);
-    const fileToDelete = match ? match[0] : image.url;
-    await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-    console.log(`✅ Image supprimée !`);
+  async deleteImageFromGCP(imageUrl: string): Promise<void> {
+    const regex = imageUrl.match(/(images\/.+)$/);
+    const fileToDelete = regex ? regex[1] : null;
+    try {
+      await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
+      console.log(`✅ Image supprimée !`);
+    } catch (error) {
+      // On ignore l'erreur si le fichier n'existe pas ou autre
+      console.warn(
+        `⚠️ Impossible de supprimer l'avatar (${fileToDelete}) :`,
+        error.message,
+      );
+    }
   }
 
-  async deleteAvatar(userSlug: string): Promise<void> {
-    const fileToDelete = `avatars/avatar-${userSlug}`;
-    await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-    console.log(`✅ Avatar supprimé !`);
+  async deleteAvatar(imageUrl: string): Promise<void> {
+    const regex = imageUrl.match(/(avatars\/.+)$/);
+    const fileToDelete = regex ? regex[1] : null;
+    try {
+      await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
+      console.log(`✅ Avatar supprimé !`);
+    } catch (error) {
+      // On ignore l'erreur si le fichier n'existe pas ou autre
+      console.warn(
+        `⚠️ Impossible de supprimer l'avatar (${fileToDelete}) :`,
+        error.message,
+      );
+    }
   }
-
-  async;
 }

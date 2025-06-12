@@ -39,6 +39,23 @@ export class RidersController {
     @User() user: RiderMe,
     @Body() updateRider: updateRiderDto,
   ): Promise<Rider> {
+    if (updateRider.images && updateRider.images.length > 0) {
+      const imagesToKeep = updateRider.images.filter(
+        (image) => !image.isToDelete,
+      );
+      const imagesToDelete = updateRider.images.filter(
+        (image) => image.isToDelete,
+      );
+
+      updateRider = await this._ridersService.removeImages(
+        user._id,
+        imagesToKeep,
+      );
+
+      for (const image of imagesToDelete) {
+        await this.storageService.deleteImageFromGCP(image.url);
+      }
+    }
     return this._ridersService.updateOne(user._id, updateRider);
   }
 
@@ -46,13 +63,19 @@ export class RidersController {
   @Post("me/upload-images")
   async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
     try {
+      if (!req.isMultipart()) {
+        return {
+          success: false,
+          message: "No files to upload",
+        };
+      }
       const imagesUrl = await this.storageService.updateRiderImages(
         () => req.files(),
         user.identifier.slug,
       );
 
       if (imagesUrl || imagesUrl.length > 0) {
-        await this._ridersService.updateImages(
+        await this._ridersService.uploadImages(
           user._id,
           imagesUrl.map((url) => ({
             url,
@@ -75,18 +98,24 @@ export class RidersController {
   @Post("me/upload-avatar")
   async uploadAvatar(@User() user: RiderMe, @Req() req: FastifyRequest) {
     try {
+      if (!req.isMultipart()) {
+        return {
+          success: false,
+          message: "No avatar file to upload",
+        };
+      }
+
       const imageUrl = await this.storageService.updateRiderAvatar(
         () => req.file(),
         user,
       );
-      console.log("Image URL:", imageUrl);
       if (imageUrl) {
         await this._ridersService.updateAvatar(user._id, imageUrl);
       }
 
       return {
         success: true,
-        message: "Files uploaded successfully",
+        message: "Avatar updated successfully",
       };
     } catch (error) {
       console.error("Error uploading files:", error);

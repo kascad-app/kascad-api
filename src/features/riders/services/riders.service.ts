@@ -5,6 +5,7 @@ import {
   AccountStatus,
   GenderIdentity,
   Image,
+  ImageDto,
   ProfileType,
   registerRiderDto,
   Rider,
@@ -200,7 +201,14 @@ export class RidersService {
     });
   }
 
-  async updateImages(id: string, images: Image[]): Promise<Rider> {
+  async removeImages(id: string, payload: ImageDto[]): Promise<Rider> {
+    const rider = await this._riderModel.findById(id).exec();
+    if (!rider) throw new Error("Rider not found");
+    rider.images = payload;
+    return await rider.save();
+  }
+
+  async uploadImages(id: string, images: Image[]): Promise<Rider> {
     const rider = await this._riderModel.findById(id).exec();
 
     if (!rider) throw new Error("Rider not found");
