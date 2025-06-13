@@ -1,25 +1,21 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Req } from "@nestjs/common";
 
-import { Rider, RiderMe } from "@kascad-app/shared-types";
+import { Rider, RiderMe, updateRiderDto } from "@kascad-app/shared-types";
 
-import { RidersCronService } from "../services/rider-cron.service";
 import { RidersService } from "../services/riders.service";
 
+import { FastifyRequest } from "fastify";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
+import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { StorageService } from "src/shared/gcp/services/storage.service";
 
 @Controller()
 export class RidersController {
   constructor(
     private _ridersService: RidersService,
-    private _ridersCronService: RidersCronService,
+    private readonly storageService: StorageService,
   ) {}
-
-  @Post("test-cron")
-  async testCron(): Promise<string> {
-    await this._ridersCronService.handleMonthlyViews();
-    return "Cron exécuté avec succès";
-  }
 
   @Get()
   @Logged()
@@ -37,18 +33,93 @@ export class RidersController {
     return await this._ridersService.findBySlug(slugRider);
   }
 
-  // A supprimer lors du deploy de l'API
-  @Put(":id")
-  async updateRider(
-    @Param("id") id: string,
-    @Body() updateRider: Rider,
+  @Logged()
+  @Put("me/update-info")
+  async updateMe(
+    @User() user: RiderMe,
+    @Body() updateRider: updateRiderDto,
   ): Promise<Rider> {
-    return this._ridersService.updateOne(id, updateRider);
+    if (updateRider.images && updateRider.images.length > 0) {
+      const imagesToKeep = updateRider.images.filter(
+        (image) => !image.isToDelete,
+      );
+      const imagesToDelete = updateRider.images.filter(
+        (image) => image.isToDelete,
+      );
+
+      updateRider = await this._ridersService.removeImages(
+        user._id,
+        imagesToKeep,
+      );
+
+      for (const image of imagesToDelete) {
+        await this.storageService.deleteImageFromGCP(image.url);
+      }
+    }
+    return this._ridersService.updateOne(user._id, updateRider);
   }
 
-  // @Delete(":id")
-  // @Logged()
-  // async deleteRider(@Param("id") id: string): Promise<void> {
-  //   return await this._ridersService.remove(id);
-  // }
+  @Logged()
+  @Post("me/upload-images")
+  async uploadFile(@User() user: RiderMe, @Req() req: FastifyRequest) {
+    try {
+      if (!req.isMultipart()) {
+        return {
+          success: false,
+          message: "No files to upload",
+        };
+      }
+      const imagesUrl = await this.storageService.updateRiderImages(
+        () => req.files(),
+        user.identifier.slug,
+      );
+
+      if (imagesUrl || imagesUrl.length > 0) {
+        await this._ridersService.uploadImages(
+          user._id,
+          imagesUrl.map((url) => ({
+            url,
+            uploadDate: new Date(),
+          })),
+        );
+      }
+
+      return {
+        success: true,
+        message: "Files uploaded successfully",
+      };
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      throw new BadRequest("Failed to upload files");
+    }
+  }
+
+  @Logged()
+  @Post("me/upload-avatar")
+  async uploadAvatar(@User() user: RiderMe, @Req() req: FastifyRequest) {
+    try {
+      if (!req.isMultipart()) {
+        return {
+          success: false,
+          message: "No avatar file to upload",
+        };
+      }
+
+      const imageUrl = await this.storageService.updateRiderAvatar(
+        () => req.file(),
+        user,
+      );
+      if (imageUrl) {
+        await this._ridersService.updateAvatar(user._id, imageUrl);
+      }
+
+      return {
+        success: true,
+        message: "Avatar updated successfully",
+      };
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      throw new BadRequest("Failed to upload files");
+    }
+  }
 }

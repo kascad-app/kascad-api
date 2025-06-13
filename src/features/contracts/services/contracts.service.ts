@@ -199,6 +199,7 @@ export class ContractsOffersService {
 
     contractOffer.messages.push(message);
     if (user.type === ProfileType.RIDER) {
+      contractOffer.isNew = false;
       contractOffer.isOpenByRider = true;
       contractOffer.isOpenBySponsor = false;
     } else if (user.type === ProfileType.SPONSOR) {

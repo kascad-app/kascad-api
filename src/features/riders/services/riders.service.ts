@@ -4,10 +4,13 @@ import { InjectModel } from "@nestjs/mongoose";
 import {
   AccountStatus,
   GenderIdentity,
+  Image,
+  ImageDto,
   ProfileType,
   registerRiderDto,
   Rider,
   RiderIdentity,
+  updateRiderDto,
   ViewEntry,
 } from "@kascad-app/shared-types";
 
@@ -165,7 +168,7 @@ export class RidersService {
     return await newRider.save();
   }
 
-  async updateOne(id: string, rider: Rider) {
+  async updateOne(id: string, rider: updateRiderDto) {
     const current = await this._riderModel.findById(id).lean();
     const newRider: Rider = {
       ...rider,
@@ -196,6 +199,33 @@ export class RidersService {
     return await this._riderModel.findByIdAndUpdate(id, newRider, {
       new: true,
     });
+  }
+
+  async removeImages(id: string, payload: ImageDto[]): Promise<Rider> {
+    const rider = await this._riderModel.findById(id).exec();
+    if (!rider) throw new Error("Rider not found");
+    rider.images = payload;
+    return await rider.save();
+  }
+
+  async uploadImages(id: string, images: Image[]): Promise<Rider> {
+    const rider = await this._riderModel.findById(id).exec();
+
+    if (!rider) throw new Error("Rider not found");
+
+    rider.images.push(...images);
+
+    return await rider.save();
+  }
+
+  async updateAvatar(id: string, avatarUrl: string) {
+    const rider = await this._riderModel.findById(id).exec();
+
+    if (!rider) throw new Error("Rider not found");
+
+    rider.avatarUrl = avatarUrl;
+
+    await rider.save();
   }
 
   async compareEncryptedPassword(

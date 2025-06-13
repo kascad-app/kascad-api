@@ -9,6 +9,7 @@ import { RidersService } from "./services/riders.service";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
+import { GcpModule } from "src/shared/gcp/gcp.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
         collection: MongoDBConnection.RIDERS,
       },
     ]),
+    GcpModule,
   ],
   controllers: [RidersController],
   providers: [RidersService, RidersCronService],
