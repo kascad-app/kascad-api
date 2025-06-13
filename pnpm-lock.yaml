@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fastify/busboy':
+        specifier: ^3.1.1
+        version: 3.1.1
       '@fastify/cookie':
         specifier: ^9.4.0
         version: 9.4.0
@@ -372,6 +375,9 @@ packages:
   '@fastify/busboy@1.2.1':
     resolution: {integrity: sha512-7PQA7EH43S0CxcOa9OeAnaeA0oQ+e/DHNPZwSQM9CQHW76jle5+OvLdibRp/Aafs9KXbLhxyjOTkRjWUbQEd3Q==}
     engines: {node: '>=14'}
+
+  '@fastify/busboy@3.1.1':
+    resolution: {integrity: sha512-5DGmA8FTdB2XbDeEwc/5ZXBl6UbBAyBOOLlPuBnZ/N1SwdH9Ii+cOX3tBROlDgcTXxjOYnLMVoKk9+FXAw0CJw==}
 
   '@fastify/cookie@9.4.0':
     resolution: {integrity: sha512-Th+pt3kEkh4MQD/Q2q1bMuJIB5NX/D5SwSpOKu3G/tjoGbwfpurIMJsWSPS0SJJ4eyjtmQ8OipDQspf8RbUOlg==}
@@ -3814,6 +3820,8 @@ snapshots:
   '@fastify/busboy@1.2.1':
     dependencies:
       text-decoding: 1.0.0
+
+  '@fastify/busboy@3.1.1': {}
 
   '@fastify/cookie@9.4.0':
     dependencies:
