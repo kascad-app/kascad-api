@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { Storage } from "@google-cloud/storage";
-import { ImageDto, RiderMe } from "@kascad-app/shared-types";
+
 import { BusboyConfig } from "@fastify/busboy";
 import { MultipartFile } from "@fastify/multipart";
+import { Storage } from "@google-cloud/storage";
+import { RiderMe } from "@kascad-app/shared-types";
 
 @Injectable()
 export class StorageService {
@@ -38,7 +39,7 @@ export class StorageService {
       });
     }
 
-    let imagesUrl: string[] = [];
+    const imagesUrl: string[] = [];
     if (imagesToUpload.length > 0) {
       for (const image of imagesToUpload) {
         const fileUrl: string = await this.uploadFileToGCP(
@@ -92,6 +93,7 @@ export class StorageService {
   }
 
   async uploadFileToGCP(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     file: any,
     userSlug: string,
     isAvatar: boolean,
@@ -127,7 +129,7 @@ export class StorageService {
     const fileToDelete = regex ? regex[1] : null;
     try {
       await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-      console.log(`✅ Image supprimée !`);
+      console.log("✅ Image supprimée !");
     } catch (error) {
       // On ignore l'erreur si le fichier n'existe pas ou autre
       console.warn(
@@ -142,7 +144,7 @@ export class StorageService {
     const fileToDelete = regex ? regex[1] : null;
     try {
       await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-      console.log(`✅ Avatar supprimé !`);
+      console.log("✅ Avatar supprimé !");
     } catch (error) {
       // On ignore l'erreur si le fichier n'existe pas ou autre
       console.warn(

@@ -4,9 +4,9 @@ import {
   FastifyAdapter,
   type NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import multipart from "@fastify/multipart";
 
 import fastifyCookie from "@fastify/cookie";
+import multipart from "@fastify/multipart";
 
 import { AppModule } from "./app.module";
 

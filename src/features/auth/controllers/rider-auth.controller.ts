@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Req,
-  Res,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import { CookieSerializeOptions } from "@fastify/cookie";
@@ -19,7 +8,6 @@ import {
   registerRiderDto,
   Rider,
   RiderMe,
-  updateRiderDto,
 } from "@kascad-app/shared-types";
 
 import { RefreshAuthGuard } from "../guards/refresh-auth.guard";

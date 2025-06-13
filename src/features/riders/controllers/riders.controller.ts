@@ -4,11 +4,11 @@ import { Rider, RiderMe, updateRiderDto } from "@kascad-app/shared-types";
 
 import { RidersService } from "../services/riders.service";
 
+import { FastifyRequest } from "fastify";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
-import { FastifyRequest } from "fastify";
-import { StorageService } from "src/shared/gcp/services/storage.service";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
+import { StorageService } from "src/shared/gcp/services/storage.service";
 
 @Controller()
 export class RidersController {

@@ -5,8 +5,6 @@ import {
   loginRiderDto,
   registerRiderDto,
   Rider,
-  RiderMe,
-  updateRiderDto,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
