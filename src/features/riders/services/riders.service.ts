@@ -201,11 +201,12 @@ export class RidersService {
     });
   }
 
-  async removeImages(id: string, payload: ImageDto[]): Promise<Rider> {
+  async removeImages(id: string, payload: ImageDto[]): Promise<ImageDto[]> {
     const rider = await this._riderModel.findById(id).exec();
     if (!rider) throw new Error("Rider not found");
     rider.images = payload;
-    return await rider.save();
+    await rider.save();
+    return rider.images;
   }
 
   async uploadImages(id: string, images: Image[]): Promise<Rider> {
