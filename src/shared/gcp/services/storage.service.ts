@@ -79,7 +79,7 @@ export class StorageService {
     const image = {
       filename: avatarFile.filename,
       mimetype: avatarFile.mimetype,
-      fieldname: "avatar-" + user.identifier.slug,
+      fieldname: "avatar-" + Date.now(),
       buffer,
     };
 
@@ -100,7 +100,7 @@ export class StorageService {
   ): Promise<string> {
     try {
       const destination = isAvatar
-        ? `avatars/${file.fieldname}`
+        ? `avatars/${userSlug}/${file.fieldname}`
         : `images/${userSlug}/${file.fieldname}`;
       const bucket = this.storage.bucket(this.bucketName);
 
