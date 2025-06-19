@@ -35,27 +35,21 @@ export class RidersController {
 
   @Logged()
   @Put("me/update-info")
-  async updateMe(
-    @User() user: RiderMe,
-    @Body() updateRider: updateRiderDto,
-  ): Promise<Rider> {
+  async updateMe(@User() user: RiderMe, @Body() updateRider: updateRiderDto) {
     if (updateRider.images && updateRider.images.length > 0) {
-      const imagesToKeep = updateRider.images.filter(
-        (image) => !image.isToDelete,
-      );
       const imagesToDelete = updateRider.images.filter(
         (image) => image.isToDelete,
       );
 
-      updateRider = await this._ridersService.removeImages(
-        user._id,
-        imagesToKeep,
-      );
+      if (imagesToDelete.length > 0) {
+        await this._ridersService.removeImages(user._id, imagesToDelete);
 
-      for (const image of imagesToDelete) {
-        await this.storageService.deleteImageFromGCP(image.url);
+        for (const image of imagesToDelete) {
+          await this.storageService.deleteImageFromGCP(image.url);
+        }
       }
     }
+
     return this._ridersService.updateOne(user._id, updateRider);
   }
 
@@ -73,7 +67,6 @@ export class RidersController {
         () => req.files(),
         user.identifier.slug,
       );
-
       if (imagesUrl || imagesUrl.length > 0) {
         await this._ridersService.uploadImages(
           user._id,

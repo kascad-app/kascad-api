@@ -183,6 +183,7 @@ export class RidersService {
           identifier: current.identifier.strava.identifier,
         },
       },
+      images: current.images,
       verified: current.verified,
       password: current.password,
       role: current.role,
@@ -201,21 +202,19 @@ export class RidersService {
     });
   }
 
-  async removeImages(id: string, payload: ImageDto[]): Promise<Rider> {
-    const rider = await this._riderModel.findById(id).exec();
-    if (!rider) throw new Error("Rider not found");
-    rider.images = payload;
-    return await rider.save();
+  async removeImages(id: string, imagesToDelete: ImageDto[]): Promise<void> {
+    const urlsToDelete = imagesToDelete.map((img) => img.url);
+    await this._riderModel.updateOne(
+      { _id: id },
+      { $pull: { images: { url: { $in: urlsToDelete } } } },
+    );
   }
 
-  async uploadImages(id: string, images: Image[]): Promise<Rider> {
-    const rider = await this._riderModel.findById(id).exec();
-
-    if (!rider) throw new Error("Rider not found");
-
-    rider.images.push(...images);
-
-    return await rider.save();
+  async uploadImages(id: string, images: Image[]): Promise<void> {
+    await this._riderModel.updateOne(
+      { _id: id },
+      { $addToSet: { images: { $each: images } } },
+    );
   }
 
   async updateAvatar(id: string, avatarUrl: string) {

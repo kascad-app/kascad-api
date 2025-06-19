@@ -30,8 +30,9 @@ export class ContractsOffersController {
 
   @Get()
   @Logged()
-  async getAll(): Promise<contractOfferDto[]> {
-    return await this._contractsService.findAll();
+  async getAll(@User() user: RiderMe): Promise<contractOfferDto[]> {
+    console.log(user);
+    return await this._contractsService.findAll(user);
   }
 
   @Get(":id")
