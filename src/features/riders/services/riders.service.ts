@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import {
@@ -10,6 +10,7 @@ import {
   registerRiderDto,
   Rider,
   RiderIdentity,
+  RiderMe,
   updateRiderDto,
   ViewEntry,
 } from "@kascad-app/shared-types";
@@ -17,6 +18,9 @@ import {
 import { RiderDocument } from "../schemas/rider.schema";
 
 import { Model } from "mongoose";
+import { BusboyConfig } from "@fastify/busboy";
+import { MultipartFile } from "@fastify/multipart";
+import { StorageService } from "src/shared/gcp/services/storage.service";
 
 type RiderSearchParams = {
   [key: string]: string | number | boolean;
@@ -25,6 +29,7 @@ type RiderSearchParams = {
 export class RidersService {
   constructor(
     @InjectModel("Rider") private readonly _riderModel: Model<RiderDocument>,
+    private readonly storageService: StorageService,
   ) {}
 
   async search(params?: RiderSearchParams): Promise<Rider[]> {
@@ -171,6 +176,7 @@ export class RidersService {
   async updateOne(id: string, rider: updateRiderDto) {
     const current = await this._riderModel.findById(id).lean();
     const newRider: Rider = {
+      avatarUrl: current.avatarUrl,
       ...rider,
       displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
       identifier: {
@@ -262,5 +268,79 @@ export class RidersService {
 
   async remove(id: string): Promise<void> {
     await this._riderModel.findByIdAndDelete(id).exec();
+  }
+
+  async updateRiderAvatar(
+    file: (options?: Omit<BusboyConfig, "headers">) => Promise<MultipartFile>,
+    user: RiderMe,
+  ): Promise<string> {
+    const avatarFile = await file();
+    console.log(avatarFile);
+
+    if (!avatarFile) {
+      throw new Error("No avatar file provided");
+    }
+    if (
+      user.avatarUrl != null &&
+      user.avatarUrl != undefined &&
+      user.avatarUrl !== ""
+    ) {
+      await this.storageService.deleteAvatar(user.type, user.avatarUrl);
+    }
+
+    const chunks = [];
+    for await (const chunk of avatarFile.file) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    const image = {
+      filename: avatarFile.filename,
+      mimetype: avatarFile.mimetype,
+      fieldname: "avatar-" + Date.now(),
+      buffer,
+    };
+    let fileUrl: string = "";
+    if (image.filename != "kascadResetAvatar") {
+      fileUrl = await this.storageService.uploadFileToGCP(image, user, true);
+    }
+
+    return fileUrl;
+  }
+
+  async updateRiderImages(
+    files: (
+      options?: Omit<BusboyConfig, "headers">,
+    ) => AsyncIterableIterator<MultipartFile>,
+    user: RiderMe,
+  ): Promise<string[]> {
+    const imagesToUpload = [];
+    for await (const file of files()) {
+      const chunks = [];
+      for await (const chunk of file.file) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+      imagesToUpload.push({
+        filename: file.filename,
+        mimetype: file.mimetype,
+        fieldname: "image-" + Date.now(),
+        buffer,
+      });
+    }
+
+    const imagesUrl: string[] = [];
+    if (imagesToUpload.length > 0) {
+      for (const image of imagesToUpload) {
+        const fileUrl: string = await this.storageService.uploadFileToGCP(
+          image,
+          user,
+          false,
+        );
+        if (fileUrl) imagesUrl.push(fileUrl);
+      }
+    }
+
+    return imagesUrl;
   }
 }
