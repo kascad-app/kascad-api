@@ -171,6 +171,7 @@ export class RidersService {
   async updateOne(id: string, rider: updateRiderDto) {
     const current = await this._riderModel.findById(id).lean();
     const newRider: Rider = {
+      avatarUrl: current.avatarUrl,
       ...rider,
       displayName: `${rider.identity.firstName} ${rider.identity.lastName}`,
       identifier: {
