@@ -1,7 +1,4 @@
 import { Injectable } from "@nestjs/common";
-
-import { BusboyConfig } from "@fastify/busboy";
-import { MultipartFile } from "@fastify/multipart";
 import { Storage } from "@google-cloud/storage";
 import { RiderMe, Sponsor } from "@kascad-app/shared-types";
 
@@ -16,76 +13,6 @@ export class StorageService {
       keyFilename: process.env.GCP_BUCKET_CREDENTIALS_JSON,
     });
     this.bucketName = process.env.GCP_BUCKET_IMAGES;
-  }
-
-  async updateRiderImages(
-    files: (
-      options?: Omit<BusboyConfig, "headers">,
-    ) => AsyncIterableIterator<MultipartFile>,
-    user: RiderMe,
-  ): Promise<string[]> {
-    const imagesToUpload = [];
-    for await (const file of files()) {
-      const chunks = [];
-      for await (const chunk of file.file) {
-        chunks.push(chunk);
-      }
-      const buffer = Buffer.concat(chunks);
-      imagesToUpload.push({
-        filename: file.filename,
-        mimetype: file.mimetype,
-        fieldname: "image-" + Date.now(),
-        buffer,
-      });
-    }
-
-    const imagesUrl: string[] = [];
-    if (imagesToUpload.length > 0) {
-      for (const image of imagesToUpload) {
-        const fileUrl: string = await this.uploadFileToGCP(image, user, false);
-        if (fileUrl) imagesUrl.push(fileUrl);
-      }
-    }
-
-    return imagesUrl;
-  }
-
-  async updateRiderAvatar(
-    file: (options?: Omit<BusboyConfig, "headers">) => Promise<MultipartFile>,
-    user: RiderMe,
-  ): Promise<string> {
-    const avatarFile = await file();
-    console.log(avatarFile);
-
-    if (!avatarFile) {
-      throw new Error("No avatar file provided");
-    }
-    if (
-      user.avatarUrl != null &&
-      user.avatarUrl != undefined &&
-      user.avatarUrl !== ""
-    ) {
-      await this.deleteAvatar(user.type, user.avatarUrl);
-    }
-
-    const chunks = [];
-    for await (const chunk of avatarFile.file) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-
-    const image = {
-      filename: avatarFile.filename,
-      mimetype: avatarFile.mimetype,
-      fieldname: "avatar-" + Date.now(),
-      buffer,
-    };
-    let fileUrl: string = "";
-    if (image.filename != "kascadResetAvatar") {
-      fileUrl = await this.uploadFileToGCP(image, user, true);
-    }
-
-    return fileUrl;
   }
 
   async uploadFileToGCP(

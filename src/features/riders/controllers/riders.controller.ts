@@ -14,7 +14,7 @@ import { StorageService } from "src/shared/gcp/services/storage.service";
 export class RidersController {
   constructor(
     private _ridersService: RidersService,
-    private readonly storageService: StorageService,
+    private readonly _storageService: StorageService,
   ) {}
 
   @Get()
@@ -45,7 +45,7 @@ export class RidersController {
         await this._ridersService.removeImages(user._id, imagesToDelete);
 
         for (const image of imagesToDelete) {
-          await this.storageService.deleteImageFromGCP(user.type, image.url);
+          await this._storageService.deleteImageFromGCP(user.type, image.url);
         }
       }
     }
@@ -63,7 +63,7 @@ export class RidersController {
           message: "No files to upload",
         };
       }
-      const imagesUrl = await this.storageService.updateRiderImages(
+      const imagesUrl = await this._ridersService.updateRiderImages(
         () => req.files(),
         user,
       );
@@ -97,7 +97,7 @@ export class RidersController {
           message: "No avatar file to upload",
         };
       }
-      const imageUrl: string = await this.storageService.updateRiderAvatar(
+      const imageUrl: string = await this._ridersService.updateRiderAvatar(
         () => req.file(),
         user,
       );
