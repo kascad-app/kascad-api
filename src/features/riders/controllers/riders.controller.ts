@@ -45,7 +45,7 @@ export class RidersController {
         await this._ridersService.removeImages(user._id, imagesToDelete);
 
         for (const image of imagesToDelete) {
-          await this.storageService.deleteImageFromGCP(image.url);
+          await this.storageService.deleteImageFromGCP(user.type, image.url);
         }
       }
     }
@@ -65,7 +65,7 @@ export class RidersController {
       }
       const imagesUrl = await this.storageService.updateRiderImages(
         () => req.files(),
-        user.identifier.slug,
+        user,
       );
       if (imagesUrl || imagesUrl.length > 0) {
         await this._ridersService.uploadImages(
@@ -97,14 +97,11 @@ export class RidersController {
           message: "No avatar file to upload",
         };
       }
-
-      const imageUrl = await this.storageService.updateRiderAvatar(
+      const imageUrl: string = await this.storageService.updateRiderAvatar(
         () => req.file(),
         user,
       );
-      if (imageUrl) {
-        await this._ridersService.updateAvatar(user._id, imageUrl);
-      }
+      await this._ridersService.updateAvatar(user._id, imageUrl);
 
       return {
         success: true,
