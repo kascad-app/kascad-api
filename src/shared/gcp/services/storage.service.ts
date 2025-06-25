@@ -8,9 +8,14 @@ export class StorageService {
   private bucketName: string;
 
   constructor() {
+    const credentialsBase64 = process.env.GCP_BUCKET_CREDENTIALS_BASE64;
+    const credentials = credentialsBase64
+      ? JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"))
+      : undefined;
+
     this.storage = new Storage({
       projectId: process.env.GCP_PROJECT_ID,
-      keyFilename: process.env.GCP_BUCKET_CREDENTIALS_JSON,
+      credentials,
     });
     this.bucketName = process.env.GCP_BUCKET_IMAGES;
   }
