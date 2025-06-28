@@ -22,8 +22,8 @@ import {
   Strava as StravaType,
   StravaIdentifier as StravaIdentifierType,
   TrainingFrequency as TrainingFrequencyType,
-  TricksVideo as TricksVideoType,
   WeatherCondition,
+  OnlineVideo as OnlineVideoType,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -293,7 +293,7 @@ class RiderPerformance implements RiderPerformanceType {
 @Schema({
   _id: false,
 })
-class TricksVideo implements TricksVideoType {
+class OnlineVideo implements OnlineVideoType {
   @Prop({
     type: String,
   })
@@ -308,16 +308,6 @@ class TricksVideo implements TricksVideoType {
     type: String,
   })
   description?: string;
-
-  @Prop({
-    type: Date,
-  })
-  uploadDate: Date;
-
-  @Prop({
-    type: RiderPerformance,
-  })
-  relatedPerformance?: RiderPerformance;
 }
 
 @Schema({
@@ -335,12 +325,6 @@ class RiderPerformanceSummary implements PerformanceSummaryType {
     default: [],
   })
   performances: RiderPerformance[];
-
-  @Prop({
-    type: [TricksVideo],
-    default: [],
-  })
-  performanceVideos: TricksVideo[];
 }
 
 @Schema({
@@ -541,6 +525,12 @@ class Rider implements IRider {
     default: () => ({}),
   })
   sponsorSummary: SponsorSummaryType;
+
+  @Prop({
+    type: [OnlineVideo],
+    default: [],
+  })
+  videos: OnlineVideo[];
 
   @Prop({
     type: [RiderImage],
