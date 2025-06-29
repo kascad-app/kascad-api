@@ -33,10 +33,6 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
         path: "contracts",
         module: ContractOfferModule,
       },
-      {
-        path: "search",
-        module: SearchModule,
-      },
     ]),
   ],
   controllers: [],

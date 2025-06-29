@@ -8,7 +8,7 @@ type SearchSearchDto = {
   [key: string]: string | number | boolean;
 };
 
-@Controller()
+@Controller("search")
 @Logged()
 export class SearchController {
   constructor(private readonly _searchService: SearchService) {}
