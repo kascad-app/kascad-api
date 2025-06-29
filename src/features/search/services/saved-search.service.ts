@@ -5,7 +5,10 @@ import {
   SavedSearch,
   SavedSearchDocument,
 } from "../schemas/saved-search.schema";
-import { CreateSavedSearchDto } from "../types/search.dtos";
+import {
+  CreateSavedSearchDto,
+  UpdateSavedSearchDto,
+} from "../types/search.dtos";
 
 import { Model } from "mongoose";
 
@@ -20,7 +23,21 @@ export class SavedSearchService {
     return this._savedSearchModel.find({ sponsorId: userId });
   }
 
-  createSavedSearch(body: CreateSavedSearchDto) {
+  create(body: CreateSavedSearchDto) {
     return this._savedSearchModel.create(body);
+  }
+
+  update(userId: string, savedSearchId: string, body: UpdateSavedSearchDto) {
+    return this._savedSearchModel.updateOne(
+      { _id: savedSearchId, sponsorId: userId },
+      body,
+    );
+  }
+
+  delete(userId: string, savedSearchId: string) {
+    return this._savedSearchModel.deleteOne({
+      _id: savedSearchId,
+      sponsorId: userId,
+    });
   }
 }

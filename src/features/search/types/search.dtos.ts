@@ -10,4 +10,10 @@ export const createSavedSearchDto = z.object({
   filters: z.record(z.string(), z.string()),
 });
 
+export const updateSavedSearchDto = z.object({
+  name: z.string(),
+  filters: z.record(z.string(), z.string()),
+});
+
 export type CreateSavedSearchDto = z.infer<typeof createSavedSearchDto>;
+export type UpdateSavedSearchDto = z.infer<typeof updateSavedSearchDto>;
