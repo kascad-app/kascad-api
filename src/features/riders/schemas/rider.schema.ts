@@ -18,12 +18,13 @@ import {
   type RiderPreferences as RiderPreferencesType,
   SocialNetwork,
   type SponsorSummary as SponsorSummaryType,
-  type Sport,
+  type Sport as SportType,
   Strava as StravaType,
   StravaIdentifier as StravaIdentifierType,
   TrainingFrequency as TrainingFrequencyType,
   WeatherCondition,
   OnlineVideo as OnlineVideoType,
+  SportName,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -65,6 +66,23 @@ class View {
 
   @Prop({ type: [ViewEntry], default: [] })
   viewEntries: ViewEntry[];
+}
+
+@Schema({
+  _id: false,
+})
+class Sport {
+  @Prop({
+    type: String,
+    required: true,
+    enum: Object.values(SportName),
+  })
+  name: SportName;
+
+  @Prop({
+    type: String,
+  })
+  description?: string;
 }
 
 @Schema({
@@ -219,16 +237,16 @@ class RiderIdentifier implements RiderIdentifierType {
 })
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
-    type: [String],
+    type: [Sport],
     default: [],
   })
-  sports: Sport[];
+  sports: SportType[];
 
   @Prop({
     type: String,
     default: Language.FR,
   })
-  languages: Language;
+  appLanguage: Language;
 
   @Prop({
     type: [String],
@@ -263,6 +281,11 @@ class RiderPerformance implements RiderPerformanceType {
   category: string;
 
   @Prop({
+    type: Sport,
+  })
+  sport: SportType;
+
+  @Prop({
     type: Number,
   })
   ranking?: number;
@@ -282,7 +305,7 @@ class RiderPerformance implements RiderPerformanceType {
     type: String,
     enum: Object.values(WeatherCondition),
   })
-  weather: WeatherCondition;
+  weather?: WeatherCondition;
 
   @Prop({
     type: String,
