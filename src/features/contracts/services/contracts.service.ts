@@ -8,6 +8,7 @@ import {
   ProfileType,
   registerMessageDto,
   Rider,
+  RiderMe,
   Sponsor,
 } from "@kascad-app/shared-types";
 
@@ -36,9 +37,17 @@ export class ContractsOffersService {
     return await this._contractModel.find(query).exec();
   }
 
-  async findAll(): Promise<contractOfferDto[]> {
+  async findAll(user: RiderMe): Promise<contractOfferDto[]> {
     return await this._contractModel
       .aggregate([
+        {
+          $match: {
+            $or: [
+              { riderMail: user.identifier.email },
+              { sponsorMail: user.identifier.email },
+            ],
+          },
+        },
         {
           $lookup: {
             from: "sponsors",
@@ -199,6 +208,7 @@ export class ContractsOffersService {
 
     contractOffer.messages.push(message);
     if (user.type === ProfileType.RIDER) {
+      contractOffer.isNew = false;
       contractOffer.isOpenByRider = true;
       contractOffer.isOpenBySponsor = false;
     } else if (user.type === ProfileType.SPONSOR) {
