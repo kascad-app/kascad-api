@@ -455,6 +455,34 @@ class Availibility implements AvailibilityType {
   },
   minimize: false,
   id: true,
+  indexes: [
+    { "status.status": 1 },
+    { "identity.country": 1, "preferences.sports": 1 },
+    { "identity.gender": 1, "availibility.isAvailable": 1 },
+    { "preferences.sports": 1, "availibility.contractType": 1 },
+    { "identity.country": 1, "identity.city": 1 },
+    { "identity.birthDate": 1 },
+    { "identity.languageSpoken": 1 },
+    { "preferences.networks": 1 },
+    { "availibility.isAvailable": 1, "availibility.contractType": 1 },
+    { "views.lastMonthViews": -1 },
+    { createdAt: -1 },
+    {
+      "identity.firstName": "text",
+      "identity.lastName": "text",
+      "identity.fullName": "text",
+      "identity.bio": "text",
+      "identifier.username": "text",
+    },
+    {
+      "preferences.sports": 1,
+      "identity.country": 1,
+      "availibility.isAvailable": 1,
+    },
+    { "identity.birthDate": 1, "preferences.sports": 1 },
+    { "identifier.username": 1 },
+    { "identity.bio": 1 },
+  ],
 })
 class Rider implements IRider {
   _id: string;
