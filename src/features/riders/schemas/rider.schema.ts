@@ -8,6 +8,7 @@ import {
   type Image as ImageType,
   Language,
   NonCompetitionAward as NonCompetitionAwardType,
+  OnlineVideo as OnlineVideoType,
   Performance as RiderPerformanceType,
   type PerformanceSummary as PerformanceSummaryType,
   ProfileRole,
@@ -19,12 +20,11 @@ import {
   SocialNetwork,
   type SponsorSummary as SponsorSummaryType,
   type Sport as SportType,
+  SportName,
   Strava as StravaType,
   StravaIdentifier as StravaIdentifierType,
   TrainingFrequency as TrainingFrequencyType,
   WeatherCondition,
-  OnlineVideo as OnlineVideoType,
-  SportName,
 } from "@kascad-app/shared-types";
 
 import * as bcrypt from "bcrypt";
@@ -462,34 +462,6 @@ class Availibility implements AvailibilityType {
   },
   minimize: false,
   id: true,
-  indexes: [
-    { "status.status": 1 },
-    { "identity.country": 1, "preferences.sports": 1 },
-    { "identity.gender": 1, "availibility.isAvailable": 1 },
-    { "preferences.sports": 1, "availibility.contractType": 1 },
-    { "identity.country": 1, "identity.city": 1 },
-    { "identity.birthDate": 1 },
-    { "identity.languageSpoken": 1 },
-    { "preferences.networks": 1 },
-    { "availibility.isAvailable": 1, "availibility.contractType": 1 },
-    { "views.lastMonthViews": -1 },
-    { createdAt: -1 },
-    {
-      "identity.firstName": "text",
-      "identity.lastName": "text",
-      "identity.fullName": "text",
-      "identity.bio": "text",
-      "identifier.username": "text",
-    },
-    {
-      "preferences.sports": 1,
-      "identity.country": 1,
-      "availibility.isAvailable": 1,
-    },
-    { "identity.birthDate": 1, "preferences.sports": 1 },
-    { "identifier.username": 1 },
-    { "identity.bio": 1 },
-  ],
 })
 class Rider implements IRider {
   _id: string;
@@ -611,6 +583,36 @@ function transformValue(_: unknown, ret: { [key: string]: any }) {
 }
 
 export const RiderSchema = SchemaFactory.createForClass<Rider>(Rider);
+
+RiderSchema.index({ "status.status": 1 });
+RiderSchema.index({ "identity.country": 1, "preferences.sports": 1 });
+RiderSchema.index({ "identity.gender": 1, "availibility.isAvailable": 1 });
+RiderSchema.index({ "preferences.sports": 1, "availibility.contractType": 1 });
+RiderSchema.index({ "identity.country": 1, "identity.city": 1 });
+RiderSchema.index({ "identity.birthDate": 1 });
+RiderSchema.index({ "identity.languageSpoken": 1 });
+RiderSchema.index({ "preferences.networks": 1 });
+RiderSchema.index({
+  "availibility.isAvailable": 1,
+  "availibility.contractType": 1,
+});
+RiderSchema.index({ "views.lastMonthViews": -1 });
+RiderSchema.index({ createdAt: -1 });
+RiderSchema.index({
+  "identity.firstName": "text",
+  "identity.lastName": "text",
+  "identity.fullName": "text",
+  "identity.bio": "text",
+  "identifier.username": "text",
+});
+RiderSchema.index({
+  "preferences.sports": 1,
+  "identity.country": 1,
+  "availibility.isAvailable": 1,
+});
+RiderSchema.index({ "identity.birthDate": 1, "preferences.sports": 1 });
+RiderSchema.index({ "identifier.username": 1 });
+RiderSchema.index({ "identity.bio": 1 });
 
 RiderSchema.methods.getEncryptedPassword = (
   password: string,

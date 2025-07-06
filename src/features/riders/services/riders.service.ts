@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { BusboyConfig } from "@fastify/busboy";
@@ -19,7 +19,7 @@ import {
 
 import { RiderDocument } from "../schemas/rider.schema";
 
-import { Model } from "mongoose";
+import { Model, PipelineStage } from "mongoose";
 import { StorageService } from "src/shared/gcp/services/storage.service";
 
 type RiderSearchParams = {
