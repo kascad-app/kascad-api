@@ -1,4 +1,5 @@
 import {
+  AccountStatus,
   ContractType,
   GenderIdentity,
   SocialNetwork,
@@ -7,7 +8,6 @@ import {
 import { PipelineStage } from "mongoose";
 
 export interface RiderSearchFilters {
-  // Filtres de base essentiels
   sports?: string[];
   country?: string;
   gender?: GenderIdentity;
@@ -18,14 +18,11 @@ export interface RiderSearchFilters {
   languages?: string[];
   socialNetworks?: SocialNetwork[];
 
-  // Disponibilité
   isAvailable?: boolean;
   contractType?: ContractType;
 
-  // Recherche textuelle
   searchText?: string;
 
-  // Pagination et tri
   page?: number;
   limit?: number;
   sortBy?: "views" | "createdAt" | "age";
@@ -37,23 +34,21 @@ export const getSearchPipeline = (
 ): PipelineStage[] => {
   const pipeline: PipelineStage[] = [];
 
-  // 1. Étape d'ajout de champs calculés (âge uniquement)
-  pipeline.push({
-    $addFields: {
-      // Calcul de l'âge en années
-      age: {
-        $divide: [
-          { $subtract: [new Date(), "$identity.birthDate"] },
-          365.25 * 24 * 60 * 60 * 1000, // millisecondes dans une année
-        ],
+  if (filters.ageRange) {
+    pipeline.push({
+      $addFields: {
+        age: {
+          $divide: [
+            { $subtract: [new Date(), "$identity.birthDate"] },
+            365.25 * 24 * 60 * 60 * 1000,
+          ],
+        },
       },
-    },
-  });
+    });
+  }
 
-  // 2. Construction des conditions de filtrage
   const matchConditions: any[] = [];
 
-  // Filtres essentiels
   if (filters.sports && filters.sports.length > 0) {
     matchConditions.push({
       "preferences.sports": { $in: filters.sports },
@@ -72,7 +67,6 @@ export const getSearchPipeline = (
     });
   }
 
-  // Filtre d'âge (calculé à partir de birthDate)
   if (filters.ageRange) {
     const ageConditions: any = {};
     if (filters.ageRange.min !== undefined) {
@@ -98,7 +92,6 @@ export const getSearchPipeline = (
     });
   }
 
-  // Filtres de disponibilité
   if (filters.isAvailable !== undefined) {
     matchConditions.push({
       "availibility.isAvailable": filters.isAvailable,
@@ -111,7 +104,6 @@ export const getSearchPipeline = (
     });
   }
 
-  // Recherche textuelle
   if (filters.searchText) {
     matchConditions.push({
       $or: [
@@ -126,24 +118,20 @@ export const getSearchPipeline = (
     });
   }
 
-  // Filtre pour les comptes actifs uniquement
   matchConditions.push({
-    "status.status": "ACTIVE",
+    "status.status": AccountStatus.ACTIVE,
   });
 
-  // 3. Application des filtres
   if (matchConditions.length > 0) {
     pipeline.push({
       $match: { $and: matchConditions },
     });
   }
 
-  // 4. Tri
-  const sortBy = filters.sortBy || "views";
   const sortOrder = filters.sortOrder === "asc" ? 1 : -1;
 
   let sortField: string;
-  switch (sortBy) {
+  switch (filters.sortBy) {
     case "views":
       sortField = "views.lastMonthViews";
       break;
@@ -160,9 +148,8 @@ export const getSearchPipeline = (
     $sort: { [sortField]: sortOrder },
   });
 
-  // 5. Pagination
   const page = filters.page || 1;
-  const limit = Math.min(filters.limit || 20, 100); // Maximum 100 résultats
+  const limit = Math.min(filters.limit || 20, 100);
   const skip = (page - 1) * limit;
 
   if (skip > 0) {
@@ -170,14 +157,6 @@ export const getSearchPipeline = (
   }
 
   pipeline.push({ $limit: limit });
-
-  // 6. Projection finale (exclure les champs sensibles)
-  pipeline.push({
-    $project: {
-      password: 0,
-      "identifier.strava.identifier": 0,
-    },
-  });
 
   return pipeline;
 };

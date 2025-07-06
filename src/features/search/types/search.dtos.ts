@@ -110,7 +110,7 @@ export const AdvancedRiderSearchDto = z.object({
         message: "Invalid sort criteria. Use: views, createdAt, age",
       }),
     })
-    .default("views"),
+    .default("createdAt"),
 
   sortOrder: z
     .enum(["asc", "desc"], {
