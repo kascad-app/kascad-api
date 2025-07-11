@@ -1,6 +1,8 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
+import { BusboyConfig } from "@fastify/busboy";
+import { MultipartFile } from "@fastify/multipart";
 import {
   AccountStatus,
   GenderIdentity,
@@ -17,9 +19,7 @@ import {
 
 import { RiderDocument } from "../schemas/rider.schema";
 
-import { Model } from "mongoose";
-import { BusboyConfig } from "@fastify/busboy";
-import { MultipartFile } from "@fastify/multipart";
+import { Model, PipelineStage } from "mongoose";
 import { StorageService } from "src/shared/gcp/services/storage.service";
 
 type RiderSearchParams = {
@@ -99,8 +99,7 @@ export class RidersService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async aggregate(pipeline: any[]): Promise<Rider[]> {
+  async aggregate(pipeline: PipelineStage[]): Promise<Rider[]> {
     return await this._riderModel.aggregate(pipeline).exec();
   }
 
