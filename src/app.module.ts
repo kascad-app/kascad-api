@@ -1,3 +1,4 @@
+import { ResendModule } from "nestjs-resend";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -25,6 +26,9 @@ import { AppService } from "./app.service";
     MongooseModule.forRootAsync({
       useClass: MongoDBConfigService,
       inject: [ConfigService],
+    }),
+    ResendModule.forRoot({
+      apiKey: process.env["RESEND_API_KEY"],
     }),
     FeaturesModule,
     ScheduleModule.forRoot(),
