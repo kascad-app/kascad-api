@@ -4,11 +4,13 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { ContactEmailDto } from "../interfaces/contact.interfaces";
 import { SponsorMessageService } from "../services/sponsor-message.service";
 
+import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { ZodValidationPipe } from "src/common/pipes/zod-validator.pipe";
 import { Sponsor } from "src/features/sponsors/schemas/sponsor.schema";
 
 @Controller("contact")
+@Logged()
 export class ContactController {
   constructor(
     private readonly resendService: ResendService,
@@ -32,19 +34,25 @@ export class ContactController {
         riderId: body.riderId,
         subject: body.email.subject,
         message: body.email.message,
-        senderEmail: "info@send.kascad.fr",
+        senderEmail: "info@kascad.fr",
         recipientEmail: body.email.toEmail,
         senderName: body.email.name,
         recipientName: body.email.name,
       });
     }
 
-    return this.resendService.send({
-      from: `"${body.email.name}" <info@send.kascad.fr>`,
-      to: body.email.toEmail,
-      subject: body.email.subject,
-      html: `<p>${body.email.message}</p>`,
-    });
+    const message = await this.resendService
+      .send({
+        from: `${body.email.name} <info@kascad.fr>`,
+        to: body.email.toEmail,
+        subject: body.email.subject,
+        html: `<p>${body.email.message}</p>`,
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    return message;
   }
 
   @Get("sponsor-messages/:sponsorId")

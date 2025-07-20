@@ -13,11 +13,21 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const secured: boolean = this._reflector.get<boolean>(
+    // Vérifie les métadonnées au niveau de la méthode ET de la classe
+    const methodSecured: boolean = this._reflector.get<boolean>(
       "secured",
       context.getHandler(),
     );
-    if (!secured) return true;
+    const classSecured: boolean = this._reflector.get<boolean>(
+      "secured",
+      context.getClass(),
+    );
+    
+    const secured = methodSecured || classSecured;
+    
+    if (!secured) {
+      return true;
+    }
 
     return super.canActivate(context);
   }

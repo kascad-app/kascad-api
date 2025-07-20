@@ -1,17 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
-import {
-  SponsorMessage,
-  SponsorMessageDocument,
-} from "../schemas/sponsor-message.schema";
+import { SponsorMessageDocument } from "../schemas/sponsor-message.schema";
 
 import { Model, Schema as MongooseSchema } from "mongoose";
 
 @Injectable()
 export class SponsorMessageService {
   constructor(
-    @InjectModel(SponsorMessage.name)
+    @InjectModel("sponsor-messages")
     private sponsorMessageModel: Model<SponsorMessageDocument>,
   ) {}
 
