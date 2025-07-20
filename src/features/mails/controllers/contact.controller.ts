@@ -9,7 +9,7 @@ import { ZodValidationPipe } from "src/common/pipes/zod-validator.pipe";
 export class ContactController {
   constructor(private readonly resendService: ResendService) {}
 
-  @Post("send")
+  @Post("send-one")
   async sendContactEmail(
     @Body(new ZodValidationPipe(ContactEmailDto)) body: ContactEmailDto,
   ) {
