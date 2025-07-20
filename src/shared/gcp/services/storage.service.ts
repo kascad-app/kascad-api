@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+
 import { Storage } from "@google-cloud/storage";
 import { RiderMe, Sponsor } from "@kascad-app/shared-types";
 
@@ -27,7 +28,7 @@ export class StorageService {
     isAvatar: boolean,
   ): Promise<string> {
     try {
-      var destination = "";
+      let destination = "";
       if (user.type === "sponsor") {
         const sponsor = user as Sponsor;
         destination = isAvatar
