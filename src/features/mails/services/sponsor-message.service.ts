@@ -27,19 +27,23 @@ export class SponsorMessageService {
   }
 
   async getSponsorMessages(sponsorId: string) {
-    const [messages, total] = await Promise.all([
-      this.sponsorMessageModel
-        .find({ sponsorId })
-        .populate("riderId", ["firstName", "lastName", "email"])
-        .sort({ sentAt: -1 })
-        .exec(),
-      this.sponsorMessageModel.countDocuments({ sponsorId }).exec(),
-    ]);
+    try {
+      const [messages, total] = await Promise.all([
+        this.sponsorMessageModel
+          .find({ sponsorId })
+          .sort({ sentAt: -1 })
+          .exec(),
+        this.sponsorMessageModel.countDocuments({ sponsorId }).exec(),
+      ]);
 
-    return {
-      messages,
-      total,
-    };
+      return {
+        messages,
+        total,
+      };
+    } catch (error) {
+      console.error("Error getting sponsor messages:", error);
+      throw error;
+    }
   }
 
   async updateMessageStatus(
