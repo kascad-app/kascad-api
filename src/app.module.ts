@@ -27,8 +27,11 @@ import { AppService } from "./app.service";
       useClass: MongoDBConfigService,
       inject: [ConfigService],
     }),
-    ResendModule.forRoot({
-      apiKey: process.env["RESEND_API_KEY"],
+    ResendModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        apiKey: configService.get("RESEND_KEY"),
+      }),
+      inject: [ConfigService],
     }),
     FeaturesModule,
     ScheduleModule.forRoot(),

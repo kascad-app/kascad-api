@@ -32,6 +32,10 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
         module: ArticlesModule,
       },
       {
+        path: "contracts",
+        module: ContractOfferModule,
+      },
+      {
         path: "mails",
         module: MailService,
       },

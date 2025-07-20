@@ -30,7 +30,7 @@ export class ContactController {
       await this.sponsorMessageService.saveSponsorMessage({
         sponsorId,
         riderId: body.riderId,
-        subject: `Contact from ${body.email.name}`,
+        subject: body.email.subject,
         message: body.email.message,
         senderEmail: "info@send.kascad.fr",
         recipientEmail: body.email.toEmail,
@@ -42,7 +42,7 @@ export class ContactController {
     return this.resendService.send({
       from: `"${body.email.name}" <info@send.kascad.fr>`,
       to: body.email.toEmail,
-      subject: `Contact from ${body.email.name}`,
+      subject: body.email.subject,
       html: `<p>${body.email.message}</p>`,
     });
   }
