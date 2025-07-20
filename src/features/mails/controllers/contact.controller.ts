@@ -14,10 +14,10 @@ export class ContactController {
     @Body(new ZodValidationPipe(ContactEmailDto)) body: ContactEmailDto,
   ) {
     return this.resendService.send({
-      from: `"${body.name}" `,
-      to: "delivered@resend.dev",
-      subject: "hello world",
-      html: "<p>Congrats on sending your <strong>first email</strong>!</p>",
+      from: `"${body.name}" <info@send.kascad.fr>`,
+      to: body.toEmail,
+      subject: `Contact from ${body.name}`,
+      html: `<p>${body.message}</p>`,
     });
   }
 }
