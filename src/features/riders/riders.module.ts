@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
@@ -27,7 +27,7 @@ import { GcpModule } from "src/shared/gcp/gcp.module";
     GcpModule,
   ],
   controllers: [RidersController],
-  providers: [RidersService, RidersCronService],
+  providers: [RidersService, RidersCronService, Logger],
   exports: [RidersService],
 })
 export class RidersModule {}

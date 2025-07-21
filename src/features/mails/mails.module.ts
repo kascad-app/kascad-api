@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 
 import { ContactController } from "./controllers/contact.controller";
@@ -18,7 +18,7 @@ import MongoDBConnection from "src/common/constants/mongoDbConnections";
     ]),
   ],
   controllers: [ContactController],
-  providers: [SponsorMessageService],
+  providers: [SponsorMessageService, Logger],
   exports: [SponsorMessageService],
 })
 export class MailService {}

@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
@@ -31,7 +31,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
   ],
 
   controllers: [SearchController, SavedSearchController],
-  providers: [SearchService, SavedSearchService],
+  providers: [SearchService, SavedSearchService, Logger],
   exports: [],
 })
 export class SearchModule {}

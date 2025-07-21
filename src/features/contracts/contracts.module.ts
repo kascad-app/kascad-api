@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
@@ -24,7 +24,7 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
     ]),
   ],
   controllers: [ContractsOffersController],
-  providers: [ContractsOffersService],
+  providers: [ContractsOffersService, Logger],
   exports: [ContractsOffersService],
 })
 export class ContractOfferModule {}
