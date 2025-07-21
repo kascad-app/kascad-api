@@ -10,15 +10,27 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
     super();
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const optionalAuth: boolean = this._reflector.get<boolean>(
+      "optionalAuth",
+      context.getHandler(),
+    );
+
     const secured: boolean = this._reflector.get<boolean>(
       "secured",
       context.getHandler(),
     );
-    if (!secured) return true;
+    if (!secured && !optionalAuth) return true;
 
-    return super.canActivate(context);
+    try {
+      const result = await super.canActivate(context);
+      return result as boolean;
+    } catch (error) {
+      // Si l'authentification est optionnelle, ne pas bloquer
+      if (optionalAuth) {
+        return true;
+      }
+      throw error;
+    }
   }
 }
