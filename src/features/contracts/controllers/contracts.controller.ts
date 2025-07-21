@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Param, Post } from "@nestjs/common";
 
 import {
   ContractOffer,
@@ -17,7 +17,10 @@ import { User } from "src/common/decorators/user.decorator";
 
 @Controller()
 export class ContractsOffersController {
-  constructor(private _contractsService: ContractsOffersService) {}
+  constructor(
+    private _contractsService: ContractsOffersService,
+    private readonly logger: Logger,
+  ) {}
 
   @Get("me/countNewMessages")
   @Logged()
@@ -31,7 +34,7 @@ export class ContractsOffersController {
   @Get()
   @Logged()
   async getAll(@User() user: RiderMe): Promise<contractOfferDto[]> {
-    console.log(user);
+    this.logger.log("User:", user);
     return await this._contractsService.findAll(user);
   }
 

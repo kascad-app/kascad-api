@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 
 import { Rider } from "@kascad-app/shared-types";
 
@@ -11,13 +11,16 @@ import { RidersService } from "src/features/riders/services/riders.service";
 
 @Injectable()
 export class SearchService {
-  constructor(private readonly _riderService: RidersService) {}
+  constructor(
+    private readonly _riderService: RidersService,
+    private readonly logger: Logger,
+  ) {}
 
   async search(filters: RiderSearchFilters): Promise<Rider[]> {
-    console.log("Search filters:", filters);
+    this.logger.log("Search filters:", filters);
 
     const pipeline = getSearchPipeline(filters);
-    console.log("Generated pipeline:", JSON.stringify(pipeline, null, 2));
+    this.logger.log("Generated pipeline:", JSON.stringify(pipeline, null, 2));
 
     return this._riderService.aggregate(pipeline);
   }

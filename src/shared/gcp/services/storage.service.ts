@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 
 import { Storage } from "@google-cloud/storage";
 import { RiderMe, Sponsor } from "@kascad-app/shared-types";
@@ -8,7 +8,7 @@ export class StorageService {
   private storage: Storage;
   private bucketName: string;
 
-  constructor() {
+  constructor(private readonly logger: Logger) {
     const credentialsBase64 = process.env.GCP_BUCKET_CREDENTIALS_BASE64;
     const credentials = credentialsBase64
       ? JSON.parse(Buffer.from(credentialsBase64, "base64").toString("utf-8"))
@@ -57,7 +57,7 @@ export class StorageService {
         stream.end(file.buffer);
       });
     } catch (error) {
-      console.error("Error uploading file to GCP:", error);
+      this.logger.error("Error uploading file to GCP:", error);
       throw new Error("Failed to upload file to GCP");
     }
   }
@@ -70,11 +70,10 @@ export class StorageService {
     const fileToDelete = regex ? regex[1] : null;
     try {
       await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-      console.log("✅ Image supprimée !");
+      this.logger.log("✅ Image deleted !");
     } catch (error) {
-      // On ignore l'erreur si le fichier n'existe pas ou autre
-      console.warn(
-        `⚠️ Impossible de supprimer l'image (${fileToDelete}) :`,
+      this.logger.warn(
+        `⚠️ Unable to delete the image (${fileToDelete}) :`,
         error.message,
       );
     }
@@ -88,11 +87,10 @@ export class StorageService {
     const fileToDelete = regex ? regex[1] : null;
     try {
       await this.storage.bucket(this.bucketName).file(fileToDelete).delete();
-      console.log("✅ Avatar supprimé !");
+      this.logger.log("✅ Avatar deleted !");
     } catch (error) {
-      // On ignore l'erreur si le fichier n'existe pas ou autre
-      console.warn(
-        `⚠️ Impossible de supprimer l'avatar (${fileToDelete}) :`,
+      this.logger.warn(
+        `⚠️ Unable to delete the avatar (${fileToDelete}) :`,
         error.message,
       );
     }

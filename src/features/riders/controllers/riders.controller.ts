@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Req,
+} from "@nestjs/common";
 
 import { Rider, RiderMe, updateRiderDto } from "@kascad-app/shared-types";
 
@@ -15,6 +24,7 @@ export class RidersController {
   constructor(
     private _ridersService: RidersService,
     private readonly _storageService: StorageService,
+    private readonly logger: Logger,
   ) {}
 
   @Get()
@@ -29,7 +39,7 @@ export class RidersController {
     @Param("slug") slugRider: string,
     @User() user?: RiderMe,
   ): Promise<Rider> {
-    console.log(user);
+    this.logger.log("User:", user);
     if (user) {
       await this._ridersService.addViewEntry(user._id, slugRider);
     }
@@ -85,7 +95,7 @@ export class RidersController {
         message: "Files uploaded successfully",
       };
     } catch (error) {
-      console.error("Error uploading files:", error);
+      this.logger.error("Error uploading files:", error);
       throw new BadRequest("Failed to upload files");
     }
   }
@@ -111,7 +121,7 @@ export class RidersController {
         message: "Avatar updated successfully",
       };
     } catch (error) {
-      console.error("Error uploading files:", error);
+      this.logger.error("Error uploading files:", error);
       throw new BadRequest("Failed to upload files");
     }
   }

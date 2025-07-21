@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { BusboyConfig } from "@fastify/busboy";
@@ -30,6 +30,7 @@ export class RidersService {
   constructor(
     @InjectModel("Rider") private readonly _riderModel: Model<RiderDocument>,
     private readonly storageService: StorageService,
+    private readonly logger: Logger,
   ) {}
 
   async search(params?: RiderSearchParams): Promise<Rider[]> {
@@ -274,7 +275,7 @@ export class RidersService {
     user: RiderMe,
   ): Promise<string> {
     const avatarFile = await file();
-    console.log(avatarFile);
+    this.logger.log(avatarFile);
 
     if (!avatarFile) {
       throw new Error("No avatar file provided");
