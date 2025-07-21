@@ -2,18 +2,18 @@ import { ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AuthGuard as JwtAuthGuard } from "@nestjs/passport";
 
-import { Observable } from "rxjs";
-
 @Injectable()
 export class AuthenticationGuard extends JwtAuthGuard("jwt") {
   constructor(private readonly _reflector: Reflector) {
     super();
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    // Vérifie les métadonnées au niveau de la méthode ET de la classe
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const optionalAuth: boolean = this._reflector.get<boolean>(
+      "optionalAuth",
+      context.getHandler(),
+    );
+
     const methodSecured: boolean = this._reflector.get<boolean>(
       "secured",
       context.getHandler(),
@@ -22,13 +22,19 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
       "secured",
       context.getClass(),
     );
-    
-    const secured = methodSecured || classSecured;
-    
-    if (!secured) {
-      return true;
-    }
 
-    return super.canActivate(context);
+    const secured = methodSecured || classSecured;
+
+    if (!secured && !optionalAuth) return true;
+
+    try {
+      const result = await super.canActivate(context);
+      return result as boolean;
+    } catch (error) {
+      if (optionalAuth) {
+        return true;
+      }
+      throw error;
+    }
   }
 }

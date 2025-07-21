@@ -5,7 +5,7 @@ import { Rider, RiderMe, updateRiderDto } from "@kascad-app/shared-types";
 import { RidersService } from "../services/riders.service";
 
 import { FastifyRequest } from "fastify";
-import { Logged } from "src/common/decorators/logged.decorator";
+import { Logged, OptionalLogged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 import { StorageService } from "src/shared/gcp/services/storage.service";
@@ -24,12 +24,15 @@ export class RidersController {
   }
 
   @Get(":slug")
-  @Logged()
+  @OptionalLogged()
   async getRider(
     @Param("slug") slugRider: string,
-    @User() user: RiderMe,
+    @User() user?: RiderMe,
   ): Promise<Rider> {
-    await this._ridersService.addViewEntry(user._id, slugRider);
+    console.log(user);
+    if (user) {
+      await this._ridersService.addViewEntry(user._id, slugRider);
+    }
     return await this._ridersService.findBySlug(slugRider);
   }
 
