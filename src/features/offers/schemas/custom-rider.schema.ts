@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import { ApplicationStatus, ICustomRider } from "@kascad-app/shared-types";
 
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 @Schema({
   toObject: {
@@ -47,6 +47,7 @@ export class CustomRider implements ICustomRider {
 }
 
 export const CustomRiderSchema = SchemaFactory.createForClass(CustomRider);
+export type CustomRiderDocument = CustomRider & Document;
 
 CustomRiderSchema.index({ offerId: 1, riderId: 1 });
 CustomRiderSchema.index({ offerId: 1, application: 1 });
