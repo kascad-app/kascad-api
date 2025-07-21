@@ -46,7 +46,7 @@ export class RidersService {
   async findAll(): Promise<Rider[]> {
     return await this._riderModel
       .find()
-      .select("-_id -__v")
+      .select("-__v")
       .where("status.status")
       .equals(AccountStatus.ACTIVE)
       .exec();
@@ -59,7 +59,7 @@ export class RidersService {
   async findBySlug(slug: string): Promise<Rider> {
     return await this._riderModel
       .findOne({ "identifier.slug": slug })
-      .select("-_id -__v")
+      .select("-__v")
       .where("status.status")
       .equals(AccountStatus.ACTIVE)
       .exec();

@@ -2,8 +2,6 @@ import { ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AuthGuard as JwtAuthGuard } from "@nestjs/passport";
 
-import { Observable } from "rxjs";
-
 @Injectable()
 export class AuthenticationGuard extends JwtAuthGuard("jwt") {
   constructor(private readonly _reflector: Reflector) {
@@ -16,17 +14,24 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
       context.getHandler(),
     );
 
-    const secured: boolean = this._reflector.get<boolean>(
+    const methodSecured: boolean = this._reflector.get<boolean>(
       "secured",
       context.getHandler(),
     );
+    const classSecured: boolean = this._reflector.get<boolean>(
+      "secured",
+      context.getClass(),
+    );
+
+    const secured = methodSecured || classSecured;
+
+
     if (!secured && !optionalAuth) return true;
 
     try {
       const result = await super.canActivate(context);
       return result as boolean;
     } catch (error) {
-      // Si l'authentification est optionnelle, ne pas bloquer
       if (optionalAuth) {
         return true;
       }

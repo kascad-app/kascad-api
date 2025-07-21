@@ -6,6 +6,7 @@ enum MongoDBConnection {
   CONTRACTS = "contracts",
 
   SAVED_SEARCHES = "saved-searches",
+  SPONSOR_MESSAGES = "sponsor-messages",
 }
 
 export default MongoDBConnection;
