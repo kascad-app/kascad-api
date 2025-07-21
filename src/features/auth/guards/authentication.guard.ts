@@ -25,6 +25,7 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
 
     const secured = methodSecured || classSecured;
 
+
     if (!secured && !optionalAuth) return true;
 
     try {
