@@ -1,39 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-import { ContractType, SportName } from "@kascad-app/shared-types";
+import {
+  ContractType,
+  Currency,
+  IOffer,
+  OfferStatus,
+  SportName,
+} from "@kascad-app/shared-types";
 
 import { Schema as MongooseSchema } from "mongoose";
-
-enum OfferStatus {
-  DRAFT = "draft",
-  ACTIVE = "active",
-  PAUSED = "paused",
-  EXPIRED = "expired",
-  CLOSED = "closed",
-  DELETED = "deleted",
-}
-
-enum Currency {
-  EUR = "EUR",
-  USD = "USD",
-  GBP = "GBP",
-}
-
-interface IOffer {
-  _id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  title: string;
-  description: string;
-  sport: string;
-  contractType: ContractType;
-  sports: SportName[];
-  sponsorId: MongooseSchema.Types.ObjectId;
-  status: OfferStatus;
-  budgetMin?: number;
-  budgetMax?: number;
-  currency?: Currency;
-}
 
 @Schema({
   toObject: {

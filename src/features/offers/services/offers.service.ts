@@ -8,6 +8,8 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
+import { OfferStatus } from "@kascad-app/shared-types";
+
 import {
   CreateOfferDto,
   GetOffersQueryDto,
@@ -45,7 +47,7 @@ export class OfferService {
       const newOffer = new this.offerModel({
         ...createOfferDto,
         sponsorId,
-        status: "draft",
+        status: OfferStatus.DRAFT,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -88,7 +90,7 @@ export class OfferService {
 
       const filter: Record<string, any> = {
         sponsorId,
-        status: { $ne: "deleted" },
+        status: { $ne: OfferStatus.DELETED },
       };
 
       if (status) {
@@ -132,7 +134,7 @@ export class OfferService {
         .findOne({
           _id: offerId,
           sponsorId,
-          status: { $ne: "deleted" },
+          status: { $ne: OfferStatus.DELETED },
         })
         .exec();
 
@@ -167,7 +169,7 @@ export class OfferService {
         .findOne({
           _id: offerId,
           sponsorId,
-          status: { $ne: "deleted" },
+          status: { $ne: OfferStatus.DELETED },
         })
         .exec();
 
@@ -177,7 +179,10 @@ export class OfferService {
         );
       }
 
-      if (updateOfferDto.status && existingOffer.status === "closed") {
+      if (
+        updateOfferDto.status &&
+        existingOffer.status === OfferStatus.CLOSED
+      ) {
         throw new BadRequestException("Cannot modify a closed offer");
       }
 
@@ -186,7 +191,7 @@ export class OfferService {
           {
             _id: offerId,
             sponsorId,
-            status: { $ne: "deleted" },
+            status: { $ne: OfferStatus.DELETED },
           },
           {
             ...updateOfferDto,
@@ -226,10 +231,10 @@ export class OfferService {
           {
             _id: offerId,
             sponsorId,
-            status: { $ne: "deleted" },
+            status: { $ne: OfferStatus.DELETED },
           },
           {
-            status: "deleted",
+            status: OfferStatus.DELETED,
             updatedAt: new Date(),
           },
           { new: true },
@@ -261,7 +266,7 @@ export class OfferService {
         {
           $match: {
             sponsorId: new MongooseSchema.Types.ObjectId(sponsorId),
-            status: { $ne: "deleted" },
+            status: { $ne: OfferStatus.DELETED },
           },
         },
         {
