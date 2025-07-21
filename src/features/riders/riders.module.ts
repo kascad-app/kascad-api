@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
@@ -9,6 +9,7 @@ import { RidersService } from "./services/riders.service";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
+import { GcpModule } from "src/shared/gcp/gcp.module";
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
         collection: MongoDBConnection.RIDERS,
       },
     ]),
+    GcpModule,
   ],
   controllers: [RidersController],
-  providers: [RidersService, RidersCronService],
+  providers: [RidersService, RidersCronService, Logger],
   exports: [RidersService],
 })
 export class RidersModule {}

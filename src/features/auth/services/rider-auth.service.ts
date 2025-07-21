@@ -75,8 +75,4 @@ export class RiderAuthService {
       accountType: user.type,
     });
   }
-
-  async updateMe(id: string, rider: Rider): Promise<Rider> {
-    return await this._ridersService.updateOne(id, rider);
-  }
 }

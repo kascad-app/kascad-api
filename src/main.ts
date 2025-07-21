@@ -6,6 +6,7 @@ import {
 } from "@nestjs/platform-fastify";
 
 import fastifyCookie from "@fastify/cookie";
+import multipart from "@fastify/multipart";
 
 import { AppModule } from "./app.module";
 
@@ -18,7 +19,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors({
-    origin: configService.get<string>("CORS_ORIGIN").split(", "),
+    origin: configService
+      .get<string>("CORS_ORIGIN")
+      .split(", ")
+      .map((x) => x.trim()),
     credentials: true,
     exposedHeaders: configService
       .get<string>("CORS_EXPOSED_HEADERS", "")
@@ -31,6 +35,12 @@ async function bootstrap() {
 
   await app.register(fastifyCookie, {
     secret: configService.get<string>("COOKIE_SECRET"),
+  });
+
+  await app.register(multipart, {
+    limits: {
+      fileSize: 20 * 1024 * 1024, // 20 MB max
+    },
   });
 
   await app.listen(parseInt(process.env.PORT || "8080", 10), "0.0.0.0");

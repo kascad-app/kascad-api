@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Param, Post } from "@nestjs/common";
 
 import {
   ContractOffer,
-  getContractsDto,
+  contractOfferDto,
   Message,
   registerMessageDto,
   Rider,
+  RiderMe,
   Sponsor,
 } from "@kascad-app/shared-types";
 
@@ -16,17 +17,37 @@ import { User } from "src/common/decorators/user.decorator";
 
 @Controller()
 export class ContractsOffersController {
-  constructor(private _contractsService: ContractsOffersService) {}
+  constructor(
+    private _contractsService: ContractsOffersService,
+    private readonly logger: Logger,
+  ) {}
+
+  @Get("me/countNewMessages")
+  @Logged()
+  async getNewMessages(@User() user: RiderMe): Promise<{ count: number }> {
+    const count = await this._contractsService.countNewMessagesForRider(
+      user.identifier.email,
+    );
+    return { count };
+  }
 
   @Get()
   @Logged()
-  async getAll(): Promise<getContractsDto[]> {
-    return await this._contractsService.findAll();
+  async getAll(@User() user: RiderMe): Promise<contractOfferDto[]> {
+    this.logger.log("User:", user);
+    return await this._contractsService.findAll(user);
   }
 
   @Get(":id")
   @Logged()
-  async getOne(@Param("id") id: string): Promise<getContractsDto> {
+  async getOne(
+    @Param("id") id: string,
+    @User() user: RiderMe,
+  ): Promise<contractOfferDto> {
+    if (!id) {
+      throw new Error("Contract ID is required");
+    }
+    await this._contractsService.messageViewedBy(id, user);
     return await this._contractsService.findById(id);
   }
 

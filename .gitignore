@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# google cloud storage
+bucket-uploader-key.json
+
 # Logs
 logs
 *.log
@@ -41,6 +44,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+.env.staging
 
 # temp directory
 .temp

@@ -1,11 +1,11 @@
-name: Deploy API - Production
+name: Deploy API - Staging
 
 on:
   push:
-    branches: [main]
+    branches: [staging]
 
 env:
-  GCP_PROJECT_ID: kascad-production
+  GCP_PROJECT_ID: kascad-staging
   REPOSITORY_NAME: kascad
   SERVICE_NAME: kascad-api
   REGION: europe-west1
@@ -22,13 +22,13 @@ jobs:
       - name: Auth to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS_PRODUCTION }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_STAGING }}
 
       - name: Docker login to Artifact Registry
         run: gcloud auth configure-docker ${{ env.DOCKER_REGISTRY }} --quiet
 
       - name: Create .env file from GitHub Secret
-        run: echo "${{ secrets.ENV_FILE_PRODUCTION }}" > .env
+        run: echo "${{ secrets.ENV_FILE_STAGING }}" > .env
 
       - name: Build and push Docker image
         run: |

@@ -8,6 +8,7 @@ import {
   type Image as ImageType,
   Language,
   NonCompetitionAward as NonCompetitionAwardType,
+  OnlineVideo as OnlineVideoType,
   Performance as RiderPerformanceType,
   type PerformanceSummary as PerformanceSummaryType,
   ProfileRole,
@@ -18,11 +19,11 @@ import {
   type RiderPreferences as RiderPreferencesType,
   SocialNetwork,
   type SponsorSummary as SponsorSummaryType,
-  type Sport,
+  type Sport as SportType,
+  SportName,
   Strava as StravaType,
   StravaIdentifier as StravaIdentifierType,
   TrainingFrequency as TrainingFrequencyType,
-  TricksVideo as TricksVideoType,
   WeatherCondition,
 } from "@kascad-app/shared-types";
 
@@ -65,6 +66,23 @@ class View {
 
   @Prop({ type: [ViewEntry], default: [] })
   viewEntries: ViewEntry[];
+}
+
+@Schema({
+  _id: false,
+})
+class Sport {
+  @Prop({
+    type: String,
+    required: true,
+    enum: Object.values(SportName),
+  })
+  name: SportName;
+
+  @Prop({
+    type: String,
+  })
+  description?: string;
 }
 
 @Schema({
@@ -195,6 +213,9 @@ class RiderIdentifier implements RiderIdentifierType {
   })
   slug: string;
 
+  @Prop({
+    type: String,
+  })
   phoneNumber?: string;
 
   @Prop({
@@ -216,16 +237,16 @@ class RiderIdentifier implements RiderIdentifierType {
 })
 class RiderPreferences implements RiderPreferencesType {
   @Prop({
-    type: [String],
+    type: [Sport],
     default: [],
   })
-  sports: Sport[];
+  sports: SportType[];
 
   @Prop({
     type: String,
     default: Language.FR,
   })
-  languages: Language;
+  appLanguage: Language;
 
   @Prop({
     type: [String],
@@ -260,6 +281,11 @@ class RiderPerformance implements RiderPerformanceType {
   category: string;
 
   @Prop({
+    type: Sport,
+  })
+  sport: SportType;
+
+  @Prop({
     type: Number,
   })
   ranking?: number;
@@ -279,7 +305,7 @@ class RiderPerformance implements RiderPerformanceType {
     type: String,
     enum: Object.values(WeatherCondition),
   })
-  weather: WeatherCondition;
+  weather?: WeatherCondition;
 
   @Prop({
     type: String,
@@ -290,7 +316,7 @@ class RiderPerformance implements RiderPerformanceType {
 @Schema({
   _id: false,
 })
-class TricksVideo implements TricksVideoType {
+class OnlineVideo implements OnlineVideoType {
   @Prop({
     type: String,
   })
@@ -305,16 +331,6 @@ class TricksVideo implements TricksVideoType {
     type: String,
   })
   description?: string;
-
-  @Prop({
-    type: Date,
-  })
-  uploadDate: Date;
-
-  @Prop({
-    type: RiderPerformance,
-  })
-  relatedPerformance?: RiderPerformance;
 }
 
 @Schema({
@@ -332,12 +348,6 @@ class RiderPerformanceSummary implements PerformanceSummaryType {
     default: [],
   })
   performances: RiderPerformance[];
-
-  @Prop({
-    type: [TricksVideo],
-    default: [],
-  })
-  performanceVideos: TricksVideo[];
 }
 
 @Schema({
@@ -489,6 +499,7 @@ class Rider implements IRider {
 
   description?: string;
 
+  @Prop({ type: String })
   avatarUrl?: string;
 
   @Prop({
@@ -539,6 +550,12 @@ class Rider implements IRider {
   sponsorSummary: SponsorSummaryType;
 
   @Prop({
+    type: [OnlineVideo],
+    default: [],
+  })
+  videos: OnlineVideo[];
+
+  @Prop({
     type: [RiderImage],
     default: [],
   })
@@ -566,6 +583,36 @@ function transformValue(_: unknown, ret: { [key: string]: any }) {
 }
 
 export const RiderSchema = SchemaFactory.createForClass<Rider>(Rider);
+
+RiderSchema.index({ "status.status": 1 });
+RiderSchema.index({ "identity.country": 1, "preferences.sports": 1 });
+RiderSchema.index({ "identity.gender": 1, "availibility.isAvailable": 1 });
+RiderSchema.index({ "preferences.sports": 1, "availibility.contractType": 1 });
+RiderSchema.index({ "identity.country": 1, "identity.city": 1 });
+RiderSchema.index({ "identity.birthDate": 1 });
+RiderSchema.index({ "identity.languageSpoken": 1 });
+RiderSchema.index({ "preferences.networks": 1 });
+RiderSchema.index({
+  "availibility.isAvailable": 1,
+  "availibility.contractType": 1,
+});
+RiderSchema.index({ "views.lastMonthViews": -1 });
+RiderSchema.index({ createdAt: -1 });
+RiderSchema.index({
+  "identity.firstName": "text",
+  "identity.lastName": "text",
+  "identity.fullName": "text",
+  "identity.bio": "text",
+  "identifier.username": "text",
+});
+RiderSchema.index({
+  "preferences.sports": 1,
+  "identity.country": 1,
+  "availibility.isAvailable": 1,
+});
+RiderSchema.index({ "identity.birthDate": 1, "preferences.sports": 1 });
+RiderSchema.index({ "identifier.username": 1 });
+RiderSchema.index({ "identity.bio": 1 });
 
 RiderSchema.methods.getEncryptedPassword = (
   password: string,
