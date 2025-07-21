@@ -4,6 +4,7 @@ enum MongoDBConnection {
   SPONSORS = "sponsors",
   ARTICLES = "articles",
   CONTRACTS = "contracts",
+  OFFERS = "offers",
 
   SAVED_SEARCHES = "saved-searches",
   SPONSOR_MESSAGES = "sponsor-messages",

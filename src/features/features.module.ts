@@ -4,7 +4,8 @@ import { RouterModule } from "@nestjs/core";
 import { ArticlesModule } from "./articles/articles.module";
 import { AuthModule } from "./auth/auth.module";
 import { ContractOfferModule } from "./contracts/contracts.module";
-import { MailService } from "./mails/mails.module";
+import { MailModule } from "./mails/mails.module";
+import { OffersModule } from "./offers/offers.module";
 import { RidersModule } from "./riders/riders.module";
 import { SearchModule } from "./search/search.module";
 import { SponsorsModule } from "./sponsors/sponsors.module";
@@ -17,7 +18,8 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     ArticlesModule,
     ContractOfferModule,
     SearchModule,
-    MailService,
+    MailModule,
+    OffersModule,
     RouterModule.register([
       {
         path: "riders",
@@ -37,7 +39,11 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
       },
       {
         path: "mails",
-        module: MailService,
+        module: MailModule,
+      },
+      {
+        path: "offers",
+        module: OffersModule,
       },
     ]),
   ],
