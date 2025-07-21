@@ -281,8 +281,8 @@ export class RidersService {
       throw new Error("No avatar file provided");
     }
     if (
-      user.avatarUrl != null &&
-      user.avatarUrl != undefined &&
+      user.avatarUrl !== null &&
+      user.avatarUrl !== undefined &&
       user.avatarUrl !== ""
     ) {
       await this.storageService.deleteAvatar(user.type, user.avatarUrl);
@@ -301,7 +301,7 @@ export class RidersService {
       buffer,
     };
     let fileUrl: string = "";
-    if (image.filename != "kascadResetAvatar") {
+    if (image.filename !== "kascadResetAvatar") {
       fileUrl = await this.storageService.uploadFileToGCP(image, user, true);
     }
 

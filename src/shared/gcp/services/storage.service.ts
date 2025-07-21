@@ -64,7 +64,7 @@ export class StorageService {
 
   async deleteImageFromGCP(userType: string, imageUrl: string): Promise<void> {
     const regex =
-      userType == "sponsor"
+      userType === "sponsor"
         ? imageUrl.match(/(sponsor\/images\/.+)$/)
         : imageUrl.match(/(rider\/images\/.+)$/);
     const fileToDelete = regex ? regex[1] : null;
@@ -81,7 +81,7 @@ export class StorageService {
 
   async deleteAvatar(userType: string, imageUrl: string): Promise<void> {
     const regex =
-      userType == "sponsor"
+      userType === "sponsor"
         ? imageUrl.match(/(sponsor\/avatars\/.+)$/)
         : imageUrl.match(/(rider\/avatars\/.+)$/);
     const fileToDelete = regex ? regex[1] : null;
