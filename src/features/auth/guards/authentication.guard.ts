@@ -23,7 +23,6 @@ export class AuthenticationGuard extends JwtAuthGuard("jwt") {
     if (!secured && !optionalAuth) return true;
 
     try {
-      // Tente l'authentification via JwtAuthGuard
       const result = await super.canActivate(context);
       return result as boolean;
     } catch (error) {
