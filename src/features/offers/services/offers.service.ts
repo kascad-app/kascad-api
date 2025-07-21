@@ -15,6 +15,7 @@ import {
   GetOffersQueryDto,
   UpdateOfferDto,
 } from "../interfaces/offer.interfaces";
+import { getOfferWithCustomRidersPipeline } from "../pipelines/offer-with-custom-riders.pipeline";
 import { Offer } from "../schemas/offers.schema";
 
 import { Model, Schema as MongooseSchema } from "mongoose";
@@ -29,7 +30,7 @@ export class OfferService {
     private readonly logger: Logger,
   ) {}
 
-  async createOffer(
+  async create(
     sponsorId: string,
     createOfferDto: CreateOfferDto,
   ): Promise<OfferDocument> {
@@ -125,15 +126,11 @@ export class OfferService {
     }
   }
 
-  async getOfferById(
-    offerId: string,
-    sponsorId: string,
-  ): Promise<OfferDocument> {
+  async getOfferById(offerId: string): Promise<OfferDocument> {
     try {
       const offer = await this.offerModel
         .findOne({
           _id: offerId,
-          sponsorId,
           status: { $ne: OfferStatus.DELETED },
         })
         .exec();
@@ -149,7 +146,36 @@ export class OfferService {
     }
   }
 
-  async updateOffer(
+  async getOfferByIdAndSponsorId(
+    offerId: string,
+    sponsorId: string,
+  ): Promise<any> {
+    try {
+      const pipeline = getOfferWithCustomRidersPipeline(offerId, sponsorId);
+      const result = await this.offerModel.aggregate(pipeline).exec();
+
+      if (!result || result.length === 0) {
+        throw new NotFoundException("Offer not found or access denied");
+      }
+
+      return result[0];
+    } catch (error) {
+      this.logger.error(
+        `Error getting offer with custom riders ${offerId}:`,
+        error,
+      );
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        "Failed to retrieve offer with custom riders",
+      );
+    }
+  }
+
+  async update(
     offerId: string,
     sponsorId: string,
     updateOfferDto: UpdateOfferDto,
@@ -221,10 +247,7 @@ export class OfferService {
     }
   }
 
-  async softDeleteOffer(
-    offerId: string,
-    sponsorId: string,
-  ): Promise<OfferDocument> {
+  async softDelete(offerId: string, sponsorId: string): Promise<OfferDocument> {
     try {
       const deletedOffer = await this.offerModel
         .findOneAndUpdate(

@@ -39,10 +39,7 @@ export class OffersController {
     const sponsorId = user._id.toString();
 
     try {
-      const offer = await this.offerService.createOffer(
-        sponsorId,
-        createOfferDto,
-      );
+      const offer = await this.offerService.create(sponsorId, createOfferDto);
       return offer;
     } catch (error) {
       this.logger.error("Error creating offer:", error);
@@ -96,7 +93,10 @@ export class OffersController {
     const sponsorId = user._id.toString();
 
     try {
-      const offer = await this.offerService.getOfferById(params.id, sponsorId);
+      const offer = await this.offerService.getOfferByIdAndSponsorId(
+        params.id,
+        sponsorId,
+      );
       return offer;
     } catch (error) {
       this.logger.error(`Error getting offer ${params.id}:`, error);
@@ -113,7 +113,7 @@ export class OffersController {
     const sponsorId = user._id.toString();
 
     try {
-      const offer = await this.offerService.updateOffer(
+      const offer = await this.offerService.update(
         params.id,
         sponsorId,
         updateOfferDto,
@@ -133,10 +133,7 @@ export class OffersController {
     const sponsorId = user._id.toString();
 
     try {
-      const offer = await this.offerService.softDeleteOffer(
-        params.id,
-        sponsorId,
-      );
+      const offer = await this.offerService.softDelete(params.id, sponsorId);
       return offer;
     } catch (error) {
       this.logger.error(`Error deleting offer ${params.id}:`, error);
