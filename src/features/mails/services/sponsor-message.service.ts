@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { SponsorMessageDocument } from "../schemas/sponsor-message.schema";
@@ -10,6 +10,7 @@ export class SponsorMessageService {
   constructor(
     @InjectModel("sponsor-messages")
     private sponsorMessageModel: Model<SponsorMessageDocument>,
+    private readonly logger: Logger,
   ) {}
 
   async saveSponsorMessage(messageData: {
@@ -41,7 +42,7 @@ export class SponsorMessageService {
         total,
       };
     } catch (error) {
-      console.error("Error getting sponsor messages:", error);
+      this.logger.error("Error getting sponsor messages:", error);
       throw error;
     }
   }

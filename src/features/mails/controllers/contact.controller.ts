@@ -1,5 +1,5 @@
 import { ResendService } from "nestjs-resend";
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Post } from "@nestjs/common";
 
 import { ContactEmailDto } from "../interfaces/contact.interfaces";
 import { SponsorMessageDocument } from "../schemas/sponsor-message.schema";
@@ -16,6 +16,7 @@ export class ContactController {
   constructor(
     private readonly resendService: ResendService,
     private readonly sponsorMessageService: SponsorMessageService,
+    private readonly logger: Logger,
   ) {}
 
   @Post("send-one")
@@ -43,7 +44,7 @@ export class ContactController {
         recipientName: body.email.name,
       });
     } catch (error) {
-      console.error("Failed to save message to database:", error);
+      this.logger.error("Failed to save message to database:", error);
       throw new Error("Failed to save message. Email not sent.");
     }
 
@@ -62,7 +63,7 @@ export class ContactController {
 
       return message;
     } catch (error) {
-      console.error("Failed to send email:", error);
+      this.logger.error("Failed to send email:", error);
 
       await this.sponsorMessageService.updateMessageStatus(
         savedMessage._id.toString(),
