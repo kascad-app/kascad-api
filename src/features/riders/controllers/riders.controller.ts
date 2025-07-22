@@ -39,7 +39,7 @@ export class RidersController {
     @Param("slug") slugRider: string,
     @User() user?: RiderMe,
   ): Promise<Rider> {
-    this.logger.log("User:", user.slug);
+    this.logger.log("User:", user);
     if (user) {
       await this._ridersService.addViewEntry(user._id, slugRider);
     }
