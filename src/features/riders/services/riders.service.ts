@@ -25,6 +25,8 @@ import { StorageService } from "src/shared/gcp/services/storage.service";
 type RiderSearchParams = {
   [key: string]: string | number | boolean;
 };
+
+const KASCAD_RESET_AVATAR = "kascadResetAvatar";
 @Injectable()
 export class RidersService {
   constructor(
@@ -275,7 +277,12 @@ export class RidersService {
     user: RiderMe,
   ): Promise<string> {
     const avatarFile = await file();
-    this.logger.log(avatarFile);
+    this.logger.log({
+      filename: avatarFile.filename,
+      mimetype: avatarFile.mimetype,
+      fieldname: avatarFile.fieldname,
+      encoding: avatarFile.encoding,
+    });
 
     if (!avatarFile) {
       throw new Error("No avatar file provided");
@@ -301,7 +308,7 @@ export class RidersService {
       buffer,
     };
     let fileUrl: string = "";
-    if (image.filename !== "kascadResetAvatar") {
+    if (image.filename !== KASCAD_RESET_AVATAR) {
       fileUrl = await this.storageService.uploadFileToGCP(image, user, true);
     }
 
