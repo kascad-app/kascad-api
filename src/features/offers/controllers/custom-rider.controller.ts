@@ -2,21 +2,15 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   Logger,
   Param,
   Post,
   Put,
-  Query,
 } from "@nestjs/common";
 
 import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
-import {
-  CustomRiderParamsDto,
-  GetCustomRidersQueryDto,
-  UpdateCustomRiderDto,
-} from "../interfaces/custom-rider.interfaces";
+import { UpdateCustomRiderDto } from "../interfaces/custom-rider.interfaces";
 import { CustomRiderService } from "../services/custom-rider.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
@@ -41,59 +35,6 @@ export class CustomRiderController {
     }
 
     return this.customRiderService.create(user._id, offerId);
-  }
-
-  @Get()
-  async getCustomRiders(
-    @Query(new ZodValidationPipe(GetCustomRidersQueryDto))
-    query: GetCustomRidersQueryDto,
-    @User() user: Sponsor,
-  ) {
-    if (user.type !== ProfileType.SPONSOR) {
-      throw new BadRequestException("Access denied: Sponsors only");
-    }
-
-    const sponsorId = user._id.toString();
-
-    try {
-      const result = await this.customRiderService.getAll(sponsorId, query);
-      return {
-        data: result.customRiders,
-        pagination: {
-          currentPage: query.page,
-          totalPages: Math.ceil(result.total / query.limit),
-          totalItems: result.total,
-          itemsPerPage: query.limit,
-        },
-      };
-    } catch (error) {
-      this.logger.error("Error getting custom riders:", error);
-      throw error;
-    }
-  }
-
-  @Get(":id")
-  async getCustomRiderById(
-    @Param(new ZodValidationPipe(CustomRiderParamsDto))
-    params: CustomRiderParamsDto,
-    @User() user: Sponsor,
-  ) {
-    if (user.type !== ProfileType.SPONSOR) {
-      throw new BadRequestException("Access denied: Sponsors only");
-    }
-
-    const sponsorId = user._id.toString();
-
-    try {
-      const customRider = await this.customRiderService.getById(
-        params.id,
-        sponsorId,
-      );
-      return customRider;
-    } catch (error) {
-      this.logger.error(`Error getting custom rider ${params.id}:`, error);
-      throw error;
-    }
   }
 
   @Put("/:offerId/:id")
