@@ -47,7 +47,7 @@ export class Offer implements IOffer {
     type: String,
     required: true,
     enum: Object.values(OfferStatus),
-    default: OfferStatus.DRAFT,
+    default: OfferStatus.ACTIVE,
   })
   status: OfferStatus;
 
