@@ -8,6 +8,7 @@ import { InjectModel } from "@nestjs/mongoose";
 
 import { ApplicationStatus, OfferStatus } from "@kascad-app/shared-types";
 
+import { getRiderApplicationsPipeline } from "../pipelines/get-rider-applications.pipeline";
 import {
   CustomRider,
   CustomRiderDocument,
@@ -63,6 +64,12 @@ export class ApplicationService {
     }
 
     return customRider;
+  }
+
+  async getRiderApplications(riderId: string) {
+    const pipeline = getRiderApplicationsPipeline(riderId);
+    const applications = await this.customRiderModel.aggregate(pipeline).exec();
+    return applications;
   }
 
   private async checkIfSponsorIsOwner(sponsorId: string, offerId: string) {

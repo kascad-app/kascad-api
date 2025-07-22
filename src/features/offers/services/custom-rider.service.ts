@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,15 +8,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
-import {
-  GetCustomRidersQueryDto,
-  UpdateCustomRiderDto,
-} from "../interfaces/custom-rider.interfaces";
-import {
-  getCustomRiderByIdPipeline,
-  getCustomRidersCountPipeline,
-  getCustomRidersPipeline,
-} from "../pipelines/custom-rider.pipeline";
+import { UpdateCustomRiderDto } from "../interfaces/custom-rider.interfaces";
 import {
   CustomRider,
   CustomRiderDocument,
@@ -34,6 +27,28 @@ export class CustomRiderService {
     private readonly logger: Logger,
   ) {}
 
+  private async checkCustomRiderOwnership(
+    customRiderId: string,
+    verifications: { offerId: string; sponsorId: string },
+  ) {
+    const customRider = await this.getById(customRiderId);
+    const offer = await this.offerService.getOfferById(verifications.offerId);
+
+    if (!customRider) {
+      throw new NotFoundException("Custom rider not found");
+    }
+
+    if (offer.sponsorId.toString() !== verifications.sponsorId) {
+      throw new ForbiddenException("You are not the owner of this offer");
+    }
+
+    if (customRider.offerId.toString() !== offer._id.toString()) {
+      throw new ForbiddenException("You are not the owner of this offer");
+    }
+
+    return customRider;
+  }
+
   async create(riderId: string, offerId: string) {
     const offer = await this.offerService.getOfferById(offerId);
 
@@ -46,94 +61,20 @@ export class CustomRiderService {
     return customRider.save();
   }
 
-  async getAll(
-    sponsorId: string,
-    query: GetCustomRidersQueryDto,
-  ): Promise<{ customRiders: any[]; total: number }> {
-    try {
-      const { offerId } = query;
-
-      let offerIds: string[];
-
-      if (offerId) {
-        const offer = await this.offerService.getOfferByIdAndSponsorId(
-          offerId,
-          sponsorId,
-        );
-        if (!offer) {
-          throw new NotFoundException("Offer not found or access denied");
-        }
-        offerIds = [offerId];
-      } else {
-        const sponsorOffers = await this.offerService.getOffers(sponsorId, {
-          page: 1,
-          limit: 1000,
-        });
-        offerIds = sponsorOffers.offers.map((offer) => offer._id.toString());
-      }
-
-      if (offerIds.length === 0) {
-        return { customRiders: [], total: 0 };
-      }
-
-      const pipeline = getCustomRidersPipeline(offerIds, query);
-      const countPipeline = getCustomRidersCountPipeline(
-        offerIds,
-        query.application,
-      );
-
-      const [customRiders, totalResult] = await Promise.all([
-        this.customRiderModel.aggregate(pipeline).exec(),
-        this.customRiderModel.aggregate(countPipeline).exec(),
-      ]);
-
-      const total = totalResult.length > 0 ? totalResult[0].total : 0;
-
-      return { customRiders, total };
-    } catch (error) {
-      this.logger.error("Error getting custom riders:", error);
-
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(
-        "Failed to retrieve custom riders",
-      );
-    }
-  }
-
-  async getById(customRiderId: string, _sponsorId: string): Promise<any> {
-    try {
-      const pipeline = getCustomRiderByIdPipeline(customRiderId);
-      const result = await this.customRiderModel.aggregate(pipeline).exec();
-
-      if (!result || result.length === 0) {
-        throw new NotFoundException("Custom rider not found or access denied");
-      }
-
-      return result[0];
-    } catch (error) {
-      this.logger.error(`Error getting custom rider ${customRiderId}:`, error);
-
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException("Failed to retrieve custom rider");
-    }
+  async getById(customRiderId: string): Promise<CustomRiderDocument> {
+    const customRider = await this.customRiderModel.findOne({
+      _id: customRiderId,
+    });
+    return customRider;
   }
 
   async update(
     customRiderId: string,
-    sponsorId: string,
+    verifications: { offerId: string; sponsorId: string },
     updateCustomRiderDto: UpdateCustomRiderDto,
   ): Promise<CustomRiderDocument> {
     try {
-      await this.getById(customRiderId, sponsorId);
+      await this.checkCustomRiderOwnership(customRiderId, verifications);
 
       const updatedCustomRider = await this.customRiderModel
         .findByIdAndUpdate(
@@ -144,10 +85,7 @@ export class CustomRiderService {
           },
           { new: true },
         )
-        .populate(
-          "riderId",
-          "firstName lastName email identity.firstName identity.lastName",
-        )
+        .populate("riderId", "email identity.firstName identity.lastName")
         .exec();
 
       if (!updatedCustomRider) {

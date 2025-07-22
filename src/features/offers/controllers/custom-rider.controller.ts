@@ -96,10 +96,10 @@ export class CustomRiderController {
     }
   }
 
-  @Put(":id")
+  @Put("/:offerId/:id")
   async updateCustomRider(
-    @Param(new ZodValidationPipe(CustomRiderParamsDto))
-    params: CustomRiderParamsDto,
+    @Param("offerId") offerId: string,
+    @Param("id") id: string,
     @Body(new ZodValidationPipe(UpdateCustomRiderDto))
     updateCustomRiderDto: UpdateCustomRiderDto,
     @User() user: Sponsor,
@@ -112,13 +112,13 @@ export class CustomRiderController {
 
     try {
       const customRider = await this.customRiderService.update(
-        params.id,
-        sponsorId,
+        id,
+        { offerId, sponsorId },
         updateCustomRiderDto,
       );
       return customRider;
     } catch (error) {
-      this.logger.error(`Error updating custom rider ${params.id}:`, error);
+      this.logger.error(`Error updating custom rider ${id}:`, error);
       throw error;
     }
   }

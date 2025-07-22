@@ -15,6 +15,7 @@ import {
   GetOffersQueryDto,
   UpdateOfferDto,
 } from "../interfaces/offer.interfaces";
+import { getOfferDashboardPipeline } from "../pipelines/get-offer-dashboard.pipeline";
 import { getOfferWithCustomRidersPipeline } from "../pipelines/offer-with-custom-riders.pipeline";
 import { Offer } from "../schemas/offers.schema";
 
@@ -77,20 +78,15 @@ export class OfferService {
     }
   }
 
-  async getOffers(
-    sponsorId: string,
-    query: GetOffersQueryDto,
-  ): Promise<{ offers: OfferDocument[]; total: number }> {
+  async getOffers(query: GetOffersQueryDto): Promise<{
+    offers: OfferDocument[];
+    total: number;
+  }> {
     try {
-      if (!sponsorId) {
-        throw new BadRequestException("Sponsor ID is required");
-      }
-
       const { page, limit, status, sport, contractType } = query;
       const skip = (page - 1) * limit;
 
       const filter: Record<string, any> = {
-        sponsorId,
         status: { $ne: OfferStatus.DELETED },
       };
 
@@ -320,6 +316,38 @@ export class OfferService {
     } catch (error) {
       this.logger.error("Error getting offer stats:", error);
       throw error;
+    }
+  }
+
+  async getOffersDashboard(sponsorId: string) {
+    try {
+      if (!sponsorId) {
+        throw new BadRequestException("Sponsor ID is required");
+      }
+
+      const pipeline = getOfferDashboardPipeline(sponsorId);
+      const result = await this.offerModel.aggregate(pipeline).exec();
+
+      return (
+        result[0] || {
+          summary: {
+            totalOffers: 0,
+            activeOffers: 0,
+            draftOffers: 0,
+            pausedOffers: 0,
+            expiredOffers: 0,
+            totalApplicationsReceived: 0,
+            totalApplicationsAccepted: 0,
+            totalApplicationsPending: 0,
+            totalApplicationsRejected: 0,
+            totalCustomRiders: 0,
+          },
+          offers: [],
+        }
+      );
+    } catch (error) {
+      this.logger.error("Error getting offers dashboard:", error);
+      throw new InternalServerErrorException("Error getting offers dashboard");
     }
   }
 }

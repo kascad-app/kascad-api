@@ -30,10 +30,6 @@ export class Offer implements IOffer {
 
   @Prop({ type: String, required: true })
   description: string;
-
-  @Prop({ type: String, required: true })
-  sport: string;
-
   @Prop({
     type: String,
     required: true,

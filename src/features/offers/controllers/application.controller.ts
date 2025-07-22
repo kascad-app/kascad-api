@@ -1,6 +1,12 @@
-import { Controller, Param, Put } from "@nestjs/common";
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Put,
+} from "@nestjs/common";
 
-import { Sponsor } from "@kascad-app/shared-types";
+import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
 import { ApplicationService } from "../services/application.service";
 
@@ -28,5 +34,14 @@ export class ApplicationController {
     @Param("riderId") riderId: string,
   ) {
     return this.applicationService.reject(riderId, offerId, user._id);
+  }
+
+  @Get()
+  async getApplications(@User() user: Rider) {
+    if (user.type !== ProfileType.RIDER) {
+      throw new BadRequestException("Access denied: Riders only");
+    }
+
+    return this.applicationService.getRiderApplications(user._id);
   }
 }

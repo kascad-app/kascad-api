@@ -8,7 +8,10 @@ import {
   Post,
   Put,
   Query,
+  UnauthorizedException,
 } from "@nestjs/common";
+
+import { ProfileType } from "@kascad-app/shared-types";
 
 import {
   CreateOfferDto,
@@ -50,12 +53,9 @@ export class OffersController {
   @Get()
   async getOffers(
     @Query(new ZodValidationPipe(GetOffersQueryDto)) query: GetOffersQueryDto,
-    @User() user: Sponsor,
   ) {
-    const sponsorId = user._id.toString();
-
     try {
-      const result = await this.offerService.getOffers(sponsorId, query);
+      const result = await this.offerService.getOffers(query);
       return {
         data: result.offers,
         pagination: {
@@ -81,6 +81,22 @@ export class OffersController {
       return stats;
     } catch (error) {
       this.logger.error("Error getting offer stats:", error);
+      throw error;
+    }
+  }
+
+  @Get("dashboard")
+  async getOffersDashboard(@User() user: Sponsor) {
+    if (user.type !== ProfileType.SPONSOR)
+      throw new UnauthorizedException("Unauthorized");
+
+    const sponsorId = user._id.toString();
+
+    try {
+      const dashboard = await this.offerService.getOffersDashboard(sponsorId);
+      return dashboard;
+    } catch (error) {
+      this.logger.error("Error getting offers dashboard:", error);
       throw error;
     }
   }
