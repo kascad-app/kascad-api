@@ -25,16 +25,16 @@ export class CustomRider implements ICustomRider {
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   name: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   email: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   phone: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   note: string;
 
   @Prop({
