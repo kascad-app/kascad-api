@@ -15,6 +15,7 @@ import {
   GetOffersQueryDto,
   UpdateOfferDto,
 } from "../interfaces/offer.interfaces";
+import { getAllOffersPipeline } from "../pipelines/get-all-offers.pipeline";
 import { getOfferDashboardPipeline } from "../pipelines/get-offer-dashboard.pipeline";
 import { getOfferWithCustomRidersPipeline } from "../pipelines/offer-with-custom-riders.pipeline";
 import { Offer } from "../schemas/offers.schema";
@@ -79,37 +80,18 @@ export class OfferService {
   }
 
   async getOffers(query: GetOffersQueryDto): Promise<{
-    offers: OfferDocument[];
+    offers: any[];
     total: number;
   }> {
     try {
-      const { page, limit, status, sport, contractType } = query;
-      const skip = (page - 1) * limit;
+      const pipeline = getAllOffersPipeline(query);
+      const result = await this.offerModel.aggregate(pipeline).exec();
 
-      const filter: Record<string, any> = {
-        status: { $ne: OfferStatus.DELETED },
-      };
-
-      if (status) {
-        filter.status = status;
-      }
-      if (sport) {
-        filter.sports = { $in: [sport] };
-      }
-      if (contractType) {
-        filter.contractType = contractType;
+      if (!result || result.length === 0) {
+        return { offers: [], total: 0 };
       }
 
-      const [offers, total] = await Promise.all([
-        this.offerModel
-          .find(filter)
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .exec(),
-        this.offerModel.countDocuments(filter).exec(),
-      ]);
-
+      const { offers, total } = result[0];
       return { offers, total };
     } catch (error) {
       this.logger.error("Error getting offers:", error);
