@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
-import { OfferStatus } from "@kascad-app/shared-types";
+import { IOffer, IOffersRider, OfferStatus } from "@kascad-app/shared-types";
 
 import {
   CreateOfferDto,
@@ -80,7 +80,7 @@ export class OfferService {
   }
 
   async getOffers(query: GetOffersQueryDto): Promise<{
-    offers: any[];
+    offers: IOffersRider[];
     total: number;
   }> {
     try {
@@ -127,7 +127,7 @@ export class OfferService {
   async getOfferByIdAndSponsorId(
     offerId: string,
     sponsorId: string,
-  ): Promise<any> {
+  ): Promise<IOffer> {
     try {
       const pipeline = getOfferWithCustomRidersPipeline(offerId, sponsorId);
       const result = await this.offerModel.aggregate(pipeline).exec();
