@@ -12,26 +12,44 @@ export const getRiderApplicationsPipeline = (
       },
     },
     {
+      $addFields: {
+        offerObjectId: { $toObjectId: "$offerId" },
+      },
+    },
+    {
       $lookup: {
         from: "offers",
-        localField: "offerId",
+        localField: "offerObjectId",
         foreignField: "_id",
         as: "offer",
         pipeline: [
           {
+            $addFields: {
+              sponsorObjectId: { $toObjectId: "$sponsorId" },
+            },
+          },
+          {
             $lookup: {
               from: "sponsors",
-              localField: "sponsorId",
+              localField: "sponsorObjectId",
               foreignField: "_id",
               as: "sponsor",
               pipeline: [
                 {
                   $project: {
                     _id: 1,
-                    companyName: 1,
+                    "identity.companyName": 1,
                     avatarUrl: 1,
                     location: 1,
                   },
+                },
+                {
+                  $addFields: {
+                    companyName: "$identity.companyName",
+                  },
+                },
+                {
+                  $unset: "identity",
                 },
               ],
             },
@@ -62,13 +80,12 @@ export const getRiderApplicationsPipeline = (
     {
       $unwind: {
         path: "$offer",
-        preserveNullAndEmptyArrays: false,
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $project: {
         _id: 1,
-        offerId: 1,
         riderId: 1,
         name: 1,
         email: 1,
@@ -77,6 +94,7 @@ export const getRiderApplicationsPipeline = (
         createdAt: 1,
         updatedAt: 1,
         offer: 1,
+        application: 1,
       },
     },
     {

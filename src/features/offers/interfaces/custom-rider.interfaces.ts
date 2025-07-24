@@ -35,7 +35,7 @@ export const GetApplicationsQueryDto = z.object({
 });
 
 export interface ApplicationsResponse {
-  data: any[];
+  applications: any[];
   pagination: {
     currentPage: number;
     totalPages: number;

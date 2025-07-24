@@ -59,7 +59,7 @@ export class ApplicationController {
     );
 
     return {
-      data: result.applications,
+      applications: result.applications,
       pagination: {
         currentPage: query.page,
         totalPages: Math.ceil(result.total / query.limit),
