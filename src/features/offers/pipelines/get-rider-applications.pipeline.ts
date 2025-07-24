@@ -52,13 +52,7 @@ export const getRiderApplicationsPipeline = (
               contractType: 1,
               budgetMin: 1,
               budgetMax: 1,
-              location: 1,
-              requirements: 1,
-              benefits: 1,
-              startDate: 1,
-              endDate: 1,
               createdAt: 1,
-              updatedAt: 1,
               sponsor: 1,
             },
           },
@@ -80,29 +74,20 @@ export const getRiderApplicationsPipeline = (
         email: 1,
         phone: 1,
         note: 1,
-        application: 1,
         createdAt: 1,
         updatedAt: 1,
         offer: 1,
       },
     },
     {
-      $sort: {
-        createdAt: -1,
-      },
-    },
-    {
       $facet: {
-        applications: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+        customRiders: [{ $skip: (page - 1) * limit }, { $limit: limit }],
         totalCount: [{ $count: "count" }],
       },
     },
     {
-      $project: {
-        applications: 1,
-        total: {
-          $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0],
-        },
+      $sort: {
+        createdAt: -1,
       },
     },
   ];
