@@ -310,23 +310,7 @@ export class OfferService {
       const pipeline = getOfferDashboardPipeline(sponsorId);
       const result = await this.offerModel.aggregate(pipeline).exec();
 
-      return (
-        result[0] || {
-          summary: {
-            totalOffers: 0,
-            activeOffers: 0,
-            draftOffers: 0,
-            pausedOffers: 0,
-            expiredOffers: 0,
-            totalApplicationsReceived: 0,
-            totalApplicationsAccepted: 0,
-            totalApplicationsPending: 0,
-            totalApplicationsRejected: 0,
-            totalCustomRiders: 0,
-          },
-          offers: [],
-        }
-      );
+      return result;
     } catch (error) {
       this.logger.error("Error getting offers dashboard:", error);
       throw new InternalServerErrorException("Error getting offers dashboard");

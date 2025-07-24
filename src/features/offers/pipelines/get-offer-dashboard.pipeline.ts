@@ -1,4 +1,4 @@
-import { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 
 export const getOfferDashboardPipeline = (
   sponsorId: string,
@@ -6,16 +6,8 @@ export const getOfferDashboardPipeline = (
   return [
     {
       $match: {
-        sponsorId,
+        sponsorId: new (mongoose as any).Types.ObjectId(sponsorId),
         status: { $ne: "DELETED" },
-      },
-    },
-    {
-      $lookup: {
-        from: "applications",
-        localField: "_id",
-        foreignField: "offerId",
-        as: "applications",
       },
     },
     {
@@ -55,7 +47,7 @@ export const getOfferDashboardPipeline = (
         newApplications: {
           $size: {
             $filter: {
-              input: "$applications",
+              input: "$customRiders",
               cond: { $eq: ["$$this.status", "PENDING"] },
             },
           },
