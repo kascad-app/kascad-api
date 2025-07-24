@@ -2,6 +2,8 @@ import { PipelineStage } from "mongoose";
 
 export const getRiderApplicationsPipeline = (
   riderId: string,
+  page: number = 1,
+  limit: number = 10,
 ): PipelineStage[] => {
   return [
     {
@@ -87,6 +89,20 @@ export const getRiderApplicationsPipeline = (
     {
       $sort: {
         createdAt: -1,
+      },
+    },
+    {
+      $facet: {
+        applications: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+        totalCount: [{ $count: "count" }],
+      },
+    },
+    {
+      $project: {
+        applications: 1,
+        total: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0],
+        },
       },
     },
   ];

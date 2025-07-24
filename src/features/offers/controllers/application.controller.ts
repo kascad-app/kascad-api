@@ -4,14 +4,20 @@ import {
   Get,
   Param,
   Put,
+  Query,
 } from "@nestjs/common";
 
 import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
+import {
+  ApplicationsResponse,
+  GetApplicationsQueryDto,
+} from "../interfaces/custom-rider.interfaces";
 import { ApplicationService } from "../services/application.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
+import { ZodValidationPipe } from "src/common/pipes/zod-validator.pipe";
 
 @Controller("application")
 @Logged()
@@ -37,11 +43,29 @@ export class ApplicationController {
   }
 
   @Get()
-  async getApplications(@User() user: Rider) {
+  async getApplications(
+    @User() user: Rider,
+    @Query(new ZodValidationPipe(GetApplicationsQueryDto))
+    query: GetApplicationsQueryDto,
+  ): Promise<ApplicationsResponse> {
     if (user.type !== ProfileType.RIDER) {
       throw new BadRequestException("Access denied: Riders only");
     }
 
-    return this.applicationService.getRiderApplications(user._id);
+    const result = await this.applicationService.getRiderApplications(
+      user._id,
+      query.page,
+      query.limit,
+    );
+
+    return {
+      data: result.applications,
+      pagination: {
+        currentPage: query.page,
+        totalPages: Math.ceil(result.total / query.limit),
+        totalItems: result.total,
+        itemsPerPage: query.limit,
+      },
+    };
   }
 }

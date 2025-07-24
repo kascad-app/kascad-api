@@ -66,10 +66,20 @@ export class ApplicationService {
     return customRider;
   }
 
-  async getRiderApplications(riderId: string) {
-    const pipeline = getRiderApplicationsPipeline(riderId);
-    const applications = await this.customRiderModel.aggregate(pipeline).exec();
-    return applications;
+  async getRiderApplications(
+    riderId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ applications: any[]; total: number }> {
+    const pipeline = getRiderApplicationsPipeline(riderId, page, limit);
+    const result = await this.customRiderModel.aggregate(pipeline).exec();
+
+    if (!result || result.length === 0) {
+      return { applications: [], total: 0 };
+    }
+
+    const { applications, total } = result[0];
+    return { applications, total };
   }
 
   private async checkIfSponsorIsOwner(sponsorId: string, offerId: string) {

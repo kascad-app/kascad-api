@@ -29,6 +29,22 @@ export const GetCustomRidersQueryDto = z.object({
   application: z.nativeEnum(ApplicationStatus).optional(),
 });
 
+export const GetApplicationsQueryDto = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+});
+
+export interface ApplicationsResponse {
+  data: any[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
 export type UpdateCustomRiderDto = z.infer<typeof UpdateCustomRiderDto>;
 export type CustomRiderParamsDto = z.infer<typeof CustomRiderParamsDto>;
 export type GetCustomRidersQueryDto = z.infer<typeof GetCustomRidersQueryDto>;
+export type GetApplicationsQueryDto = z.infer<typeof GetApplicationsQueryDto>;
