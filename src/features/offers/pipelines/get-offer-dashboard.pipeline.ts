@@ -50,7 +50,7 @@ export const getOfferDashboardPipeline = (
           $size: {
             $filter: {
               input: "$customRiders",
-              cond: { $eq: ["$$this.status", "PENDING"] },
+              cond: { $eq: ["$$this.application", "PENDING"] },
             },
           },
         },
