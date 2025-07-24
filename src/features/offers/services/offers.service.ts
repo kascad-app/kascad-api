@@ -305,7 +305,7 @@ export class OfferService {
     sponsorId: string,
     page: number = 1,
     limit: number = 10,
-  ) {
+  ): Promise<{ offers: any[]; total: number }> {
     try {
       if (!sponsorId) {
         throw new BadRequestException("Sponsor ID is required");
@@ -314,7 +314,12 @@ export class OfferService {
       const pipeline = getOfferDashboardPipeline(sponsorId, page, limit);
       const result = await this.offerModel.aggregate(pipeline).exec();
 
-      return result;
+      if (!result || result.length === 0) {
+        return { offers: [], total: 0 };
+      }
+
+      const { offers, total } = result[0];
+      return { offers, total };
     } catch (error) {
       this.logger.error("Error getting offers dashboard:", error);
       throw new InternalServerErrorException("Error getting offers dashboard");

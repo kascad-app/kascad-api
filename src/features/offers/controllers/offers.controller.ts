@@ -18,6 +18,7 @@ import {
   GetOffersDashboardQueryDto,
   GetOffersQueryDto,
   OfferParamsDto,
+  OffersDashboardResponse,
   UpdateOfferDto,
 } from "../interfaces/offer.interfaces";
 import { OfferService } from "../services/offers.service";
@@ -91,19 +92,27 @@ export class OffersController {
     @User() user: Sponsor,
     @Query(new ZodValidationPipe(GetOffersDashboardQueryDto))
     query: GetOffersDashboardQueryDto,
-  ) {
+  ): Promise<OffersDashboardResponse> {
     if (user.type !== ProfileType.SPONSOR)
       throw new UnauthorizedException("Unauthorized");
 
     const sponsorId = user._id.toString();
 
     try {
-      const dashboard = await this.offerService.getOffersDashboard(
+      const result = await this.offerService.getOffersDashboard(
         sponsorId,
         query.page,
         query.limit,
       );
-      return dashboard;
+      return {
+        data: result.offers,
+        pagination: {
+          currentPage: query.page,
+          totalPages: Math.ceil(result.total / query.limit),
+          totalItems: result.total,
+          itemsPerPage: query.limit,
+        },
+      };
     } catch (error) {
       this.logger.error("Error getting offers dashboard:", error);
       throw error;

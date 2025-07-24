@@ -57,10 +57,18 @@ export const getOfferDashboardPipeline = (
       },
     },
     {
-      $skip: (page - 1) * limit,
+      $facet: {
+        offers: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+        totalCount: [{ $count: "count" }],
+      },
     },
     {
-      $limit: limit,
+      $project: {
+        offers: 1,
+        total: {
+          $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0],
+        },
+      },
     },
   ];
 };

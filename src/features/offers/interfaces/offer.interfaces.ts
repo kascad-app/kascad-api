@@ -77,6 +77,18 @@ export const GetOffersDashboardQueryDto = z.object({
   limit: z.coerce.number().min(1).max(100).default(10),
 });
 
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+}
+
+export interface OffersDashboardResponse {
+  data: any[];
+  pagination: PaginationInfo;
+}
+
 export type CreateOfferDto = z.infer<typeof CreateOfferDto>;
 export type UpdateOfferDto = z.infer<typeof UpdateOfferDto>;
 export type GetOffersQueryDto = z.infer<typeof GetOffersQueryDto>;
