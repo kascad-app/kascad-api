@@ -1,4 +1,4 @@
-import mongoose, { PipelineStage } from "mongoose";
+import { PipelineStage } from "mongoose";
 
 export const getRiderApplicationsPipeline = (
   riderId: string,
@@ -8,7 +8,7 @@ export const getRiderApplicationsPipeline = (
   return [
     {
       $match: {
-        riderId: new (mongoose as any).Types.ObjectId(riderId),
+        riderId,
       },
     },
     {
