@@ -66,7 +66,9 @@ export class CustomRiderService {
       _id: customRiderId,
     });
     if (!customRider) {
-      throw new NotFoundException(`Custom rider with ID ${customRiderId} not found`);
+      throw new NotFoundException(
+        `Custom rider with ID ${customRiderId} not found`,
+      );
     }
     return customRider;
   }
