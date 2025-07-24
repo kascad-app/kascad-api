@@ -2,6 +2,8 @@ import mongoose, { PipelineStage } from "mongoose";
 
 export const getOfferDashboardPipeline = (
   sponsorId: string,
+  page: number = 1,
+  limit: number = 10,
 ): PipelineStage[] => {
   return [
     {
@@ -53,6 +55,12 @@ export const getOfferDashboardPipeline = (
           },
         },
       },
+    },
+    {
+      $skip: (page - 1) * limit,
+    },
+    {
+      $limit: limit,
     },
   ];
 };

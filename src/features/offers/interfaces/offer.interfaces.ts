@@ -1,5 +1,6 @@
-import { z } from "zod";
 import { ContractType, SportName } from "@kascad-app/shared-types";
+
+import { z } from "zod";
 
 const OfferStatus = z.enum([
   "draft",
@@ -71,7 +72,15 @@ export const OfferParamsDto = z.object({
   id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
 });
 
+export const GetOffersDashboardQueryDto = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+});
+
 export type CreateOfferDto = z.infer<typeof CreateOfferDto>;
 export type UpdateOfferDto = z.infer<typeof UpdateOfferDto>;
 export type GetOffersQueryDto = z.infer<typeof GetOffersQueryDto>;
 export type OfferParamsDto = z.infer<typeof OfferParamsDto>;
+export type GetOffersDashboardQueryDto = z.infer<
+  typeof GetOffersDashboardQueryDto
+>;

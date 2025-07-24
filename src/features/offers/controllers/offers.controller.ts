@@ -15,6 +15,7 @@ import { ProfileType } from "@kascad-app/shared-types";
 
 import {
   CreateOfferDto,
+  GetOffersDashboardQueryDto,
   GetOffersQueryDto,
   OfferParamsDto,
   UpdateOfferDto,
@@ -86,14 +87,22 @@ export class OffersController {
   }
 
   @Get("dashboard")
-  async getOffersDashboard(@User() user: Sponsor) {
+  async getOffersDashboard(
+    @User() user: Sponsor,
+    @Query(new ZodValidationPipe(GetOffersDashboardQueryDto))
+    query: GetOffersDashboardQueryDto,
+  ) {
     if (user.type !== ProfileType.SPONSOR)
       throw new UnauthorizedException("Unauthorized");
 
     const sponsorId = user._id.toString();
 
     try {
-      const dashboard = await this.offerService.getOffersDashboard(sponsorId);
+      const dashboard = await this.offerService.getOffersDashboard(
+        sponsorId,
+        query.page,
+        query.limit,
+      );
       return dashboard;
     } catch (error) {
       this.logger.error("Error getting offers dashboard:", error);

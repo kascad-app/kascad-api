@@ -301,13 +301,17 @@ export class OfferService {
     }
   }
 
-  async getOffersDashboard(sponsorId: string) {
+  async getOffersDashboard(
+    sponsorId: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     try {
       if (!sponsorId) {
         throw new BadRequestException("Sponsor ID is required");
       }
 
-      const pipeline = getOfferDashboardPipeline(sponsorId);
+      const pipeline = getOfferDashboardPipeline(sponsorId, page, limit);
       const result = await this.offerModel.aggregate(pipeline).exec();
 
       return result;
