@@ -209,7 +209,10 @@ export class OfferService {
         .exec();
 
       this.logger.log(`Offer updated: ${offerId}`);
-      return updatedOffer!;
+      if (!updatedOffer) {
+        throw new NotFoundException("Failed to update offer. Offer not found.");
+      }
+      return updatedOffer;
     } catch (error) {
       this.logger.error(`Error updating offer ${offerId}:`, error);
 
