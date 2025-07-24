@@ -6,6 +6,7 @@ import { PipelineStage } from "mongoose";
 
 export function getAllOffersPipeline(
   query: GetOffersQueryDto,
+  riderId?: string,
 ): PipelineStage[] {
   const { page, limit, status, sport, contractType } = query;
   const skip = (page - 1) * limit;
@@ -59,6 +60,39 @@ export function getAllOffersPipeline(
         path: "$sponsor",
         preserveNullAndEmptyArrays: true,
       },
+    },
+    ...(riderId
+      ? [
+          {
+            $lookup: {
+              from: "custom-riders",
+              let: { offerId: "$_id", currentRiderId: riderId },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$offerId", { $toString: "$$offerId" }] },
+                        { $eq: ["$riderId", "$$currentRiderId"] },
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: "application",
+            },
+          },
+        ]
+      : []),
+    {
+      $addFields: {
+        alreadyApplied: riderId
+          ? { $gt: [{ $size: "$application" }, 0] }
+          : false,
+      },
+    },
+    {
+      $unset: "application",
     },
     {
       $sort: {

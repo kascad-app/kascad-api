@@ -79,12 +79,15 @@ export class OfferService {
     }
   }
 
-  async getOffers(query: GetOffersQueryDto): Promise<{
+  async getOffers(
+    query: GetOffersQueryDto,
+    riderId: string,
+  ): Promise<{
     offers: IOffersRider[];
     total: number;
   }> {
     try {
-      const pipeline = getAllOffersPipeline(query);
+      const pipeline = getAllOffersPipeline(query, riderId);
       const result = await this.offerModel.aggregate(pipeline).exec();
 
       if (!result || result.length === 0) {

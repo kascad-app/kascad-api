@@ -11,7 +11,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 
-import { ProfileType } from "@kascad-app/shared-types";
+import { ProfileType, Rider } from "@kascad-app/shared-types";
 
 import {
   CreateOfferDto,
@@ -55,9 +55,14 @@ export class OffersController {
   @Get()
   async getOffers(
     @Query(new ZodValidationPipe(GetOffersQueryDto)) query: GetOffersQueryDto,
+    @User() user: Rider,
   ) {
+    if (user.type !== ProfileType.RIDER) {
+      throw new UnauthorizedException("Unauthorized");
+    }
+
     try {
-      const result = await this.offerService.getOffers(query);
+      const result = await this.offerService.getOffers(query, user._id);
       return {
         data: result.offers,
         pagination: {
