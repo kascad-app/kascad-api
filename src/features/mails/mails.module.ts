@@ -21,4 +21,4 @@ import MongoDBConnection from "src/common/constants/mongoDbConnections";
   providers: [SponsorMessageService, Logger],
   exports: [SponsorMessageService],
 })
-export class MailService {}
+export class MailModule {}
