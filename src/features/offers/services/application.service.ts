@@ -72,7 +72,11 @@ export class ApplicationService {
     limit: number = 10,
   ): Promise<{ applications: any[]; total: number }> {
     const pipeline = getRiderApplicationsPipeline(riderId, page, limit);
+    console.log("riderId", riderId, typeof riderId);
+    console.log("pipeline", pipeline);
     const result = await this.customRiderModel.aggregate(pipeline).exec();
+
+    console.log("result", result);
 
     if (!result || result.length === 0) {
       return { applications: [], total: 0 };
