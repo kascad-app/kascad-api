@@ -8,6 +8,8 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
+import { ConversationType, ProfileType } from "@kascad-app/shared-types";
+
 import { UpdateCustomRiderDto } from "../interfaces/custom-rider.interfaces";
 import {
   CustomRider,
@@ -17,6 +19,7 @@ import {
 import { OfferService } from "./offers.service";
 
 import { Model } from "mongoose";
+import { ConversationService } from "src/features/direct-messages/services/conversation.service";
 
 @Injectable()
 export class CustomRiderService {
@@ -24,6 +27,7 @@ export class CustomRiderService {
     @InjectModel(CustomRider.name)
     private customRiderModel: Model<CustomRiderDocument>,
     private readonly offerService: OfferService,
+    private readonly conversationService: ConversationService,
     private readonly logger: Logger,
   ) {}
 
@@ -57,8 +61,35 @@ export class CustomRiderService {
     }
 
     const customRider = new this.customRiderModel({ riderId, offerId });
+    const savedCustomRider = await customRider.save();
 
-    return customRider.save();
+    try {
+      await this.conversationService.getOrCreate(
+        {
+          userId: savedCustomRider.riderId,
+          userType: ProfileType.RIDER,
+        },
+        {
+          userId: offer.sponsorId,
+          userType: ProfileType.SPONSOR,
+        },
+        {
+          type: ConversationType.JOB_OFFER,
+          referenceId: offerId,
+        },
+      );
+
+      this.logger.debug(
+        `Conversation automatically created between rider ${riderId} and sponsor ${offer.sponsorId} for offer ${offerId}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Error creating automatic conversation for application ${savedCustomRider._id}:`,
+        error,
+      );
+    }
+
+    return savedCustomRider;
   }
 
   async getById(customRiderId: string): Promise<CustomRiderDocument> {
