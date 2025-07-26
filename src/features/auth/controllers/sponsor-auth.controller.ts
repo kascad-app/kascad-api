@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
 } from "@nestjs/swagger";
 
 import { CookieSerializeOptions } from "@fastify/cookie";
@@ -23,7 +23,7 @@ import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { BadRequest } from "src/common/exceptions/bad-request.exception";
 
-@ApiTags('Sponsor Authentication')
+@ApiTags("Sponsor Authentication")
 @Controller("auth/sponsor")
 export class SponsorAuthController {
   constructor(
@@ -52,21 +52,37 @@ export class SponsorAuthController {
   };
 
   @Get("me")
-  @ApiOperation({ summary: 'Get current sponsor profile', description: 'Retrieves the authenticated sponsor profile information' })
+  @ApiOperation({
+    summary: "Get current sponsor profile",
+    description: "Retrieves the authenticated sponsor profile information",
+  })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Sponsor profile retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
+  @ApiResponse({
+    status: 200,
+    description: "Sponsor profile retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing token",
+  })
   @Logged()
   async getMe(@User() user: Sponsor) {
     return user;
   }
 
   @Post("register")
-  @ApiOperation({ summary: 'Register new sponsor', description: 'Creates a new sponsor account and returns authentication tokens' })
-  @ApiBody({ description: 'Sponsor registration data' })
-  @ApiResponse({ status: 201, description: 'Sponsor registered successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or email already exists' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Register new sponsor",
+    description:
+      "Creates a new sponsor account and returns authentication tokens",
+  })
+  @ApiBody({ description: "Sponsor registration data" })
+  @ApiResponse({ status: 201, description: "Sponsor registered successfully" })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid input data or email already exists",
+  })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async register(
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() registerDto: registerSponsorDto,
@@ -98,11 +114,14 @@ export class SponsorAuthController {
   }
 
   @Post("login")
-  @ApiOperation({ summary: 'Login sponsor', description: 'Authenticates a sponsor and returns authentication tokens' })
-  @ApiBody({ description: 'Sponsor login credentials' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
-  @ApiResponse({ status: 400, description: 'Invalid credentials' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Login sponsor",
+    description: "Authenticates a sponsor and returns authentication tokens",
+  })
+  @ApiBody({ description: "Sponsor login credentials" })
+  @ApiResponse({ status: 200, description: "Login successful" })
+  @ApiResponse({ status: 400, description: "Invalid credentials" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async login(
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() data: registerSponsorDto,
@@ -134,11 +153,14 @@ export class SponsorAuthController {
   }
 
   @Post("refresh-token")
-  @ApiOperation({ summary: 'Refresh access token', description: 'Refreshes the access token using the refresh token' })
+  @ApiOperation({
+    summary: "Refresh access token",
+    description: "Refreshes the access token using the refresh token",
+  })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
-  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 200, description: "Token refreshed successfully" })
+  @ApiResponse({ status: 401, description: "Invalid or expired refresh token" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   @UseGuards(RefreshAuthGuard)
   @Logged()
   async refreshToken(
@@ -166,9 +188,12 @@ export class SponsorAuthController {
   }
 
   @Post("logout")
-  @ApiOperation({ summary: 'Logout sponsor', description: 'Logs out the sponsor by clearing authentication cookies' })
-  @ApiResponse({ status: 200, description: 'Logout successful' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Logout sponsor",
+    description: "Logs out the sponsor by clearing authentication cookies",
+  })
+  @ApiResponse({ status: 200, description: "Logout successful" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async signOut(
     @Res({ passthrough: true }) res: FastifyReply,
   ): Promise<APIResponse> {
