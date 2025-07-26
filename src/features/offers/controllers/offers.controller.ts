@@ -53,7 +53,7 @@ export class OffersController {
   @ApiResponse({ status: 201, description: 'Offer created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status:500, description: 'Internal server error' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async createOffer(
     @Body(new ZodValidationPipe(CreateOfferDto)) createOfferDto: CreateOfferDto,
     @User() user: Sponsor,
