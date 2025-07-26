@@ -2,11 +2,14 @@ import { Logger, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 
+import { ConversationsController } from "./controllers/conversation.controller";
+import { MessagesController } from "./controllers/messages.controller";
 import {
   Conversation,
   ConversationSchema,
 } from "./schemas/conversation.schema";
 import { Message, MessageSchema } from "./schemas/messages.schema";
+import { ConversationService } from "./services/conversation.service";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
 import { MongoDBConfigService } from "src/config/database/mongodb.config";
@@ -30,8 +33,8 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
       },
     ]),
   ],
-  controllers: [],
-  providers: [Logger],
-  exports: [MongooseModule],
+  controllers: [ConversationsController, MessagesController],
+  providers: [Logger, ConversationService],
+  exports: [MongooseModule, ConversationService],
 })
 export class DirectMessagesModule {}

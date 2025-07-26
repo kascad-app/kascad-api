@@ -1,29 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-import { ProfileType } from "@kascad-app/shared-types";
+import {
+  ConversationStatus,
+  ConversationType,
+  IConversation,
+  ProfileType,
+} from "@kascad-app/shared-types";
 
 import type { HydratedDocument } from "mongoose";
 import { Types } from "mongoose";
-
-export enum ConversationType {
-  JOB_OFFER = "job-offer",
-  PRIVATE = "private",
-}
-
-export interface IConversation {
-  _id: string;
-  participants: Array<{
-    userId: Types.ObjectId;
-    userType: ProfileType;
-  }>;
-  context?: {
-    type: ConversationType;
-    referenceId?: string;
-  };
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export type ConversationDocument = HydratedDocument<Conversation>;
 
@@ -92,10 +77,11 @@ export class Conversation implements IConversation {
   };
 
   @Prop({
-    type: Boolean,
-    default: true,
+    type: String,
+    enum: Object.values(ConversationStatus),
+    default: ConversationStatus.ACTIVE,
   })
-  isActive: boolean;
+  status: ConversationStatus;
 
   @Prop({
     type: Date,
