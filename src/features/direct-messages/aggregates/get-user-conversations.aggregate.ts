@@ -22,7 +22,7 @@ export function getUserConversationsPipeline(
   const { participant, page, limit, contextType } = params;
   const skip = (page - 1) * limit;
 
-  const matchStage: any = {
+  const matchStage = {
     status: ConversationStatus.ACTIVE,
     participants: {
       $elemMatch: {
