@@ -1,6 +1,7 @@
 import {
   ConversationStatus,
   ConversationType,
+  PaginationType,
   ProfileType,
 } from "@kascad-app/shared-types";
 
@@ -82,8 +83,6 @@ export interface ConversationWithParticipants {
 }
 
 export interface UserConversationsServiceQuery {
-  userId: Types.ObjectId;
-  userType: ProfileType;
   page: number;
   limit: number;
   contextType?: ConversationType;
@@ -101,4 +100,9 @@ export interface ConversationWithParticipantPreview
     fullName?: string;
     companyName?: string;
   };
+}
+
+export interface GetUserConversationsResponse {
+  conversations: ConversationWithParticipantPreview[];
+  pagination: PaginationType;
 }
