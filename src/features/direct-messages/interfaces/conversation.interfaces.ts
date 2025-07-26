@@ -35,6 +35,7 @@ export const GetOrCreateConversationDto = z.object({
 export const GetUserConversationsDto = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
+  context: z.nativeEnum(ConversationType).optional(),
 });
 
 export const ConversationParamsDto = z.object({
@@ -85,4 +86,19 @@ export interface UserConversationsServiceQuery {
   userType: ProfileType;
   page: number;
   limit: number;
+  contextType?: ConversationType;
+}
+
+export interface ConversationWithParticipantPreview
+  extends ConversationWithParticipants {
+  otherParticipant: {
+    userId: Types.ObjectId;
+    userType: ProfileType;
+    displayName?: string;
+    avatarUrl?: string;
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
+    companyName?: string;
+  };
 }

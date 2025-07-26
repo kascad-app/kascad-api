@@ -9,7 +9,9 @@ import {
 } from "@kascad-app/shared-types";
 
 import { getFindExistingConversationPipeline } from "../aggregates/find-existing-conversation.aggregate";
+import { getUserConversationsPipeline } from "../aggregates/get-user-conversations.aggregate";
 import {
+  ConversationWithParticipantPreview,
   ConversationWithParticipants,
   CreateConversationServiceInput,
   UserConversationsServiceQuery,
@@ -29,7 +31,7 @@ export class ConversationService {
     private readonly logger: Logger,
   ) {}
 
-  async getOrCreateConversation(
+  async getOrCreate(
     currentParticipant: Participant,
     targetParticipant: Participant,
     context?: { type: ConversationType; referenceId?: string },
@@ -89,37 +91,32 @@ export class ConversationService {
     return await conversation.save();
   }
 
-  async getUser(
+  async getUserConversations(
     participant: Participant,
     query: UserConversationsServiceQuery,
   ): Promise<{
-    conversations: ConversationWithParticipants[];
+    conversations: ConversationWithParticipantPreview[];
     pagination: PaginationType;
   }> {
     this.logger.debug(`Getting conversations for user: ${participant.userId}`);
 
-    const { page, limit } = query;
-    const skip = (page - 1) * limit;
+    const { page, limit, contextType } = query;
 
-    const filter = {
-      status: ConversationStatus.ACTIVE,
-      participants: {
-        $elemMatch: {
-          userId: participant.userId,
-          userType: participant.userType,
-        },
+    const pipeline = getUserConversationsPipeline({
+      participant: {
+        userId: participant.userId,
+        userType: participant.userType,
       },
-    };
+      page,
+      limit,
+      contextType,
+    });
 
-    const [conversations, total] = await Promise.all([
-      this.conversationModel
-        .find(filter)
-        .sort({ updatedAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      this.conversationModel.countDocuments(filter),
-    ]);
+    const result = await this.conversationModel.aggregate(pipeline).exec();
+    const { conversations, total } = result[0] || {
+      conversations: [],
+      total: 0,
+    };
 
     return {
       conversations,
