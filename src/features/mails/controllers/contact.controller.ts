@@ -1,5 +1,12 @@
 import { ResendService } from "nestjs-resend";
 import { Body, Controller, Get, Logger, Post } from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from "@nestjs/swagger";
 
 import { ContactEmailDto } from "../interfaces/contact.interfaces";
 import { SponsorMessageDocument } from "../schemas/sponsor-message.schema";
@@ -10,6 +17,8 @@ import { User } from "src/common/decorators/user.decorator";
 import { ZodValidationPipe } from "src/common/pipes/zod-validator.pipe";
 import { Sponsor } from "src/features/sponsors/schemas/sponsor.schema";
 
+@ApiTags('Contact')
+@ApiBearerAuth()
 @Controller("contact")
 @Logged()
 export class ContactController {
@@ -20,6 +29,11 @@ export class ContactController {
   ) {}
 
   @Post("send-one")
+  @ApiOperation({ summary: 'Send contact email', description: 'Sends a contact email from sponsor to rider' })
+  @ApiBody({ description: 'Contact email data' })
+  @ApiResponse({ status: 200, description: 'Email sent successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
+  @ApiResponse({ status: 500, description: 'Failed to send email' })
   async sendContactEmail(
     @Body(new ZodValidationPipe(ContactEmailDto)) body: ContactEmailDto,
     @User() user: Sponsor,
@@ -77,6 +91,10 @@ export class ContactController {
   }
 
   @Get("sponsor-messages")
+  @ApiOperation({ summary: 'Get sponsor messages', description: 'Retrieves all messages sent by the authenticated sponsor' })
+  @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getSponsorMessages(@User() user: Sponsor) {
     const sponsorId = user._id;
 

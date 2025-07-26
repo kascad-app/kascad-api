@@ -4,7 +4,7 @@ import { PassportStrategy } from "@nestjs/passport";
 
 import { Rider, Sponsor } from "@kascad-app/shared-types";
 
-import { Request as RequestType } from "express";
+import { FastifyRequest as RequestType } from "fastify";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { RidersService } from "src/features/riders/services/riders.service";
 import { SponsorsService } from "src/features/sponsors/services/sponsors.service";

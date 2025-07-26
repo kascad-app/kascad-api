@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 
-import { Request as RequestType } from "express";
+import { FastifyRequest as RequestType } from "fastify";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
 @Injectable()
