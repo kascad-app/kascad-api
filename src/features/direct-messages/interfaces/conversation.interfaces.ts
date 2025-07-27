@@ -5,10 +5,10 @@ import {
   ProfileType,
 } from "@kascad-app/shared-types";
 
+import { MessageType } from "../schemas/messages.schema";
+
 import { Types } from "mongoose";
 import { z } from "zod";
-
-import { MessageType } from "../schemas/messages.schema";
 
 // Zod schemas
 export const ParticipantDto = z.object({

@@ -8,14 +8,14 @@ import {
   Participant,
 } from "@kascad-app/shared-types";
 
-import { getFindExistingConversationPipeline } from "../aggregates/find-existing-conversation.aggregate";
-import { getUserConversationsPipeline } from "../aggregates/get-user-conversations.aggregate";
 import {
   ConversationWithParticipantPreview,
   ConversationWithParticipants,
   CreateConversationServiceInput,
   UserConversationsServiceQuery,
 } from "../interfaces/conversation.interfaces";
+import { getFindExistingConversationPipeline } from "../pipelines/find-existing-conversation.pipeline";
+import { getUserConversationsPipeline } from "../pipelines/get-user-conversations.pipeline";
 import {
   Conversation,
   ConversationDocument,
