@@ -122,6 +122,37 @@ export function getUserConversationsPipeline(
     },
 
     {
+      $lookup: {
+        from: "messages",
+        let: { conversationId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$conversationId", "$$conversationId"] },
+            },
+          },
+          {
+            $sort: { createdAt: -1 },
+          },
+          {
+            $limit: 1,
+          },
+          {
+            $project: {
+              _id: 1,
+              senderId: 1,
+              senderType: 1,
+              content: 1,
+              messageType: 1,
+              createdAt: 1,
+            },
+          },
+        ],
+        as: "lastMessage",
+      },
+    },
+
+    {
       $project: {
         _id: 1,
         participants: 1,
@@ -138,6 +169,9 @@ export function getUserConversationsPipeline(
           lastName: "$otherParticipantInfo.identity.lastName",
           fullName: "$otherParticipantInfo.identity.fullName",
           companyName: "$otherParticipantInfo.companyName",
+        },
+        lastMessage: {
+          $arrayElemAt: ["$lastMessage", 0],
         },
       },
     },

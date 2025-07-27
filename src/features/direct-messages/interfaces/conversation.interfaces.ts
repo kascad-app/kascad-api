@@ -8,6 +8,8 @@ import {
 import { Types } from "mongoose";
 import { z } from "zod";
 
+import { MessageType } from "../schemas/messages.schema";
+
 // Zod schemas
 export const ParticipantDto = z.object({
   userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
@@ -99,6 +101,14 @@ export interface ConversationWithParticipantPreview
     lastName?: string;
     fullName?: string;
     companyName?: string;
+  };
+  lastMessage?: {
+    _id: string;
+    senderId: Types.ObjectId;
+    senderType: ProfileType;
+    content: string;
+    messageType: MessageType;
+    createdAt: Date;
   };
 }
 
