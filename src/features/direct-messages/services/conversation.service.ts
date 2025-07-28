@@ -162,7 +162,7 @@ export class ConversationService {
     conversationId: Types.ObjectId,
     participant: Participant,
   ): Promise<boolean> {
-    return !!(await this.conversationModel
+    const verificationResult = await this.conversationModel
       .findOne({
         _id: conversationId,
         status: ConversationStatus.ACTIVE,
@@ -174,6 +174,8 @@ export class ConversationService {
         },
       })
       .lean()
-      .exec());
+      .exec();
+
+    return !!verificationResult;
   }
 }

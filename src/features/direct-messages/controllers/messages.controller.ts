@@ -26,11 +26,11 @@ import {
 
 import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
-import { ConversationParamsDto } from "../interfaces/conversation.interfaces";
 import {
-  ConversationParams as MessageConversationParams,
   CreateMessageDto,
   CreateMessageInput,
+  GetMessageConversationParams,
+  GetMessageConversationParamsDto,
   GetMessagesQuery,
   GetMessagesQueryDto,
   MarkAsReadDto,
@@ -41,7 +41,7 @@ import {
 import { ConversationService } from "../services/conversation.service";
 import { MessageService } from "../services/message.service";
 
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import { Logged } from "src/common/decorators/logged.decorator";
 import { User } from "src/common/decorators/user.decorator";
 import { ZodValidationPipe } from "src/common/pipes/zod-validator.pipe";
@@ -353,8 +353,8 @@ export class MessagesController {
   })
   @ApiResponse({ status: 500, description: "Internal server error" })
   async getMessagesByConversation(
-    @Param(new ZodValidationPipe(ConversationParamsDto))
-    params: MessageConversationParams,
+    @Param(new ZodValidationPipe(GetMessageConversationParamsDto))
+    params: GetMessageConversationParams,
     @Query(new ZodValidationPipe(GetMessagesQueryDto))
     query: GetMessagesQuery,
     @User() user: Rider | Sponsor,
@@ -363,6 +363,7 @@ export class MessagesController {
       const conversationId = new (mongoose as any).Types.ObjectId(
         params.conversationId,
       );
+
       const userParticipant = {
         userId: user._id,
         userType: user.type as ProfileType,
@@ -788,8 +789,8 @@ export class MessagesController {
   })
   @ApiResponse({ status: 500, description: "Internal server error" })
   async markAllMessagesAsRead(
-    @Param(new ZodValidationPipe(ConversationParamsDto))
-    params: MessageConversationParams,
+    @Param(new ZodValidationPipe(GetMessageConversationParamsDto))
+    params: GetMessageConversationParams,
     @User() user: Rider | Sponsor,
   ) {
     try {

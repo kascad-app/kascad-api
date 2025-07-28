@@ -23,7 +23,7 @@ export const MessageParamsDto = z.object({
   id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
 });
 
-export const ConversationParamsDto = z.object({
+export const GetMessageConversationParamsDto = z.object({
   conversationId: z
     .string()
     .regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
@@ -39,7 +39,9 @@ export const MarkAsReadDto = z.object({
 export type CreateMessageInput = z.infer<typeof CreateMessageDto>;
 export type GetMessagesQuery = z.infer<typeof GetMessagesQueryDto>;
 export type MessageParams = z.infer<typeof MessageParamsDto>;
-export type ConversationParams = z.infer<typeof ConversationParamsDto>;
+export type GetMessageConversationParams = z.infer<
+  typeof GetMessageConversationParamsDto
+>;
 export type MarkAsReadInput = z.infer<typeof MarkAsReadDto>;
 
 // Service interfaces

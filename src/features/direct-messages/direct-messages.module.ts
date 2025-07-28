@@ -17,10 +17,6 @@ import { MongoDBConfigService } from "src/config/database/mongodb.config";
 
 @Module({
   imports: [
-    MongooseModule.forRootAsync({
-      useClass: MongoDBConfigService,
-      inject: [ConfigService],
-    }),
     MongooseModule.forFeature([
       {
         name: Conversation.name,
