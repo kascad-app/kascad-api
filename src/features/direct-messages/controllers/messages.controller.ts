@@ -14,18 +14,20 @@ import {
   Query,
   UnauthorizedException,
 } from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
+import {
+  ApiSwaggerCreateMessage,
+  ApiSwaggerDeleteMessage,
+  ApiSwaggerGetMessageById,
+  ApiSwaggerGetMessages,
+  ApiSwaggerGetUnreadCount,
+  ApiSwaggerGetUnreadCountsByConversation,
+  ApiSwaggerMarkAllAsRead,
+  ApiSwaggerMarkAsRead,
+} from "../decorators/messages-swagger.decorators";
 import {
   CreateMessageDto,
   CreateMessageInput,
@@ -58,107 +60,7 @@ export class MessagesController {
   ) {}
 
   @Post()
-  @ApiOperation({
-    summary: "Create a new message",
-    description:
-      "Creates a new message in the specified conversation. The sender is automatically marked as having read the message.",
-  })
-  @ApiBody({
-    description: "Message content and conversation details",
-    schema: {
-      type: "object",
-      properties: {
-        conversationId: {
-          type: "string",
-          description: "MongoDB ObjectId of the conversation",
-          example: "64f1b2c3d4e5f6g7h8i9j0k1",
-        },
-        content: {
-          type: "string",
-          description: "Message content",
-          example: "Hello, I'm interested in your offer!",
-          minLength: 1,
-          maxLength: 5000,
-        },
-        messageType: {
-          type: "string",
-          enum: ["text", "image", "file"],
-          description: "Type of message",
-          default: "text",
-        },
-      },
-      required: ["conversationId", "content"],
-    },
-  })
-  @ApiResponse({
-    status: 201,
-    description: "Message created successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Message ID" },
-        conversationId: {
-          type: "string",
-          description: "Conversation ID",
-        },
-        senderId: { type: "string", description: "Sender user ID" },
-        senderType: {
-          type: "string",
-          enum: ["rider", "sponsor"],
-          description: "Sender user type",
-        },
-        content: { type: "string", description: "Message content" },
-        messageType: {
-          type: "string",
-          enum: ["text", "image", "file"],
-          description: "Type of message",
-        },
-        readBy: {
-          type: "array",
-          description: "Array of users who have read the message",
-          items: {
-            type: "object",
-            properties: {
-              userId: { type: "string", description: "User ID" },
-              userType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "User type",
-              },
-              readAt: {
-                type: "string",
-                format: "date-time",
-                description: "Read timestamp",
-              },
-            },
-          },
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Bad request - Invalid input data",
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in the conversation",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerCreateMessage()
   async createMessage(
     @Body(new ZodValidationPipe(CreateMessageDto))
     body: CreateMessageInput,
@@ -211,147 +113,7 @@ export class MessagesController {
   }
 
   @Get("conversations/:conversationId")
-  @ApiOperation({
-    summary: "Get messages from a conversation",
-    description:
-      "Retrieves all messages from the specified conversation with pagination. Includes sender information (name, avatar, etc.) for each message.",
-  })
-  @ApiParam({
-    name: "conversationId",
-    description: "Conversation MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiQuery({
-    name: "page",
-    required: false,
-    description: "Page number for pagination",
-    example: 1,
-    type: "number",
-  })
-  @ApiQuery({
-    name: "limit",
-    required: false,
-    description: "Number of messages per page (max 100)",
-    example: 20,
-    type: "number",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Messages retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        messages: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              _id: { type: "string", description: "Message ID" },
-              conversationId: {
-                type: "string",
-                description: "Conversation ID",
-              },
-              senderId: { type: "string", description: "Sender user ID" },
-              senderType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "Sender user type",
-              },
-              content: { type: "string", description: "Message content" },
-              messageType: {
-                type: "string",
-                enum: ["text", "image", "file"],
-                description: "Type of message",
-              },
-              readBy: {
-                type: "array",
-                description: "Array of users who have read the message",
-              },
-              sender: {
-                type: "object",
-                description: "Sender information",
-                properties: {
-                  userId: { type: "string", description: "Sender user ID" },
-                  userType: {
-                    type: "string",
-                    enum: ["rider", "sponsor"],
-                    description: "Sender user type",
-                  },
-                  displayName: {
-                    type: "string",
-                    description: "Sender display name",
-                  },
-                  avatarUrl: {
-                    type: "string",
-                    description: "Sender avatar URL",
-                  },
-                  firstName: {
-                    type: "string",
-                    description: "First name (for riders)",
-                  },
-                  lastName: {
-                    type: "string",
-                    description: "Last name (for riders)",
-                  },
-                  fullName: {
-                    type: "string",
-                    description: "Full name (for riders)",
-                  },
-                  companyName: {
-                    type: "string",
-                    description: "Company name (for sponsors)",
-                  },
-                },
-              },
-              createdAt: {
-                type: "string",
-                format: "date-time",
-                description: "Creation timestamp",
-              },
-              updatedAt: {
-                type: "string",
-                format: "date-time",
-                description: "Last update timestamp",
-              },
-            },
-          },
-        },
-        pagination: {
-          type: "object",
-          description: "Pagination information",
-          properties: {
-            currentPage: { type: "number", description: "Current page number" },
-            totalPages: {
-              type: "number",
-              description: "Total number of pages",
-            },
-            totalItems: {
-              type: "number",
-              description: "Total number of messages",
-            },
-            itemsPerPage: {
-              type: "number",
-              description: "Number of items per page",
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in the conversation",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Conversation not found",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetMessages()
   async getMessagesByConversation(
     @Param(new ZodValidationPipe(GetMessageConversationParamsDto))
     params: GetMessageConversationParams,
@@ -408,83 +170,7 @@ export class MessagesController {
   }
 
   @Get(":id")
-  @ApiOperation({
-    summary: "Get message by ID",
-    description:
-      "Retrieves a specific message by its ID. Only accessible to users who are participants in the message's conversation.",
-  })
-  @ApiParam({
-    name: "id",
-    description: "Message MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Message retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Message ID" },
-        conversationId: { type: "string", description: "Conversation ID" },
-        senderId: { type: "string", description: "Sender user ID" },
-        senderType: {
-          type: "string",
-          enum: ["rider", "sponsor"],
-          description: "Sender user type",
-        },
-        content: { type: "string", description: "Message content" },
-        messageType: {
-          type: "string",
-          enum: ["text", "image", "file"],
-          description: "Type of message",
-        },
-        readBy: {
-          type: "array",
-          description: "Array of users who have read the message",
-          items: {
-            type: "object",
-            properties: {
-              userId: { type: "string", description: "User ID" },
-              userType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "User type",
-              },
-              readAt: {
-                type: "string",
-                format: "date-time",
-                description: "Read timestamp",
-              },
-            },
-          },
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in the conversation",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Message not found",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetMessageById()
   async getMessageById(
     @Param(new ZodValidationPipe(MessageParamsDto))
     params: MessageParams,
@@ -540,70 +226,7 @@ export class MessagesController {
 
   @Delete(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Soft delete message",
-    description:
-      "Marks a message as deleted by replacing its content with '[Message deleted]'. Only the message sender can delete their own messages.",
-  })
-  @ApiParam({
-    name: "id",
-    description: "Message MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Message deleted successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Message ID" },
-        conversationId: { type: "string", description: "Conversation ID" },
-        senderId: { type: "string", description: "Sender user ID" },
-        senderType: {
-          type: "string",
-          enum: ["rider", "sponsor"],
-          description: "Sender user type",
-        },
-        content: {
-          type: "string",
-          description: "Message content (will be '[Message deleted]')",
-        },
-        messageType: {
-          type: "string",
-          enum: ["text", "image", "file"],
-          description: "Type of message",
-        },
-        readBy: {
-          type: "array",
-          description: "Array of users who have read the message",
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not the sender of this message",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Message not found",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerDeleteMessage()
   async deleteMessage(
     @Param(new ZodValidationPipe(MessageParamsDto))
     params: MessageParams,
@@ -658,58 +281,7 @@ export class MessagesController {
 
   @Patch("mark-read")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Mark messages as read",
-    description:
-      "Marks the specified messages as read by the authenticated user. Only marks messages that haven't been read by this user yet.",
-  })
-  @ApiBody({
-    description: "Array of message IDs to mark as read",
-    schema: {
-      type: "object",
-      properties: {
-        messageIds: {
-          type: "array",
-          items: {
-            type: "string",
-            description: "Message MongoDB ObjectId",
-            example: "64f1b2c3d4e5f6g7h8i9j0k1",
-          },
-          minItems: 1,
-          description: "Array of message IDs to mark as read",
-        },
-      },
-      required: ["messageIds"],
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Messages marked as read successfully",
-    schema: {
-      type: "object",
-      properties: {
-        success: {
-          type: "boolean",
-          description: "Operation success status",
-          example: true,
-        },
-        message: {
-          type: "string",
-          description: "Success message",
-          example: "Messages marked as read successfully",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Bad request - Invalid input data",
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerMarkAsRead()
   async markMessagesAsRead(
     @Body(new ZodValidationPipe(MarkAsReadDto))
     body: MarkAsReadInput,
@@ -745,49 +317,7 @@ export class MessagesController {
 
   @Patch("conversations/:conversationId/mark-all-read")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Mark all messages in conversation as read",
-    description:
-      "Marks all unread messages in the specified conversation as read by the authenticated user.",
-  })
-  @ApiParam({
-    name: "conversationId",
-    description: "Conversation MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "All messages in conversation marked as read successfully",
-    schema: {
-      type: "object",
-      properties: {
-        success: {
-          type: "boolean",
-          description: "Operation success status",
-          example: true,
-        },
-        message: {
-          type: "string",
-          description: "Success message",
-          example: "All messages marked as read successfully",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in the conversation",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Conversation not found",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerMarkAllAsRead()
   async markAllMessagesAsRead(
     @Param(new ZodValidationPipe(GetMessageConversationParamsDto))
     params: GetMessageConversationParams,
@@ -840,30 +370,7 @@ export class MessagesController {
   }
 
   @Get("unread-count")
-  @ApiOperation({
-    summary: "Get total unread message count",
-    description:
-      "Returns the total number of unread messages for the authenticated user across all conversations.",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Unread count retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        unreadCount: {
-          type: "number",
-          description: "Total number of unread messages",
-          example: 15,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetUnreadCount()
   async getUnreadCount(@User() user: Rider | Sponsor) {
     try {
       const userParticipant = {
@@ -889,38 +396,7 @@ export class MessagesController {
   }
 
   @Get("conversations/unread-counts")
-  @ApiOperation({
-    summary: "Get unread message counts by conversation",
-    description:
-      "Returns the number of unread messages for each conversation for the authenticated user. Useful for displaying badges in conversation lists.",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Unread counts by conversation retrieved successfully",
-    schema: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          conversationId: {
-            type: "string",
-            description: "Conversation MongoDB ObjectId",
-            example: "64f1b2c3d4e5f6g7h8i9j0k1",
-          },
-          unreadCount: {
-            type: "number",
-            description: "Number of unread messages in this conversation",
-            example: 3,
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetUnreadCountsByConversation()
   async getUnreadCountsByConversation(@User() user: Rider | Sponsor) {
     try {
       const userParticipant = {

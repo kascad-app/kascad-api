@@ -13,18 +13,16 @@ import {
   Query,
   UnauthorizedException,
 } from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 import { ProfileType, Rider, Sponsor } from "@kascad-app/shared-types";
 
+import {
+  ApiSwaggerCreateConversation,
+  ApiSwaggerDeleteConversation,
+  ApiSwaggerGetConversationById,
+  ApiSwaggerGetUserConversations,
+} from "../decorators/conversations-swagger.decorators";
 import {
   ConversationParams,
   ConversationParamsDto,
@@ -52,163 +50,7 @@ export class ConversationsController {
   ) {}
 
   @Get()
-  @ApiOperation({
-    summary: "Get user conversations with participant previews",
-    description:
-      "Retrieves all conversations for the authenticated user with pagination and optional context filtering. Includes preview information of other participants (name, avatar, etc.)",
-  })
-  @ApiQuery({
-    name: "page",
-    required: false,
-    description: "Page number for pagination",
-    example: 1,
-    type: "number",
-  })
-  @ApiQuery({
-    name: "limit",
-    required: false,
-    description: "Number of conversations per page (max 100)",
-    example: 10,
-    type: "number",
-  })
-  @ApiQuery({
-    name: "context",
-    required: false,
-    description: "Filter conversations by context type",
-    enum: ["job-offer", "private"],
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      "Conversations retrieved successfully with participant previews",
-    schema: {
-      type: "object",
-      properties: {
-        conversations: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              _id: { type: "string", description: "Conversation ID" },
-              participants: {
-                type: "array",
-                description: "Array of conversation participants",
-                items: {
-                  type: "object",
-                  properties: {
-                    userId: {
-                      type: "string",
-                      description: "User MongoDB ObjectId",
-                    },
-                    userType: {
-                      type: "string",
-                      enum: ["rider", "sponsor"],
-                      description: "Type of user",
-                    },
-                  },
-                },
-              },
-              context: {
-                type: "object",
-                nullable: true,
-                description: "Optional conversation context",
-                properties: {
-                  type: {
-                    type: "string",
-                    enum: ["job-offer", "private"],
-                    description: "Type of conversation context",
-                  },
-                  referenceId: {
-                    type: "string",
-                    description:
-                      "Reference ID (e.g., offer ID for job-offer context)",
-                  },
-                },
-              },
-              status: {
-                type: "string",
-                enum: ["active", "inactive", "deleted"],
-                description: "Conversation status",
-              },
-              otherParticipant: {
-                type: "object",
-                description: "Preview information of the other participant",
-                properties: {
-                  userId: {
-                    type: "string",
-                    description: "Other participant's user ID",
-                  },
-                  userType: {
-                    type: "string",
-                    enum: ["rider", "sponsor"],
-                    description: "Other participant's user type",
-                  },
-                  displayName: {
-                    type: "string",
-                    description: "Display name of the other participant",
-                  },
-                  avatarUrl: {
-                    type: "string",
-                    description: "Avatar URL of the other participant",
-                  },
-                  firstName: {
-                    type: "string",
-                    description: "First name (for riders)",
-                  },
-                  lastName: {
-                    type: "string",
-                    description: "Last name (for riders)",
-                  },
-                  fullName: {
-                    type: "string",
-                    description: "Full name (for riders)",
-                  },
-                  companyName: {
-                    type: "string",
-                    description: "Company name (for sponsors)",
-                  },
-                },
-              },
-              createdAt: {
-                type: "string",
-                format: "date-time",
-                description: "Conversation creation timestamp",
-              },
-              updatedAt: {
-                type: "string",
-                format: "date-time",
-                description: "Last update timestamp",
-              },
-            },
-          },
-        },
-        pagination: {
-          type: "object",
-          description: "Pagination information",
-          properties: {
-            currentPage: { type: "number", description: "Current page number" },
-            totalPages: {
-              type: "number",
-              description: "Total number of pages",
-            },
-            totalItems: {
-              type: "number",
-              description: "Total number of conversations",
-            },
-            itemsPerPage: {
-              type: "number",
-              description: "Number of items per page",
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetUserConversations()
   async getUserConversationsWithPreviews(
     @Query(new ZodValidationPipe(GetUserConversationsDto))
     query: GetUserConversationsQuery,
@@ -243,115 +85,7 @@ export class ConversationsController {
 
   @Post("get-or-create")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Get or create conversation between participants",
-    description:
-      "Finds an existing conversation between the authenticated user and target user, or creates a new one if none exists. Supports optional context for job offers or other conversation types.",
-  })
-  @ApiBody({
-    description: "Conversation participants and optional context",
-    schema: {
-      type: "object",
-      properties: {
-        targetUserId: {
-          type: "string",
-          description: "MongoDB ObjectId of the target user",
-          example: "64f1b2c3d4e5f6g7h8i9j0k1",
-        },
-        targetUserType: {
-          type: "string",
-          enum: ["rider", "sponsor"],
-          description: "Type of the target user",
-        },
-        context: {
-          type: "object",
-          description: "Optional conversation context",
-          properties: {
-            type: {
-              type: "string",
-              enum: ["job-offer", "private"],
-              description: "Type of conversation context",
-            },
-            referenceId: {
-              type: "string",
-              description:
-                "Reference ID (e.g., offer ID for job-offer context)",
-            },
-          },
-        },
-      },
-      required: ["targetUserId", "targetUserType"],
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Conversation found or created successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Conversation ID" },
-        participants: {
-          type: "array",
-          description: "Array of conversation participants",
-          items: {
-            type: "object",
-            properties: {
-              userId: {
-                type: "string",
-                description: "User MongoDB ObjectId",
-              },
-              userType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "Type of user",
-              },
-            },
-          },
-        },
-        context: {
-          type: "object",
-          nullable: true,
-          description: "Optional conversation context",
-          properties: {
-            type: {
-              type: "string",
-              enum: ["job-offer", "private"],
-              description: "Type of conversation context",
-            },
-            referenceId: {
-              type: "string",
-              description:
-                "Reference ID (e.g., offer ID for job-offer context)",
-            },
-          },
-        },
-        status: {
-          type: "string",
-          enum: ["active", "inactive", "deleted"],
-          description: "Conversation status",
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Conversation creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Bad request - Invalid input data",
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerCreateConversation()
   async getOrCreateConversation(
     @Body(new ZodValidationPipe(GetOrCreateConversationDto))
     body: GetOrCreateConversationInput,
@@ -394,90 +128,7 @@ export class ConversationsController {
   }
 
   @Get(":id")
-  @ApiOperation({
-    summary: "Get conversation by ID",
-    description:
-      "Retrieves a specific conversation by its ID. Only returns conversations where the authenticated user is a participant and the conversation is active.",
-  })
-  @ApiParam({
-    name: "id",
-    description: "Conversation MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Conversation retrieved successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Conversation ID" },
-        participants: {
-          type: "array",
-          description: "Array of conversation participants",
-          items: {
-            type: "object",
-            properties: {
-              userId: {
-                type: "string",
-                description: "User MongoDB ObjectId",
-              },
-              userType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "Type of user",
-              },
-            },
-          },
-        },
-        context: {
-          type: "object",
-          nullable: true,
-          description: "Optional conversation context",
-          properties: {
-            type: {
-              type: "string",
-              enum: ["job-offer", "private"],
-              description: "Type of conversation context",
-            },
-            referenceId: {
-              type: "string",
-              description:
-                "Reference ID (e.g., offer ID for job-offer context)",
-            },
-          },
-        },
-        status: {
-          type: "string",
-          enum: ["active", "inactive", "deleted"],
-          description: "Conversation status",
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Conversation creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in this conversation",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Conversation not found or deleted",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerGetConversationById()
   async getConversationById(
     @Param(new ZodValidationPipe(ConversationParamsDto))
     params: ConversationParams,
@@ -535,78 +186,7 @@ export class ConversationsController {
 
   @Delete(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Soft delete conversation",
-    description:
-      "Marks a conversation as deleted (soft delete). Only participants can delete conversations. The conversation remains in the database but is marked with deleted status.",
-  })
-  @ApiParam({
-    name: "id",
-    description: "Conversation MongoDB ObjectId",
-    example: "64f1b2c3d4e5f6g7h8i9j0k1",
-    type: "string",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Conversation deleted successfully",
-    schema: {
-      type: "object",
-      properties: {
-        _id: { type: "string", description: "Conversation ID" },
-        participants: {
-          type: "array",
-          description: "Array of conversation participants",
-          items: {
-            type: "object",
-            properties: {
-              userId: {
-                type: "string",
-                description: "User MongoDB ObjectId",
-              },
-              userType: {
-                type: "string",
-                enum: ["rider", "sponsor"],
-                description: "Type of user",
-              },
-            },
-          },
-        },
-        context: {
-          type: "object",
-          nullable: true,
-          description: "Optional conversation context",
-        },
-        status: {
-          type: "string",
-          enum: ["deleted"],
-          description: "Conversation status (will be 'deleted')",
-        },
-        createdAt: {
-          type: "string",
-          format: "date-time",
-          description: "Conversation creation timestamp",
-        },
-        updatedAt: {
-          type: "string",
-          format: "date-time",
-          description: "Last update timestamp",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized - Invalid or missing authentication token",
-  })
-  @ApiResponse({
-    status: 403,
-    description: "Forbidden - User is not a participant in this conversation",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Conversation not found or already deleted",
-  })
-  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiSwaggerDeleteConversation()
   async deleteConversation(
     @Param(new ZodValidationPipe(ConversationParamsDto))
     params: ConversationParams,
