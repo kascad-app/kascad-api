@@ -4,6 +4,8 @@ import {
   ProfileType,
 } from "@kascad-app/shared-types";
 
+import { MessageStatus } from "../schemas/messages.schema";
+
 import { PipelineStage, Types } from "mongoose";
 
 export interface GetUserConversationsParams {
@@ -128,7 +130,12 @@ export function getUserConversationsPipeline(
         pipeline: [
           {
             $match: {
-              $expr: { $eq: ["$conversationId", "$$conversationId"] },
+              $expr: {
+                $and: [
+                  { $eq: ["$conversationId", "$$conversationId"] },
+                  { $ne: ["$status", MessageStatus.DELETED] },
+                ],
+              },
             },
           },
           {

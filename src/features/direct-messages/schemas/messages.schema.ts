@@ -11,6 +11,14 @@ export enum MessageType {
   FILE = "file",
 }
 
+export enum MessageStatus {
+  PENDING = "pending",
+  SENT = "sent",
+  DELIVERED = "delivered",
+  READ = "read",
+  DELETED = "deleted",
+}
+
 export interface IMessage {
   _id: string;
   conversationId: Types.ObjectId;
@@ -18,6 +26,7 @@ export interface IMessage {
   senderType: ProfileType;
   content: string;
   messageType: MessageType;
+  status: MessageStatus;
   readBy: Array<{
     userId: Types.ObjectId;
     userType: ProfileType;
@@ -91,6 +100,13 @@ export class Message implements IMessage {
     default: MessageType.TEXT,
   })
   messageType: MessageType;
+
+  @Prop({
+    type: String,
+    enum: Object.values(MessageStatus),
+    default: MessageStatus.SENT,
+  })
+  status: MessageStatus;
 
   @Prop({
     type: [ReadStatus],

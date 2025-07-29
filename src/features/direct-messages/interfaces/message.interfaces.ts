@@ -77,6 +77,16 @@ export interface MessageWithSender {
     fullName?: string;
     companyName?: string;
   };
+  offer?: {
+    _id: Types.ObjectId;
+    title: string;
+    description?: string;
+    imageUrl?: string;
+    sponsor: {
+      companyName: string;
+      avatarUrl?: string;
+    };
+  };
 }
 
 export interface GetMessagesServiceQuery {

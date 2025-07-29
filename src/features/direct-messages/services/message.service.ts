@@ -24,7 +24,11 @@ import {
   Conversation,
   ConversationDocument,
 } from "../schemas/conversation.schema";
-import { Message, MessageDocument } from "../schemas/messages.schema";
+import {
+  Message,
+  MessageDocument,
+  MessageStatus,
+} from "../schemas/messages.schema";
 
 import { Model, Types } from "mongoose";
 
@@ -258,7 +262,7 @@ export class MessageService {
       const deletedMessage = await this.messageModel
         .findByIdAndUpdate(
           messageId,
-          { content: "[Message deleted]", updatedAt: new Date() },
+          { status: MessageStatus.DELETED, updatedAt: new Date() },
           { new: true },
         )
         .lean()

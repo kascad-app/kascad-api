@@ -1,5 +1,7 @@
 import { Participant } from "@kascad-app/shared-types";
 
+import { MessageStatus } from "../schemas/messages.schema";
+
 import { PipelineStage } from "mongoose";
 
 export interface GetUnreadMessagesParams {
@@ -34,6 +36,7 @@ export function getUnreadMessagesPipeline(
                 $and: [
                   { $eq: ["$conversationId", "$$conversationId"] },
                   { $ne: ["$senderId", participant.userId] },
+                  { $ne: ["$status", MessageStatus.DELETED] },
                   {
                     $not: {
                       $in: [
@@ -115,6 +118,7 @@ export function getUnreadCountPipeline(
                 $and: [
                   { $eq: ["$conversationId", "$$conversationId"] },
                   { $ne: ["$senderId", participant.userId] },
+                  { $ne: ["$status", MessageStatus.DELETED] },
                   {
                     $not: {
                       $in: [
