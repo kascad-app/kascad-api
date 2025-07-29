@@ -16,6 +16,14 @@ import {
   UnreadCountByConversation,
 } from "../interfaces/message.interfaces";
 import { getMessagesByConversationPipeline } from "../pipelines/get-messages-by-conversation.pipeline";
+import {
+  getUnreadCountPipeline,
+  getUnreadMessagesPipeline,
+} from "../pipelines/get-unread-messages.pipeline";
+import {
+  Conversation,
+  ConversationDocument,
+} from "../schemas/conversation.schema";
 import { Message, MessageDocument } from "../schemas/messages.schema";
 
 import { Model, Types } from "mongoose";
@@ -25,6 +33,8 @@ export class MessageService {
   constructor(
     @InjectModel(Message.name)
     private readonly messageModel: Model<MessageDocument>,
+    @InjectModel(Conversation.name)
+    private readonly conversationModel: Model<ConversationDocument>,
     private readonly logger: Logger,
   ) {}
 
@@ -193,15 +203,12 @@ export class MessageService {
     try {
       this.logger.debug(`Getting unread count for user: ${participant.userId}`);
 
-      const count = await this.messageModel
-        .countDocuments({
-          senderId: { $ne: participant.userId },
-          "readBy.userId": { $ne: participant.userId },
-        })
-        .exec();
+      const pipeline = getUnreadCountPipeline({ participant });
+      const result = await this.conversationModel.aggregate(pipeline).exec();
 
-      this.logger.debug(`Unread count: ${count}`);
-      return count;
+      const totalCount = result[0]?.totalUnreadCount || 0;
+      this.logger.debug(`Unread count: ${totalCount}`);
+      return totalCount;
     } catch (error) {
       this.logger.error("Error getting unread count:", error);
       throw new InternalServerErrorException("Failed to get unread count");
@@ -216,35 +223,31 @@ export class MessageService {
         `Getting unread count by conversation for user: ${participant.userId}`,
       );
 
-      const pipeline = [
-        {
-          $match: {
-            senderId: { $ne: participant.userId },
-            "readBy.userId": { $ne: participant.userId },
-          },
-        },
-        {
-          $group: {
-            _id: "$conversationId",
-            unreadCount: { $sum: 1 },
-          },
-        },
-        {
-          $project: {
-            conversationId: "$_id",
-            unreadCount: 1,
-            _id: 0,
-          },
-        },
-      ];
+      const pipeline = getUnreadCountPipeline({ participant });
+      const result = await this.conversationModel.aggregate(pipeline).exec();
 
-      const result = await this.messageModel.aggregate(pipeline).exec();
-      return result;
+      return result[0]?.conversationsWithUnread || [];
     } catch (error) {
       this.logger.error("Error getting unread count by conversation:", error);
       throw new InternalServerErrorException(
         "Failed to get unread count by conversation",
       );
+    }
+  }
+
+  async getUnreadMessages(participant: Participant) {
+    try {
+      this.logger.debug(
+        `Getting unread messages for user: ${participant.userId}`,
+      );
+
+      const pipeline = getUnreadMessagesPipeline({ participant });
+      const result = await this.conversationModel.aggregate(pipeline).exec();
+
+      return result;
+    } catch (error) {
+      this.logger.error("Error getting unread messages:", error);
+      throw new InternalServerErrorException("Failed to get unread messages");
     }
   }
 
