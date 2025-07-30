@@ -18,6 +18,7 @@ import {
 
 import { registerSponsorDto, Sponsor } from "@kascad-app/shared-types";
 
+import { UpdateSponsorDto } from "../interfaces/update-sponsor.dto";
 import { SponsorsService } from "../services/sponsors.service";
 
 import { Logged } from "src/common/decorators/logged.decorator";
@@ -98,7 +99,7 @@ export class SponsorsController {
   @ApiResponse({ status: 500, description: "Internal server error" })
   async update(
     @Param("id") id: string,
-    @Body() updateSponsorDto: registerSponsorDto,
+    @Body() updateSponsorDto: UpdateSponsorDto,
   ): Promise<Sponsor> {
     return await this._sponsorsService.update(id, updateSponsorDto);
   }
