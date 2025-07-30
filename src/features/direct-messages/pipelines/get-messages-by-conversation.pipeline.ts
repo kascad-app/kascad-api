@@ -66,7 +66,6 @@ export function getMessagesByConversationPipeline(
               _id: 1,
               firstName: "$identity.firstName",
               lastName: "$identity.lastName",
-              logo: "$identity.logo",
               avatarUrl: 1,
               type: 1,
             },
@@ -96,7 +95,7 @@ export function getMessagesByConversationPipeline(
           {
             $project: {
               _id: 1,
-              logo: "$identity.logo",
+              avatarUrl: 1,
               companyName: "$identity.companyName",
               type: 1,
             },
