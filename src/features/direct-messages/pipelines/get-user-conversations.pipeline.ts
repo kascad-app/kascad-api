@@ -74,11 +74,10 @@ export function getUserConversationsPipeline(
           {
             $project: {
               _id: 1,
-              displayName: 1,
               avatarUrl: 1,
-              "identity.firstName": 1,
-              "identity.lastName": 1,
-              "identity.fullName": 1,
+              firstName: "$identity.firstName",
+              lastName: "$identity.lastName",
+              fullName: "$identity.fullName",
               type: 1,
             },
           },
@@ -100,9 +99,8 @@ export function getUserConversationsPipeline(
           {
             $project: {
               _id: 1,
-              displayName: 1,
               avatarUrl: 1,
-              companyName: 1,
+              companyName: "$identity.companyName",
               type: 1,
             },
           },
@@ -170,11 +168,10 @@ export function getUserConversationsPipeline(
         otherParticipant: {
           userId: "$otherParticipant.userId",
           userType: "$otherParticipant.userType",
-          displayName: "$otherParticipantInfo.displayName",
           avatarUrl: "$otherParticipantInfo.avatarUrl",
-          firstName: "$otherParticipantInfo.identity.firstName",
-          lastName: "$otherParticipantInfo.identity.lastName",
-          fullName: "$otherParticipantInfo.identity.fullName",
+          firstName: "$otherParticipantInfo.firstName",
+          lastName: "$otherParticipantInfo.lastName",
+          fullName: "$otherParticipantInfo.fullName",
           companyName: "$otherParticipantInfo.companyName",
         },
         lastMessage: {
