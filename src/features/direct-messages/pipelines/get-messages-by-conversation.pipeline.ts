@@ -67,6 +67,7 @@ export function getMessagesByConversationPipeline(
               firstName: "$identity.firstName",
               lastName: "$identity.lastName",
               logo: "$identity.logo",
+              avatarUrl: 1,
               type: 1,
             },
           },
