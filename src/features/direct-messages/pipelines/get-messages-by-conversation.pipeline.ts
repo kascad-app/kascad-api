@@ -1,10 +1,15 @@
-import { ConversationType, ProfileType } from "@kascad-app/shared-types";
+import {
+  ConversationType,
+  Participant,
+  ProfileType,
+} from "@kascad-app/shared-types";
 
 import { MessageStatus } from "../schemas/messages.schema";
 
 import { PipelineStage, Types } from "mongoose";
 
 export interface GetMessagesByConversationParams {
+  participant: Participant;
   conversationId: Types.ObjectId;
   page: number;
   limit: number;
@@ -13,49 +18,109 @@ export interface GetMessagesByConversationParams {
 export function getMessagesByConversationPipeline(
   params: GetMessagesByConversationParams,
 ): PipelineStage[] {
-  const { conversationId, page, limit } = params;
+  const { conversationId, participant, page, limit } = params;
   const skip = (page - 1) * limit;
 
   return [
     {
       $match: {
-        conversationId: conversationId,
-        status: { $ne: MessageStatus.DELETED },
+        _id: conversationId,
+        participants: { $in: [participant] },
       },
     },
-
+    {
+      $addFields: {
+        otherParticipant: {
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: "$participants",
+                cond: { $ne: ["$$this.userId", participant.userId] },
+              },
+            },
+            0,
+          ],
+        },
+      },
+    },
     {
       $lookup: {
-        from: "conversations",
-        let: { conversationId: "$conversationId" },
+        from: "riders",
+        let: {
+          participantId: "$otherParticipant.userId",
+          participantType: "$otherParticipant.userType",
+        },
         pipeline: [
           {
             $match: {
-              $expr: { $eq: ["$_id", "$$conversationId"] },
+              $expr: {
+                $and: [
+                  { $eq: ["$_id", "$$participantId"] },
+                  { $eq: ["$type", ProfileType.RIDER] },
+                ],
+              },
             },
           },
           {
             $project: {
-              context: 1,
+              _id: 1,
+              firstName: "$identity.firstName",
+              lastName: "$identity.lastName",
+              logo: "$identity.logo",
+              type: 1,
             },
           },
         ],
-        as: "conversationData",
+        as: "riderParticipant",
       },
     },
-
+    {
+      $lookup: {
+        from: "sponsors",
+        let: {
+          participantId: "$otherParticipant.userId",
+          participantType: "$otherParticipant.userType",
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$_id", "$$participantId"] },
+                  { $eq: ["$type", ProfileType.SPONSOR] },
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              logo: "$identity.logo",
+              companyName: "$identity.companyName",
+              type: 1,
+            },
+          },
+        ],
+        as: "sponsorParticipant",
+      },
+    },
     {
       $addFields: {
-        conversationContext: { $arrayElemAt: ["$conversationData", 0] },
+        participantInfo: {
+          $cond: {
+            if: { $eq: ["$otherParticipant.userType", ProfileType.RIDER] },
+            then: { $arrayElemAt: ["$riderParticipant", 0] },
+            else: { $arrayElemAt: ["$sponsorParticipant", 0] },
+          },
+        },
       },
     },
-
     {
       $lookup: {
         from: "offers",
         let: {
-          referenceId: "$conversationContext.context.referenceId",
-          contextType: "$conversationContext.context.type",
+          referenceId: "$context.referenceId",
+          contextType: "$context.type",
         },
         pipeline: [
           {
@@ -69,175 +134,84 @@ export function getMessagesByConversationPipeline(
             },
           },
           {
-            $lookup: {
-              from: "sponsors",
-              localField: "createdBy",
-              foreignField: "_id",
-              as: "sponsorInfo",
-            },
-          },
-          {
             $project: {
               _id: 1,
               title: 1,
               description: 1,
-              "images.url": 1,
-              sponsorInfo: {
-                $arrayElemAt: [
-                  {
-                    $map: {
-                      input: "$sponsorInfo",
-                      as: "sponsor",
-                      in: {
-                        companyName: "$$sponsor.companyName",
-                        avatarUrl: "$$sponsor.avatarUrl",
-                      },
-                    },
-                  },
-                  0,
-                ],
-              },
             },
           },
         ],
         as: "offerData",
       },
     },
-
     {
       $addFields: {
         offerInfo: { $arrayElemAt: ["$offerData", 0] },
       },
     },
-
     {
       $lookup: {
-        from: "riders",
-        let: { senderId: "$senderId", senderType: "$senderType" },
+        from: "messages",
+        let: { conversationId: "$_id" },
         pipeline: [
           {
             $match: {
               $expr: {
                 $and: [
-                  { $eq: ["$_id", "$$senderId"] },
-                  { $eq: ["$$senderType", ProfileType.RIDER] },
+                  { $eq: ["$conversationId", "$$conversationId"] },
+                  { $ne: ["$status", MessageStatus.DELETED] },
                 ],
               },
             },
           },
           {
-            $project: {
-              _id: 1,
-              displayName: 1,
-              avatarUrl: 1,
-              "identity.firstName": 1,
-              "identity.lastName": 1,
-              "identity.fullName": 1,
-              type: 1,
+            $sort: {
+              createdAt: -1,
             },
           },
         ],
-        as: "riderData",
+        as: "allMessages",
       },
     },
-
-    {
-      $lookup: {
-        from: "sponsors",
-        let: { senderId: "$senderId", senderType: "$senderType" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$_id", "$$senderId"] },
-                  { $eq: ["$$senderType", ProfileType.SPONSOR] },
-                ],
-              },
-            },
-          },
-          {
-            $project: {
-              _id: 1,
-              displayName: 1,
-              avatarUrl: 1,
-              companyName: 1,
-              type: 1,
-            },
-          },
-        ],
-        as: "sponsorData",
-      },
-    },
-
     {
       $addFields: {
-        senderInfo: {
-          $cond: {
-            if: { $eq: ["$senderType", ProfileType.RIDER] },
-            then: { $arrayElemAt: ["$riderData", 0] },
-            else: { $arrayElemAt: ["$sponsorData", 0] },
-          },
-        },
-      },
-    },
-
-    {
-      $project: {
-        _id: 1,
-        conversationId: 1,
-        senderId: 1,
-        senderType: 1,
-        content: 1,
-        messageType: 1,
-        readBy: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        sender: {
-          userId: "$senderId",
-          userType: "$senderType",
-          displayName: "$senderInfo.displayName",
-          avatarUrl: "$senderInfo.avatarUrl",
-          firstName: "$senderInfo.identity.firstName",
-          lastName: "$senderInfo.identity.lastName",
-          fullName: "$senderInfo.identity.fullName",
-          companyName: "$senderInfo.companyName",
-        },
-        offer: {
-          $cond: {
-            if: { $ne: ["$offerInfo", null] },
-            then: {
-              _id: "$offerInfo._id",
-              title: "$offerInfo.title",
-              description: "$offerInfo.description",
-              imageUrl: { $arrayElemAt: ["$offerInfo.images.url", 0] },
-              sponsor: "$offerInfo.sponsorInfo",
+        messages: {
+          $map: {
+            input: { $slice: ["$allMessages", skip, limit] },
+            as: "message",
+            in: {
+              $mergeObjects: [
+                "$$message",
+                {
+                  offer: {
+                    $cond: {
+                      if: { $ne: ["$offerInfo", null] },
+                      then: {
+                        _id: "$offerInfo._id",
+                        title: "$offerInfo.title",
+                        description: "$offerInfo.description",
+                        imageUrl: {
+                          $arrayElemAt: ["$offerInfo.images.url", 0],
+                        },
+                        sponsor: "$offerInfo.sponsorInfo",
+                      },
+                      else: null,
+                    },
+                  },
+                },
+              ],
             },
-            else: null,
           },
         },
+        total: { $size: "$allMessages" },
       },
     },
-
-    {
-      $sort: {
-        createdAt: -1,
-      },
-    },
-
-    {
-      $facet: {
-        messages: [{ $skip: skip }, { $limit: limit }],
-        totalCount: [{ $count: "count" }],
-      },
-    },
-
     {
       $project: {
+        participantInfo: 1,
+        offerInfo: 1,
         messages: 1,
-        total: {
-          $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0],
-        },
+        total: 1,
       },
     },
   ];

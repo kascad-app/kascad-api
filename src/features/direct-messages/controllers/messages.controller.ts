@@ -147,6 +147,10 @@ export class MessagesController {
 
       const result = await this.messageService.getByConversationId({
         conversationId,
+        participant: {
+          userId: user._id,
+          userType: user.type as ProfileType,
+        },
         page: query.page,
         limit: query.limit,
       });

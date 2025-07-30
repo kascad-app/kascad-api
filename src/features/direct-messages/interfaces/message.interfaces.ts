@@ -1,4 +1,8 @@
-import { PaginationType, ProfileType } from "@kascad-app/shared-types";
+import {
+  PaginationType,
+  Participant,
+  ProfileType,
+} from "@kascad-app/shared-types";
 
 import { MessageType } from "../schemas/messages.schema";
 
@@ -91,11 +95,25 @@ export interface MessageWithSender {
 
 export interface GetMessagesServiceQuery {
   conversationId: Types.ObjectId;
+  participant: Participant;
   page: number;
   limit: number;
 }
 
+export interface RiderInfo {
+  _id: Types.ObjectId;
+  displayName: string;
+  avatarUrl: string;
+}
+
+export interface SponsorInfo {
+  _id: Types.ObjectId;
+  companyName: string;
+  logo: string;
+}
+
 export interface GetMessagesResponse {
+  participantInfo: RiderInfo | SponsorInfo;
   messages: MessageWithSender[];
   pagination: PaginationType;
 }

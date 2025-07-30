@@ -83,18 +83,28 @@ export class MessageService {
         `Getting messages for conversation: ${query.conversationId}`,
       );
 
-      const { conversationId, page, limit } = query;
+      const { conversationId, participant, page, limit } = query;
 
       const pipeline = getMessagesByConversationPipeline({
+        participant: {
+          userId: participant.userId,
+          userType: participant.userType,
+        },
         conversationId,
         page,
         limit,
       });
 
-      const result = await this.messageModel.aggregate(pipeline).exec();
-      const { messages, total } = result[0] || { messages: [], total: 0 };
+      const result = await this.conversationModel.aggregate(pipeline).exec();
+      console.log(result);
+      const { participantInfo, messages, total } = result[0] || {
+        participantInfo: null,
+        messages: [],
+        total: 0,
+      };
 
       return {
+        participantInfo,
         messages,
         pagination: {
           currentPage: page,
