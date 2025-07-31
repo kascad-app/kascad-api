@@ -1,4 +1,4 @@
-import { OfferStatus } from "@kascad-app/shared-types";
+import { ConversationType, OfferStatus } from "@kascad-app/shared-types";
 
 import { GetOffersQueryDto } from "../interfaces/offer.interfaces";
 
@@ -11,7 +11,7 @@ export function getAllOffersPipeline(
   const { page, limit, status, sport, contractType } = query;
   const skip = (page - 1) * limit;
 
-  const matchStage: Record<string, any> = {
+  const matchStage: Record<string, unknown> = {
     status: { $ne: OfferStatus.DELETED },
   };
 
@@ -60,6 +60,63 @@ export function getAllOffersPipeline(
         path: "$sponsor",
         preserveNullAndEmptyArrays: true,
       },
+    },
+    {
+      $lookup: {
+        from: "conversations",
+        let: {
+          offerId: { $toString: "$_id" },
+          ...(riderId && { currentRiderId: riderId }),
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$context.referenceId", "$$offerId"] },
+                  { $eq: ["$context.type", ConversationType.JOB_OFFER] },
+                  ...(riderId
+                    ? [
+                        {
+                          $in: [
+                            riderId,
+                            {
+                              $map: {
+                                input: "$participants",
+                                as: "participant",
+                                in: { $toString: "$$participant.userId" },
+                              },
+                            },
+                          ],
+                        },
+                      ]
+                    : []),
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+            },
+          },
+        ],
+        as: "conversation",
+      },
+    },
+    {
+      $addFields: {
+        conversationId: {
+          $cond: {
+            if: { $gt: [{ $size: "$conversation" }, 0] },
+            then: { $arrayElemAt: ["$conversation._id", 0] },
+            else: null,
+          },
+        },
+      },
+    },
+    {
+      $unset: "conversation",
     },
     ...(riderId
       ? [

@@ -3,6 +3,7 @@ import { RouterModule } from "@nestjs/core";
 
 import { ArticlesModule } from "./articles/articles.module";
 import { AuthModule } from "./auth/auth.module";
+import { DirectMessagesModule } from "./direct-messages/direct-messages.module";
 import { MailModule } from "./mails/mails.module";
 import { OffersModule } from "./offers/offers.module";
 import { RidersModule } from "./riders/riders.module";
@@ -18,6 +19,7 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     SearchModule,
     MailModule,
     OffersModule,
+    DirectMessagesModule,
     RouterModule.register([
       {
         path: "riders",
@@ -39,6 +41,10 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
         path: "offers",
         module: OffersModule,
       },
+      {
+        path: "dm",
+        module: DirectMessagesModule,
+      },
     ]),
   ],
   controllers: [],
@@ -48,6 +54,7 @@ import { SponsorsModule } from "./sponsors/sponsors.module";
     AuthModule,
     ArticlesModule,
     SearchModule,
+    DirectMessagesModule,
   ],
 })
 export class FeaturesModule {}

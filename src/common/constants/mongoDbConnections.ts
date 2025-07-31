@@ -7,6 +7,8 @@ enum MongoDBConnection {
   CUSTOM_RIDERS = "custom-riders",
   SAVED_SEARCHES = "saved-searches",
   SPONSOR_MESSAGES = "sponsor-messages",
+  CONVERSATIONS = "conversations",
+  MESSAGES = "messages",
 }
 
 export default MongoDBConnection;
