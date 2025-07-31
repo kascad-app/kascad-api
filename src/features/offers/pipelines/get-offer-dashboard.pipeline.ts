@@ -1,3 +1,5 @@
+import { OfferStatus } from "@kascad-app/shared-types";
+
 import mongoose, { PipelineStage } from "mongoose";
 
 export const getOfferDashboardPipeline = (
@@ -9,7 +11,7 @@ export const getOfferDashboardPipeline = (
     {
       $match: {
         sponsorId: new (mongoose as any).Types.ObjectId(sponsorId),
-        status: { $ne: "DELETED" },
+        status: { $ne: OfferStatus.DELETED },
       },
     },
     {

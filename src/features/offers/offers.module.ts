@@ -11,9 +11,11 @@ import { CustomRiderService } from "./services/custom-rider.service";
 import { OfferService } from "./services/offers.service";
 
 import MongoDBConnection from "src/common/constants/mongoDbConnections";
+import { DirectMessagesModule } from "src/features/direct-messages/direct-messages.module";
 
 @Module({
   imports: [
+    DirectMessagesModule,
     MongooseModule.forFeature([
       {
         name: Offer.name,

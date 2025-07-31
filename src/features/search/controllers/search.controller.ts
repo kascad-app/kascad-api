@@ -7,12 +7,12 @@ import {
   Query,
 } from "@nestjs/common";
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiOperation,
   ApiQuery,
+  ApiResponse,
+  ApiTags,
 } from "@nestjs/swagger";
 
 import { RiderSearchFilters } from "../aggregates/get-search-pipeline";
@@ -24,7 +24,7 @@ import {
 
 import { Logged } from "src/common/decorators/logged.decorator";
 
-@ApiTags('Search')
+@ApiTags("Search")
 @ApiBearerAuth()
 @Controller("search")
 @Logged()
@@ -32,12 +32,21 @@ export class SearchController {
   constructor(private readonly _searchService: SearchService) {}
 
   @Post("riders")
-  @ApiOperation({ summary: 'Advanced rider search', description: 'Performs advanced search for riders with detailed filters' })
-  @ApiBody({ description: 'Advanced search filters' })
-  @ApiResponse({ status: 200, description: 'Search results retrieved successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid search parameters' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Advanced rider search",
+    description: "Performs advanced search for riders with detailed filters",
+  })
+  @ApiBody({ description: "Advanced search filters" })
+  @ApiResponse({
+    status: 200,
+    description: "Search results retrieved successfully",
+  })
+  @ApiResponse({ status: 400, description: "Invalid search parameters" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing token",
+  })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async searchRiders(@Body() body: unknown) {
     const validation = validateAdvancedSearch(body);
 
@@ -56,16 +65,50 @@ export class SearchController {
   }
 
   @Get("riders/quick")
-  @ApiOperation({ summary: 'Quick rider search', description: 'Performs quick search for riders with basic filters' })
-  @ApiQuery({ name: 'q', required: false, type: String, description: 'Search query' })
-  @ApiQuery({ name: 'sport', required: false, type: String, description: 'Sport filter' })
-  @ApiQuery({ name: 'location', required: false, type: String, description: 'Location filter' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
-  @ApiResponse({ status: 200, description: 'Quick search results retrieved successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid search parameters' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Quick rider search",
+    description: "Performs quick search for riders with basic filters",
+  })
+  @ApiQuery({
+    name: "q",
+    required: false,
+    type: String,
+    description: "Search query",
+  })
+  @ApiQuery({
+    name: "sport",
+    required: false,
+    type: String,
+    description: "Sport filter",
+  })
+  @ApiQuery({
+    name: "location",
+    required: false,
+    type: String,
+    description: "Location filter",
+  })
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Page number",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items per page",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Quick search results retrieved successfully",
+  })
+  @ApiResponse({ status: 400, description: "Invalid search parameters" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing token",
+  })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async quickSearchRiders(@Query() query: unknown) {
     const validation = validateQuickSearch(query);
 
@@ -84,15 +127,44 @@ export class SearchController {
   }
 
   @Get("riders/count")
-  @ApiOperation({ summary: 'Get rider search count', description: 'Returns the total count of riders matching search criteria' })
-  @ApiQuery({ name: 'sport', required: false, type: String, description: 'Sport filter' })
-  @ApiQuery({ name: 'location', required: false, type: String, description: 'Location filter' })
-  @ApiQuery({ name: 'ageMin', required: false, type: Number, description: 'Minimum age' })
-  @ApiQuery({ name: 'ageMax', required: false, type: Number, description: 'Maximum age' })
-  @ApiResponse({ status: 200, description: 'Search count retrieved successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid search parameters' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({
+    summary: "Get rider search count",
+    description: "Returns the total count of riders matching search criteria",
+  })
+  @ApiQuery({
+    name: "sport",
+    required: false,
+    type: String,
+    description: "Sport filter",
+  })
+  @ApiQuery({
+    name: "location",
+    required: false,
+    type: String,
+    description: "Location filter",
+  })
+  @ApiQuery({
+    name: "ageMin",
+    required: false,
+    type: Number,
+    description: "Minimum age",
+  })
+  @ApiQuery({
+    name: "ageMax",
+    required: false,
+    type: Number,
+    description: "Maximum age",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Search count retrieved successfully",
+  })
+  @ApiResponse({ status: 400, description: "Invalid search parameters" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing token",
+  })
+  @ApiResponse({ status: 500, description: "Internal server error" })
   async getRiderSearchCount(@Query() query: Record<string, any>) {
     const queryWithDefaults = {
       ...query,

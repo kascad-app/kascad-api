@@ -27,8 +27,8 @@ importers:
         specifier: ^7.16.0
         version: 7.16.0
       '@kascad-app/shared-types':
-        specifier: ^1.5.6
-        version: 1.5.7
+        specifier: ^1.5.9
+        version: 1.5.9
       '@nestjs/common':
         specifier: ^11.1.5
         version: 11.1.5(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -706,8 +706,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@kascad-app/shared-types@1.5.7':
-    resolution: {integrity: sha512-XnJtS/Z1sK646b4jrURNSZQktrgc1ps8wUuxmpNJqJVuF8vGggBiU14gjQ5SHhLAN5/zc1xZzXs2c2UtmMIjQA==, tarball: https://npm.pkg.github.com/download/@kascad-app/shared-types/1.5.7/1c4d284fdb41eb8ddffd7d50c8d41f7b238cf572}
+  '@kascad-app/shared-types@1.5.9':
+    resolution: {integrity: sha512-/LIICgpg6qkBSRn9iSdrPl7Cvk6sZMT1vM5HDSbQeidgVTNHlqsK9f8YGXKZkYeehkojXtghW7IpjBXRSNbdpA==, tarball: https://npm.pkg.github.com/download/@kascad-app/shared-types/1.5.9/913f7fcc368cd349f35625ea8af2fdd2faa2db08}
 
   '@lukeed/csprng@1.1.0':
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
@@ -4364,7 +4364,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@kascad-app/shared-types@1.5.7': {}
+  '@kascad-app/shared-types@1.5.9': {}
 
   '@lukeed/csprng@1.1.0': {}
 

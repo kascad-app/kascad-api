@@ -7,6 +7,7 @@ import {
   Sponsor,
 } from "@kascad-app/shared-types";
 
+import { UpdateSponsorDto } from "../interfaces/update-sponsor.dto";
 import { SponsorDocument } from "../schemas/sponsor.schema";
 
 import { Model } from "mongoose";
@@ -75,18 +76,27 @@ export class SponsorsService {
 
   async update(
     id: string,
-    updateSponsorDto: registerSponsorDto,
+    updateSponsorDto: UpdateSponsorDto,
   ): Promise<Sponsor> {
     const newSponsor = new this._sponsorModel(updateSponsorDto);
 
     newSponsor.identity = {
       companyName: updateSponsorDto.companyName,
-      website: "",
-      logo: "",
+      website: updateSponsorDto.website,
+      logo: updateSponsorDto.logo,
     };
 
     return await this._sponsorModel
-      .findByIdAndUpdate(id, updateSponsorDto, { new: true })
+      .findByIdAndUpdate(
+        id,
+        {
+          ...updateSponsorDto,
+          logo: newSponsor.avatarUrl,
+          displayName: newSponsor.displayName,
+          description: newSponsor.description,
+        },
+        { new: true },
+      )
       .exec();
   }
 
