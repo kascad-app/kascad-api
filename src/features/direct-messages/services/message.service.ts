@@ -96,7 +96,7 @@ export class MessageService {
       });
 
       const result = await this.conversationModel.aggregate(pipeline).exec();
-      console.log(result);
+      this.logger.debug(`Aggregation pipeline result: ${JSON.stringify(result)}`);
       const { participantInfo, messages, total } = result[0] || {
         participantInfo: null,
         messages: [],
